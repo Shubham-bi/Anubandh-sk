@@ -36,6 +36,8 @@ import { CandidateFormModal } from './components/CandidateFormModal';
 import { KanbanBoard } from './components/KanbanBoard';
 import { AnalyticsDashboard } from './components/AnalyticsDashboard';
 import { FamilyShareModal } from './components/FamilyShareModal';
+import { InstallPwaModal } from './components/InstallPwaModal';
+import { InstallFloatingBanner } from './components/InstallFloatingBanner';
 import { Toast, ToastMessage } from './components/Toast';
 import { ChevronLeft, ChevronRight, Inbox } from 'lucide-react';
 
@@ -55,6 +57,42 @@ export const App: React.FC = () => {
   // Family Share & Dossier State
   const [isFamilyShareOpen, setIsFamilyShareOpen] = useState(false);
   const [familyShareCandidate, setFamilyShareCandidate] = useState<BookletCandidate | Profile | null>(null);
+
+  // PWA Install State & Handlers
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(false);
+
+  useEffect(() => {
+    const isStandaloneMode =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as any).standalone === true;
+    setIsStandalone(isStandaloneMode);
+
+    const handleBeforeInstall = (e: any) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener('beforeinstallprompt', handleBeforeInstall);
+    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      try {
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          setIsStandalone(true);
+        }
+      } catch {
+        // Fallback
+      }
+      setDeferredPrompt(null);
+    } else {
+      setIsInstallModalOpen(true);
+    }
+  };
 
   // Portal Filter State
   const [portalFilters, setPortalFilters] = useState<FilterState>({
@@ -494,6 +532,8 @@ export const App: React.FC = () => {
           setFamilyShareCandidate(null);
           setIsFamilyShareOpen(true);
         }}
+        onOpenInstall={handleInstallClick}
+        isStandalone={isStandalone}
         onToggleMobileFilters={() => setIsMobileFiltersOpen(true)}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
@@ -824,6 +864,20 @@ export const App: React.FC = () => {
         bookletCandidates={bookletCandidates}
         bookletInteractions={bookletInteractionsMap}
         onShowToast={(msg) => setToast({ id: Date.now().toString(), message: msg })}
+      />
+
+      {/* Floating PWA Install Prompt Banner */}
+      <InstallFloatingBanner
+        onInstall={handleInstallClick}
+        isStandalone={isStandalone}
+      />
+
+      {/* PWA Install Guide Modal */}
+      <InstallPwaModal
+        isOpen={isInstallModalOpen}
+        onClose={() => setIsInstallModalOpen(false)}
+        onNativeInstall={handleInstallClick}
+        canNativeInstall={Boolean(deferredPrompt)}
       />
 
       {/* Action Toast with Undo */}

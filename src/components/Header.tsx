@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Search, Filter, Layers, Download, CheckSquare, Sparkles, X, Smartphone, Plus, BarChart3, Users } from 'lucide-react';
 import { TriageStatus } from '../types/profile';
-import { InstallPwaModal } from './InstallPwaModal';
 
 interface HeaderProps {
   activeSection: 'portal' | 'booklet' | 'kanban' | 'analytics';
@@ -25,6 +24,8 @@ interface HeaderProps {
   onOpenExport: () => void;
   onOpenAddCandidate: () => void;
   onOpenFamilyShare: () => void;
+  onOpenInstall: () => void;
+  isStandalone?: boolean;
   onToggleMobileFilters: () => void;
   viewMode: 'grid' | 'compact';
   onViewModeChange: (mode: 'grid' | 'compact') => void;
@@ -45,47 +46,12 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenExport,
   onOpenAddCandidate,
   onOpenFamilyShare,
+  onOpenInstall,
+  isStandalone = false,
   onToggleMobileFilters,
   viewMode,
   onViewModeChange
 }) => {
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
-  const [isStandalone, setIsStandalone] = useState(false);
-
-  useEffect(() => {
-    // Check if app is already running in standalone PWA window
-    const isStandaloneMode =
-      window.matchMedia('(display-mode: standalone)').matches ||
-      (window.navigator as any).standalone === true;
-    setIsStandalone(isStandaloneMode);
-
-    const handleBeforeInstall = (e: any) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-    };
-    window.addEventListener('beforeinstallprompt', handleBeforeInstall);
-    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
-  }, []);
-
-  const handleInstallClick = async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      try {
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') {
-          setIsStandalone(true);
-        }
-      } catch {
-        // Fallback
-      }
-      setDeferredPrompt(null);
-    } else {
-      // If browser doesn't support beforeinstallprompt or not triggered yet (e.g. iOS Safari, Edge), show step-by-step modal guide
-      setIsInstallModalOpen(true);
-    }
-  };
-
   const tabs: { id: 'all' | TriageStatus; label: string; count: number; color: string; icon?: string }[] = [
     { id: 'all', label: 'All Profiles', count: stats.total, color: 'bg-slate-100 text-slate-700 hover:bg-slate-200' },
     { id: 'shortlisted', label: 'Shortlisted', count: stats.shortlisted, color: 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100', icon: '⭐' },
@@ -209,17 +175,29 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="hidden md:inline">कौटुंबिक पत्रिका</span>
             </button>
 
-            {/* PWA Install Button */}
-            {!isStandalone && (
-              <button
-                onClick={handleInstallClick}
-                className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white shadow-sm shadow-rose-600/30 transition-all active:scale-95 animate-pulse"
-                title="मोबाईल किंवा संगणकावर ॲप इन्स्टॉल करा (Install PWA)"
-              >
-                <Smartphone className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">इन्स्टॉल</span>
-              </button>
-            )}
+            {/* PWA Install Button - Always Prominent */}
+            <button
+              onClick={onOpenInstall}
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs font-black transition-all active:scale-95 flex-shrink-0 shadow-md ${
+                isStandalone
+                  ? 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 shadow-slate-200/50'
+                  : 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-700 hover:to-teal-700 text-white shadow-emerald-600/30'
+              }`}
+              title={
+                isStandalone
+                  ? 'Anubandh ॲप आधीच इन्स्टॉल केले आहे (PWA Active)'
+                  : 'मोबाईल किंवा संगणकावर ॲप इन्स्टॉल करा (Install Anubandh App)'
+              }
+            >
+              <Smartphone
+                className={`w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0 ${
+                  isStandalone ? 'text-emerald-600' : 'text-emerald-100 animate-pulse'
+                }`}
+              />
+              <span className="font-extrabold whitespace-nowrap">
+                {isStandalone ? 'ॲप इन्स्टॉल्ड ✓' : 'ॲप इन्स्टॉल करा'}
+              </span>
+            </button>
           </div>
         </div>
 
@@ -349,14 +327,6 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         )}
       </div>
-
-      {/* Install PWA Guide Modal */}
-      <InstallPwaModal
-        isOpen={isInstallModalOpen}
-        onClose={() => setIsInstallModalOpen(false)}
-        onNativeInstall={handleInstallClick}
-        canNativeInstall={Boolean(deferredPrompt)}
-      />
     </header>
   );
 };

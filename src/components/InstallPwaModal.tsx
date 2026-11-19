@@ -23,7 +23,13 @@ export const InstallPwaModal: React.FC<InstallPwaModalProps> = ({
   onNativeInstall,
   canNativeInstall
 }) => {
-  const [deviceTab, setDeviceTab] = useState<'android' | 'ios' | 'desktop'>('android');
+  const [deviceTab, setDeviceTab] = useState<'android' | 'ios' | 'desktop'>(() => {
+    if (typeof window === 'undefined') return 'android';
+    const ua = navigator.userAgent.toLowerCase();
+    if (/iphone|ipad|ipod/.test(ua)) return 'ios';
+    if (/android/.test(ua)) return 'android';
+    return 'desktop';
+  });
 
   if (!isOpen) return null;
 
@@ -34,12 +40,12 @@ export const InstallPwaModal: React.FC<InstallPwaModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="p-5 bg-gradient-to-r from-rose-600 to-pink-600 text-white flex items-center justify-between">
+        <div className="p-5 bg-gradient-to-r from-rose-600 via-pink-600 to-rose-700 text-white flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img
               src="/icon.svg"
               alt="Anubandh अनुबंध"
-              className="w-11 h-11 rounded-2xl shadow-md border border-white/20 flex-shrink-0 object-contain"
+              className="w-12 h-12 rounded-2xl shadow-md border-2 border-white/30 flex-shrink-0 object-contain p-0.5 bg-white/10"
             />
             <div>
               <h3 className="text-base sm:text-lg font-black tracking-tight">
@@ -58,24 +64,31 @@ export const InstallPwaModal: React.FC<InstallPwaModalProps> = ({
           </button>
         </div>
 
-        {/* Quick Native Install Button if browser supports it */}
+        {/* Quick Direct 1-Click Install Button */}
         {canNativeInstall && onNativeInstall && (
-          <div className="p-4 bg-emerald-50 border-b border-emerald-100 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-              <span className="text-xs font-bold text-emerald-900">
-                तुमचा ब्राउझर थेट इन्स्टॉलेशनला सपोर्ट करतो!
-              </span>
+          <div className="p-4 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border-b border-emerald-200/80 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center flex-shrink-0 shadow-sm">
+                <Sparkles className="w-4 h-4 animate-pulse" />
+              </div>
+              <div>
+                <span className="text-xs font-black text-emerald-950 block">
+                  १-क्लिक थेट इन्स्टॉलेशन उपलब्ध आहे!
+                </span>
+                <span className="text-[11px] text-emerald-700">
+                  कोणतीही वेगळी सेटिंग न करता थेट फोनवर ॲप जोडा.
+                </span>
+              </div>
             </div>
             <button
               onClick={() => {
                 onNativeInstall();
                 onClose();
               }}
-              className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-sm flex items-center gap-1.5 flex-shrink-0 active:scale-95"
+              className="w-full sm:w-auto px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-black transition-all shadow-md shadow-emerald-600/30 flex items-center justify-center gap-2 flex-shrink-0"
             >
-              <Download className="w-3.5 h-3.5" />
-              <span>आत्ताच जोडा</span>
+              <Download className="w-4 h-4" />
+              <span>📲 थेट इन्स्टॉल करा</span>
             </button>
           </div>
         )}

@@ -13,6 +13,8 @@ export default defineConfig({
         name: 'Anubandh अनुबंध',
         short_name: 'Anubandh अनुबंध',
         description: 'अनुबंध | दोन मनांचे आणि दोन घराण्यांचे रेशीमबंध',
+        start_url: '/',
+        scope: '/',
         theme_color: '#e11d48',
         background_color: '#f8fafc',
         display: 'standalone',
