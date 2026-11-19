@@ -98,18 +98,18 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main top bar */}
-        <div className="flex items-center justify-between h-14 sm:h-16 gap-2 sm:gap-3">
+        <div className="flex items-center justify-between h-14 sm:h-16 gap-1.5 sm:gap-3">
           {/* Logo & Title */}
-          <div className="flex items-center gap-2 sm:gap-2.5 flex-shrink-0">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-rose-600 to-pink-500 flex items-center justify-center text-white shadow-md shadow-rose-500/20">
+          <div className="flex items-center gap-2 sm:gap-2.5 flex-shrink min-w-0">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-rose-600 to-pink-500 flex items-center justify-center text-white shadow-md shadow-rose-500/20 flex-shrink-0">
               <Heart className="w-4 h-4 sm:w-5 sm:h-5 fill-white" />
             </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-extrabold text-base sm:text-lg text-slate-900 tracking-tight">Anubandh अनुबंध</span>
-                <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded-full bg-rose-100 text-rose-700">PWA</span>
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span className="font-extrabold text-sm sm:text-lg text-slate-900 tracking-tight truncate">Anubandh अनुबंध</span>
+                <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded-full bg-rose-100 text-rose-700 flex-shrink-0">PWA</span>
               </div>
-              <p className="text-[11px] text-slate-500 hidden sm:block font-medium">दोन मनांचे आणि दोन घराण्यांचे रेशीमबंध</p>
+              <p className="text-[11px] text-slate-500 hidden sm:block font-medium truncate">दोन मनांचे आणि दोन घराण्यांचे रेशीमबंध</p>
             </div>
           </div>
 
@@ -136,15 +136,15 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Action buttons */}
-          <div className="flex items-center gap-1 sm:gap-2">
+          <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
             {/* Mobile Filter toggle */}
             <button
               onClick={onToggleMobileFilters}
-              className="lg:hidden flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-rose-50 text-rose-700 text-xs font-bold border border-rose-200"
+              className="lg:hidden flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-xl bg-rose-50 text-rose-700 text-xs font-bold border border-rose-200"
               title="Open Filters"
             >
-              <Filter className="w-4 h-4" />
-              <span>Filters</span>
+              <Filter className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Filters</span>
             </button>
 
             {/* View switcher */}
@@ -173,7 +173,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={onOpenComparison}
               disabled={comparisonCount === 0}
-              className={`flex items-center gap-1 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs font-semibold transition-all ${
+              className={`flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs font-semibold transition-all ${
                 comparisonCount > 0
                   ? 'bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200'
                   : 'bg-slate-100 text-slate-400 opacity-60 cursor-not-allowed'
@@ -190,7 +190,7 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Export Button */}
             <button
               onClick={onOpenExport}
-              className="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
+              className="flex items-center gap-1 px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors"
               title="Export CSV / Backup Data"
             >
               <Download className="w-3.5 h-3.5" />
@@ -200,24 +200,22 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Family Dossier & PDF Button */}
             <button
               onClick={onOpenFamilyShare}
-              className="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-rose-50 to-amber-50 hover:from-rose-100 hover:to-amber-100 text-rose-800 border border-rose-200 transition-all shadow-xs"
+              className="flex items-center gap-1 px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-rose-50 to-amber-50 hover:from-rose-100 hover:to-amber-100 text-rose-800 border border-rose-200 transition-all shadow-xs"
               title="कौटुंबिक चर्चा पत्रिका तयार करा (A4 PDF / WhatsApp Share)"
             >
               <Users className="w-3.5 h-3.5 text-rose-600" />
               <span className="hidden md:inline">कौटुंबिक पत्रिका</span>
-              <span className="md:hidden">पत्रिका</span>
             </button>
 
             {/* PWA Install Button */}
             {!isStandalone && (
               <button
                 onClick={handleInstallClick}
-                className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white shadow-sm shadow-rose-600/30 transition-all active:scale-95 animate-pulse"
+                className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white shadow-sm shadow-rose-600/30 transition-all active:scale-95 animate-pulse"
                 title="मोबाईल किंवा संगणकावर ॲप इन्स्टॉल करा (Install PWA)"
               >
                 <Smartphone className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">ॲप इन्स्टॉल करा</span>
-                <span className="sm:hidden">इन्स्टॉल</span>
+                <span className="hidden sm:inline">इन्स्टॉल</span>
               </button>
             )}
           </div>
@@ -246,11 +244,11 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Section Switcher Tabs */}
-        <div className="flex items-center justify-between gap-2 pt-2 pb-1.5 overflow-x-auto no-scrollbar border-t border-slate-100">
-          <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 pt-2 pb-1.5 overflow-x-auto thin-scrollbar border-t border-slate-100">
+          <div className="flex items-center gap-2 flex-shrink-0">
             <button
               onClick={() => onSectionChange('portal')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+              className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                 activeSection === 'portal'
                   ? 'bg-rose-600 text-white shadow-sm shadow-rose-600/30'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -268,7 +266,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={() => onSectionChange('booklet')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+              className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                 activeSection === 'booklet'
                   ? 'bg-amber-600 text-white shadow-sm shadow-amber-600/30'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -286,7 +284,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={() => onSectionChange('kanban')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+              className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                 activeSection === 'kanban'
                   ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/30'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -297,20 +295,20 @@ export const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={() => onSectionChange('analytics')}
-              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+              className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                 activeSection === 'analytics'
                   ? 'bg-purple-600 text-white shadow-sm shadow-purple-600/30'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
               <BarChart3 className="w-3.5 h-3.5" />
-              <span>📊 ॲनालिटिक्स (Analytics)</span>
+              <span>📊 ॲनालिटिक्स</span>
             </button>
           </div>
 
           <button
             onClick={onOpenAddCandidate}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-600/20 transition-all whitespace-nowrap ml-auto"
+            className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-600/20 transition-all whitespace-nowrap ml-auto"
             title="नवीन उमेदवार जोडा (Add New Candidate)"
           >
             <Plus className="w-4 h-4" />
@@ -321,14 +319,14 @@ export const Header: React.FC<HeaderProps> = ({
 
         {/* Status Filter Tab Pills */}
         {(activeSection === 'portal' || activeSection === 'booklet') && (
-          <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto py-2.5 no-scrollbar border-t border-slate-100">
+          <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto py-2.5 thin-scrollbar border-t border-slate-100">
             {tabs.map((tab) => {
               const isActive = statusTab === tab.id;
               return (
                 <button
                   key={tab.id}
                   onClick={() => onStatusTabChange(tab.id)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
+                  className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
                     isActive
                       ? 'bg-slate-900 text-white shadow-sm ring-2 ring-slate-900/10'
                       : tab.color

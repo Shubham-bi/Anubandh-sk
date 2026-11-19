@@ -395,7 +395,7 @@ export const CandidateFormModal: React.FC<CandidateFormModalProps> = ({
           </div>
 
           {/* Action Buttons */}
-          <div className="pt-4 border-t border-slate-200 flex items-center justify-end gap-2.5 sticky bottom-0 bg-white">
+          <div className="pt-4 pb-2 border-t border-slate-200 flex items-center justify-end gap-2.5 sticky bottom-0 bg-white z-10">
             <button
               type="button"
               onClick={onClose}

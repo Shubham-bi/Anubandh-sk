@@ -134,7 +134,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
       {/* Sidebar Panel */}
       <aside
-        className={`fixed top-0 bottom-0 left-0 z-50 w-[85vw] max-w-sm sm:w-80 bg-white border-r border-slate-200 overflow-y-auto transform transition-transform duration-300 ease-in-out lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] lg:z-10 lg:transform-none ${
+        className={`fixed top-0 bottom-0 left-0 z-50 w-[85vw] max-w-sm sm:w-80 bg-white border-r border-slate-200 overflow-y-auto transform transition-transform duration-300 ease-in-out lg:sticky lg:top-[144px] lg:h-[calc(100vh-152px)] lg:z-10 lg:transform-none ${
           isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >

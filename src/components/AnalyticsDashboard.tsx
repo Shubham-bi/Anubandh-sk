@@ -278,10 +278,10 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
         </div>
 
         {/* Scope Selector Tabs */}
-        <div className="bg-white/15 p-1 rounded-2xl flex items-center gap-1 backdrop-blur-md border border-white/20 self-stretch sm:self-auto">
+        <div className="bg-white/15 p-1 rounded-2xl flex items-center gap-1 backdrop-blur-md border border-white/20 self-stretch sm:self-auto overflow-x-auto thin-scrollbar flex-nowrap">
           <button
             onClick={() => setDataScope('all')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+            className={`flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
               dataScope === 'all' ? 'bg-white text-slate-900 shadow-md' : 'text-white hover:bg-white/10'
             }`}
           >
@@ -289,7 +289,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
           </button>
           <button
             onClick={() => setDataScope('portal')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+            className={`flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
               dataScope === 'portal' ? 'bg-white text-rose-800 shadow-md' : 'text-white hover:bg-white/10'
             }`}
           >
@@ -297,7 +297,7 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
           </button>
           <button
             onClick={() => setDataScope('booklet')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+            className={`flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
               dataScope === 'booklet' ? 'bg-white text-amber-800 shadow-md' : 'text-white hover:bg-white/10'
             }`}
           >

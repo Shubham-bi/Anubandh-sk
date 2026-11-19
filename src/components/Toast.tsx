@@ -16,8 +16,8 @@ export const Toast: React.FC<ToastProps> = ({ toast, onClose }) => {
   if (!toast) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 animate-in slide-in-from-bottom-5 fade-in duration-300">
-      <div className="bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 border border-slate-800 text-xs font-medium">
+    <div className="fixed bottom-4 sm:bottom-6 left-4 right-4 sm:left-auto sm:right-6 z-50 flex justify-center sm:justify-end pointer-events-none animate-in slide-in-from-bottom-5 fade-in duration-300">
+      <div className="pointer-events-auto bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-3 border border-slate-800 text-xs font-medium max-w-md">
         <span>{toast.message}</span>
         {toast.onUndo && (
           <button

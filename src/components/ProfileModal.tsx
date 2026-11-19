@@ -472,7 +472,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           {/* Deep Tabs Section */}
           <div>
             {/* Tab Navigation Strip */}
-            <div className="flex items-center gap-1 px-4 sm:px-6 pt-3 border-b border-slate-200 overflow-x-auto no-scrollbar bg-slate-50/50">
+            <div className="flex items-center gap-1 px-4 sm:px-6 pt-3 border-b border-slate-200 overflow-x-auto thin-scrollbar bg-slate-50/50">
               {[
                 { id: 'kundali', label: 'Kundali & Astrology', icon: Sparkles },
                 { id: 'family', label: 'Family & Native', icon: Calendar },
@@ -487,7 +487,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as any)}
-                    className={`flex items-center gap-1.5 py-2.5 px-3.5 font-bold text-xs border-b-2 whitespace-nowrap transition-all ${
+                    className={`flex-shrink-0 flex items-center gap-1.5 py-2.5 px-3.5 font-bold text-xs border-b-2 whitespace-nowrap transition-all ${
                       isActive
                         ? 'border-rose-600 text-rose-600 bg-white rounded-t-xl shadow-sm'
                         : 'border-transparent text-slate-500 hover:text-slate-800'

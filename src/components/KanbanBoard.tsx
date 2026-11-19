@@ -269,7 +269,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
       </div>
 
       {/* Kanban Board Columns Container */}
-      <div className="flex items-start gap-4 overflow-x-auto pb-6 pt-1 no-scrollbar">
+      <div className="flex items-start gap-4 overflow-x-auto pb-6 pt-1 thin-scrollbar">
         {PIPELINE_STAGES.map((stageDef) => {
           const items = itemsByStage[stageDef.id] || [];
 

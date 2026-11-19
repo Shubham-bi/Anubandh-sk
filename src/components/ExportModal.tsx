@@ -125,7 +125,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-lg p-6 space-y-6">
+      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-lg max-h-[92vh] flex flex-col overflow-y-auto p-5 sm:p-6 space-y-5 sm:space-y-6">
         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
           <div className="flex items-center gap-2.5">
             <div className="p-2 rounded-xl bg-rose-50 text-rose-600">

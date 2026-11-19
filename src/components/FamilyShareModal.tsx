@@ -354,12 +354,12 @@ export const FamilyShareModal: React.FC<FamilyShareModalProps> = ({
         </div>
 
         {/* Selected Candidates Pill Bar */}
-        <div className="px-4 py-2.5 bg-white border-b border-slate-100 flex items-center gap-2 overflow-x-auto no-scrollbar">
-          <span className="text-[11px] font-bold text-slate-400 whitespace-nowrap">निवडलेली स्थळे ({selectedItems.length}):</span>
+        <div className="px-4 py-2.5 bg-white border-b border-slate-100 flex items-center gap-2 overflow-x-auto thin-scrollbar">
+          <span className="text-[11px] font-bold text-slate-400 whitespace-nowrap flex-shrink-0">निवडलेली स्थळे ({selectedItems.length}):</span>
           {selectedItems.map((item) => (
             <span
               key={item.id}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-50 text-rose-800 border border-rose-200 text-xs font-bold whitespace-nowrap"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-50 text-rose-800 border border-rose-200 text-xs font-bold whitespace-nowrap flex-shrink-0"
             >
               <span>{item.name}</span>
               <button

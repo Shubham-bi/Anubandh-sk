@@ -31,7 +31,7 @@ export const InstallPwaModal: React.FC<InstallPwaModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
       <div
-        className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-lg overflow-hidden relative"
+        className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-lg max-h-[92vh] flex flex-col overflow-hidden relative"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -115,7 +115,7 @@ export const InstallPwaModal: React.FC<InstallPwaModalProps> = ({
         </div>
 
         {/* Step-by-step instructions based on device */}
-        <div className="p-5 space-y-4 text-xs">
+        <div className="p-5 space-y-4 text-xs overflow-y-auto flex-1">
           {deviceTab === 'android' && (
             <div className="space-y-3">
               <h4 className="font-bold text-slate-900 text-sm flex items-center gap-1.5">
