@@ -36,6 +36,7 @@ import { CandidateFormModal } from './components/CandidateFormModal';
 import { KanbanBoard } from './components/KanbanBoard';
 import { AnalyticsDashboard } from './components/AnalyticsDashboard';
 import { FamilyShareModal } from './components/FamilyShareModal';
+import { GroomProfilePage } from './components/GroomProfilePage';
 import { InstallPwaModal } from './components/InstallPwaModal';
 import { InstallFloatingBanner } from './components/InstallFloatingBanner';
 import { Toast, ToastMessage } from './components/Toast';
@@ -47,8 +48,48 @@ export const App: React.FC = () => {
   const [isDbReady, setIsDbReady] = useState(false);
   const [dbError, setDbError] = useState<string | null>(null);
 
-  // Active section: 'portal' | 'booklet' | 'kanban' | 'analytics'
-  const [activeSection, setActiveSection] = useState<'portal' | 'booklet' | 'kanban' | 'analytics'>('portal');
+  // Active section: 'portal' | 'booklet' | 'kanban' | 'analytics' | 'groom_profile'
+  const [activeSection, setActiveSection] = useState<'portal' | 'booklet' | 'kanban' | 'analytics' | 'groom_profile'>(() => {
+    if (typeof window !== 'undefined') {
+      const path = window.location.pathname.toLowerCase();
+      const hash = window.location.hash.toLowerCase();
+      if (path.includes('/profile') || hash.includes('profile')) {
+        return 'groom_profile';
+      }
+    }
+    return 'portal';
+  });
+
+  const handleSectionChange = (sec: 'portal' | 'booklet' | 'kanban' | 'analytics' | 'groom_profile') => {
+    setActiveSection(sec);
+    setCurrentPage(1);
+    if (typeof window !== 'undefined') {
+      if (sec === 'groom_profile') {
+        if (!window.location.pathname.includes('/profile')) {
+          window.history.pushState(null, '', '/profile');
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        if (window.location.pathname.includes('/profile')) {
+          window.history.pushState(null, '', '/');
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname.toLowerCase();
+      const hash = window.location.hash.toLowerCase();
+      if (path.includes('/profile') || hash.includes('profile')) {
+        setActiveSection('groom_profile');
+      } else if (activeSection === 'groom_profile') {
+        setActiveSection('portal');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [activeSection]);
 
   // Candidate Add / Edit State
   const [isAddCandidateOpen, setIsAddCandidateOpen] = useState(false);
@@ -515,10 +556,7 @@ export const App: React.FC = () => {
       {/* Header */}
       <Header
         activeSection={activeSection}
-        onSectionChange={(sec) => {
-          setActiveSection(sec);
-          setCurrentPage(1);
-        }}
+        onSectionChange={handleSectionChange}
         portalCount={profiles.length}
         bookletCount={bookletCandidates.length}
         searchQuery={activeSearchQuery}
@@ -555,7 +593,9 @@ export const App: React.FC = () => {
       />
 
       {/* Main Body */}
-      {activeSection === 'analytics' ? (
+      {activeSection === 'groom_profile' ? (
+        <GroomProfilePage onBackToPortal={() => handleSectionChange('portal')} />
+      ) : activeSection === 'analytics' ? (
         <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <AnalyticsDashboard
             portalProfiles={profiles}
