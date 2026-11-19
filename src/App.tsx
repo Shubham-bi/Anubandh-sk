@@ -439,7 +439,7 @@ export const App: React.FC = () => {
           <Sparkles className="w-8 h-8" />
         </div>
         <h2 className="text-xl font-black text-slate-800">Anubandh अनुबंध</h2>
-        <p className="text-sm text-slate-500 mt-1">Initializing database & records...</p>
+        <p className="text-xs font-semibold text-rose-600 mt-1">दोन मनांचे आणि दोन घराण्यांचे रेशीमबंध</p>
         {dbError && (
           <p className="text-xs text-rose-600 bg-rose-50 p-2 rounded-lg mt-3">
             Error: {dbError}

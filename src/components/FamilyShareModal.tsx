@@ -194,7 +194,7 @@ export const FamilyShareModal: React.FC<FamilyShareModalProps> = ({
   const generateWhatsAppMessage = (item: UnifiedShareItem): string => {
     const lines: string[] = [];
     lines.push('*॥ श्री गणेशाय नमः ॥*');
-    lines.push('*लेवा शुभ मंगल - स्थळ माहिती (Family Dossier)*');
+    lines.push('*अनुबंध | दोन मनांचे आणि दोन घराण्यांचे रेशीमबंध*');
     lines.push('--------------------------------');
     lines.push(`👤 *नाव:* ${item.name}`);
     lines.push(`🎂 *वय:* ${item.age} वर्षे | *उंची:* ${item.height}`);
@@ -394,9 +394,12 @@ export const FamilyShareModal: React.FC<FamilyShareModalProps> = ({
                       ॥ श्री गणेशाय नमः ॥
                     </p>
                     <h3 className="text-lg sm:text-xl font-black text-slate-900 mt-1">
-                      लेवा शुभ मंगल - कौटुंबिक चर्चा पत्रिका
+                      अनुबंध - कौटुंबिक चर्चा पत्रिका
                     </h3>
-                    <p className="text-[11px] text-slate-500 font-medium">
+                    <p className="text-xs text-rose-700 font-bold mt-0.5">
+                      दोन मनांचे आणि दोन घराण्यांचे रेशीमबंध
+                    </p>
+                    <p className="text-[11px] text-slate-500 font-medium mt-1">
                       स्थळ क्र. {idx + 1} • {item.isBooklet ? 'मेळावा पुस्तिका नोंदणी' : 'ऑनलाइन पोर्टल नोंदणी'}
                     </p>
                   </div>
