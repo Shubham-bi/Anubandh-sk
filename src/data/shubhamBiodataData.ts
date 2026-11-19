@@ -40,6 +40,7 @@ export const SHUBHAM_BIODATA: GroomBiodata = {
     { label: 'जन्म वेळ', value: 'सकाळी 11.56' },
     { label: 'जन्म ठिकाण', value: 'शेलगाव बाजार' },
     { label: 'गोत्र', value: 'वशिष्ठ' },
+    { label: 'उंची', value: "5' 6\" (5.6 inch)" },
     { label: 'वर्ण', value: 'गोरा' },
     { label: 'रक्तगट', value: 'B+ve' },
     { label: 'शिक्षण', value: 'B.E. Mechanical' },

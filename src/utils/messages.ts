@@ -33,6 +33,7 @@ export const DEFAULT_GROOM = {
   salary: '7.8 LPA',
   dob: '25/08/1996',
   gotra: 'वशिष्ठ',
+  height: '5\' 6" (5.6 inch)',
   mobile1: '9420539396',
   mobile2: '9422152231'
 };
@@ -52,8 +53,10 @@ export interface CandidateProposalParams {
   groomSalary?: string;
   groomDob?: string;
   groomGotra?: string;
+  groomHeight?: string;
   biodataUrl?: string;
   includeGotra?: boolean;
+  includeHeight?: boolean;
   includeFamilyFooter?: boolean;
   familyFooterText?: string;
   customTemplate?: string;
@@ -102,6 +105,7 @@ export function buildCandidateProposalMessage(params: CandidateProposalParams = 
   const groomSalary = params.groomSalary || DEFAULT_GROOM.salary;
   const groomDob = params.groomDob || DEFAULT_GROOM.dob;
   const groomGotra = params.groomGotra || DEFAULT_GROOM.gotra;
+  const groomHeight = params.groomHeight || DEFAULT_GROOM.height;
   const url = params.biodataUrl || getBiodataUrl();
 
   // Optional CMS Custom Template override
@@ -118,6 +122,7 @@ export function buildCandidateProposalMessage(params: CandidateProposalParams = 
       groom_salary: groomSalary,
       groom_dob: groomDob,
       groom_gotra: groomGotra,
+      groom_height: groomHeight,
       profile_url: url
     };
     return params.customTemplate.replace(
@@ -135,6 +140,9 @@ export function buildCandidateProposalMessage(params: CandidateProposalParams = 
   ];
   if (params.includeGotra !== false) {
     groomLines.push(`• गोत्र: ${groomGotra}`);
+  }
+  if (params.includeHeight !== false && groomHeight) {
+    groomLines.push(`• उंची: ${groomHeight}`);
   }
 
   let footerNote = 'धन्यवाद! 🙏';
@@ -168,6 +176,8 @@ export interface GenericShareParams {
   groomCompany?: string;
   groomSalary?: string;
   groomDob?: string;
+  groomGotra?: string;
+  groomHeight?: string;
   biodataUrl?: string;
   customTemplate?: string;
 }
@@ -182,6 +192,8 @@ export function buildGenericShareMessage(params: GenericShareParams = {}): strin
   const groomCompany = params.groomCompany || DEFAULT_GROOM.company;
   const groomSalary = params.groomSalary || DEFAULT_GROOM.salary;
   const groomDob = params.groomDob || DEFAULT_GROOM.dob;
+  const groomGotra = params.groomGotra || DEFAULT_GROOM.gotra;
+  const groomHeight = params.groomHeight || DEFAULT_GROOM.height;
   const url = params.biodataUrl || getBiodataUrl();
 
   if (params.customTemplate && params.customTemplate.trim()) {
@@ -192,6 +204,8 @@ export function buildGenericShareMessage(params: GenericShareParams = {}): strin
       groom_company: groomCompany,
       groom_salary: groomSalary,
       groom_dob: groomDob,
+      groom_gotra: groomGotra,
+      groom_height: groomHeight,
       profile_url: url
     };
     return params.customTemplate.replace(
@@ -212,6 +226,8 @@ export function buildGenericShareMessage(params: GenericShareParams = {}): strin
 • नोकरी: ${groomJob}, ${groomCompany}
 • वार्षिक पॅकेज: ${groomSalary}
 • जन्मतारीख: ${groomDob}
+• गोत्र: ${groomGotra}
+• उंची: ${groomHeight}
 
 मुलाचा (${groomName}) बायोडाटा सोबत जोडलेला आहे. अधिक माहिती खालील लिंकवर पाहता येईल:
 ${url}
