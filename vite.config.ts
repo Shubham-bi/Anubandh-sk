@@ -12,7 +12,7 @@ export default defineConfig({
         id: 'anubandh-pwa',
         name: 'Anubandh अनुबंध',
         short_name: 'Anubandh अनुबंध',
-        description: 'Anubandh अनुबंध - Leva Patidar Matrimonial Profiles & Matchmaking Assistant',
+        description: 'Anubandh अनुबंध',
         theme_color: '#e11d48',
         background_color: '#f8fafc',
         display: 'standalone',

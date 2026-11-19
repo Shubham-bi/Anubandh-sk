@@ -42,7 +42,7 @@ export const InstallPwaModal: React.FC<InstallPwaModalProps> = ({
             </div>
             <div>
               <h3 className="text-base sm:text-lg font-black tracking-tight">
-                Anubandh ॲप इन्स्टॉल करा (PWA)
+                Anubandh अनुबंध ॲप इन्स्टॉल करा
               </h3>
               <p className="text-xs text-rose-100">
                 फोनच्या होम स्क्रीनवर ॲप जोडा व इंटरनेटशिवाय वापरा

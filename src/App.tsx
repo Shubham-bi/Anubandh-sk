@@ -438,7 +438,7 @@ export const App: React.FC = () => {
         <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-rose-600 to-pink-500 animate-pulse flex items-center justify-center text-white mb-4 shadow-lg shadow-rose-500/30">
           <Sparkles className="w-8 h-8" />
         </div>
-        <h2 className="text-xl font-black text-slate-800">Leva Shubh Mangal</h2>
+        <h2 className="text-xl font-black text-slate-800">Anubandh अनुबंध</h2>
         <p className="text-sm text-slate-500 mt-1">Initializing database & records...</p>
         {dbError && (
           <p className="text-xs text-rose-600 bg-rose-50 p-2 rounded-lg mt-3">
