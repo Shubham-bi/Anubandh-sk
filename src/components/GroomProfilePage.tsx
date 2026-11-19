@@ -9,7 +9,6 @@ import {
   Download,
   Image as ImageIcon,
   MessageCircle,
-  X,
   ExternalLink
 } from 'lucide-react';
 import { getBiodataUrl, buildGenericShareMessage } from '../utils/messages';
@@ -19,6 +18,7 @@ import {
   downloadBiodataCanvasImage,
   copyBiodataCanvasToClipboard
 } from '../utils/biodataCanvasGenerator';
+import { BottomSheet } from './BottomSheet';
 
 interface GroomProfilePageProps {
   onBackToPortal?: () => void;
@@ -411,102 +411,86 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
         </button>
       </footer>
 
-      {/* Canvas Share Card Preview Modal */}
-      {isPreviewOpen && (
-        <div
-          className="fixed inset-0 bg-slate-900/75 backdrop-blur-sm z-[10000] flex items-center justify-center p-3 sm:p-4"
-          onClick={() => setIsPreviewOpen(false)}
-        >
-          <div
-            className="bg-white w-full max-w-[540px] max-h-[92vh] rounded-2xl overflow-hidden shadow-2xl flex flex-col animate-fade-in"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200">
-              <h3 className="font-extrabold text-sm sm:text-base text-[#881337] flex items-center gap-2">
-                <span>🖼️</span>
-                <span>विवाह परिचय पत्रिका (कॅनव्हास कार्ड)</span>
-              </h3>
-              <button
-                type="button"
-                onClick={() => setIsPreviewOpen(false)}
-                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg"
-              >
-                <X className="w-5 h-5" />
-              </button>
+      {/* Canvas Share Card Preview Bottom Sheet */}
+      <BottomSheet
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        title="विवाह परिचय पत्रिका (कॅनव्हास कार्ड)"
+        subtitle="चि. शुभम अनिल खर्चे विवाह पत्रिका कार्ड"
+        icon={<ImageIcon className="w-5 h-5 text-[#881337]" />}
+        maxWidth="max-w-lg"
+        maxHeight="max-h-[90vh]"
+      >
+        <div className="text-center space-y-4">
+          {isGeneratingCanvas ? (
+            <div className="py-12 space-y-3">
+              <div className="animate-spin text-3xl">🎨</div>
+              <p className="text-sm font-semibold text-slate-600">
+                कॅनव्हास कार्ड तयार होत आहे, कृपया प्रतीक्षा करा...
+              </p>
             </div>
+          ) : previewDataUrl ? (
+            <div className="space-y-4">
+              <img
+                src={previewDataUrl}
+                alt="चि. शुभम अनिल खर्चे विवाह पत्रिका कार्ड"
+                className="max-w-full max-h-[50vh] mx-auto rounded-xl shadow-lg border border-slate-200 object-contain"
+              />
+              <div className="flex items-center justify-center gap-2 flex-wrap">
+                <button
+                  type="button"
+                  onClick={handleShareWhatsApp}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#16a34a] hover:bg-[#15803d] text-white text-xs font-bold shadow-xs transition-all"
+                >
+                  <MessageCircle className="w-3.5 h-3.5" />
+                  <span>WhatsApp वर पाठवा</span>
+                </button>
 
-            <div className="p-4 bg-slate-50 flex-1 overflow-y-auto text-center">
-              {isGeneratingCanvas ? (
-                <div className="py-12 space-y-3">
-                  <div className="animate-spin text-3xl">🎨</div>
-                  <p className="text-sm font-semibold text-slate-600">
-                    कॅनव्हास कार्ड तयार होत आहे, कृपया प्रतीक्षा करा...
-                  </p>
-                </div>
-              ) : previewDataUrl ? (
-                <div className="space-y-4">
-                  <img
-                    src={previewDataUrl}
-                    alt="चि. शुभम अनिल खर्चे विवाह पत्रिका कार्ड"
-                    className="max-w-full max-h-[55vh] mx-auto rounded-lg shadow-lg border border-slate-200 object-contain"
-                  />
-                  <div className="flex items-center justify-center gap-2 flex-wrap">
-                    <button
-                      type="button"
-                      onClick={handleShareWhatsApp}
-                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#16a34a] hover:bg-[#15803d] text-white text-xs font-bold shadow-xs transition-all"
-                    >
-                      <MessageCircle className="w-3.5 h-3.5" />
-                      <span>WhatsApp वर पाठवा</span>
-                    </button>
+                <button
+                  type="button"
+                  onClick={handleShareNative}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#4f46e5] hover:bg-[#4338ca] text-white text-xs font-bold shadow-xs transition-all"
+                >
+                  <Share2 className="w-3.5 h-3.5" />
+                  <span>इतर ॲप्स (Share)</span>
+                </button>
 
-                    <button
-                      type="button"
-                      onClick={handleShareNative}
-                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#4f46e5] hover:bg-[#4338ca] text-white text-xs font-bold shadow-xs transition-all"
-                    >
-                      <Share2 className="w-3.5 h-3.5" />
-                      <span>इतर ॲप्स (Share)</span>
-                    </button>
+                <button
+                  type="button"
+                  onClick={handleDownloadImage}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-bold shadow-xs transition-all"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>डाऊनलोड</span>
+                </button>
 
-                    <button
-                      type="button"
-                      onClick={handleDownloadImage}
-                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-bold shadow-xs transition-all"
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                      <span>डाऊनलोड</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={handleCopyImage}
-                      className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs font-bold shadow-xs transition-all"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                      <span>इमेज कॉपी</span>
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="py-8 text-rose-600 font-semibold text-sm">
-                  इमेज लोड करण्यात अडचण आली. कृपया पुन्हा प्रयत्न करा.
-                </div>
-              )}
+                <button
+                  type="button"
+                  onClick={handleCopyImage}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs font-bold shadow-xs transition-all"
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                  <span>इमेज कॉपी</span>
+                </button>
+              </div>
             </div>
-
-            <div className="px-4 py-3 bg-slate-100 border-t border-slate-200 flex justify-end">
-              <button
-                type="button"
-                onClick={() => setIsPreviewOpen(false)}
-                className="px-4 py-1.5 rounded-xl bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 text-xs font-bold transition-all"
-              >
-                बंद करा
-              </button>
+          ) : (
+            <div className="py-8 text-rose-600 font-semibold text-sm">
+              इमेज लोड करण्यात अडचण आली. कृपया पुन्हा प्रयत्न करा.
             </div>
+          )}
+
+          <div className="pt-2 flex justify-end">
+            <button
+              type="button"
+              onClick={() => setIsPreviewOpen(false)}
+              className="px-4 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold transition-all"
+            >
+              बंद करा
+            </button>
           </div>
         </div>
-      )}
+      </BottomSheet>
     </div>
   );
 };

@@ -26,16 +26,16 @@ import { PipelineStage } from './types/pipeline';
 import { Header } from './components/Header';
 import { FilterSidebar } from './components/FilterSidebar';
 import { ProfileCard } from './components/ProfileCard';
-import { ProfileModal } from './components/ProfileModal';
+import { ProfileDetailPage } from './components/ProfileDetailPage';
 import { BookletCard } from './components/BookletCard';
-import { BookletModal } from './components/BookletModal';
+import { BookletDetailPage } from './components/BookletDetailPage';
 import { BookletFilterSidebar, BookletFilterState } from './components/BookletFilterSidebar';
-import { ComparisonModal } from './components/ComparisonModal';
+import { ComparisonPage } from './components/ComparisonPage';
 import { ExportModal } from './components/ExportModal';
-import { CandidateFormModal } from './components/CandidateFormModal';
+import { CandidateFormPage } from './components/CandidateFormPage';
 import { KanbanBoard } from './components/KanbanBoard';
 import { AnalyticsDashboard } from './components/AnalyticsDashboard';
-import { FamilyShareModal } from './components/FamilyShareModal';
+import { FamilySharePage } from './components/FamilySharePage';
 import { GroomProfilePage } from './components/GroomProfilePage';
 import { InstallPwaModal } from './components/InstallPwaModal';
 import { InstallFloatingBanner } from './components/InstallFloatingBanner';
@@ -47,6 +47,24 @@ import { ChevronLeft, ChevronRight, Inbox } from 'lucide-react';
 
 const ITEMS_PER_PAGE = 24;
 
+export type PageView =
+  | { type: 'portal' }
+  | { type: 'booklet' }
+  | { type: 'kanban' }
+  | { type: 'analytics' }
+  | { type: 'groom_profile' }
+  | { type: 'profile_detail'; profile: Profile }
+  | { type: 'booklet_detail'; candidate: BookletCandidate }
+  | { type: 'comparison' }
+  | { type: 'family_share'; candidate?: BookletCandidate | Profile | null }
+  | { type: 'candidate_form'; candidateToEdit?: BookletCandidate | null };
+
+export type SheetState =
+  | { type: 'none' }
+  | { type: 'admin_login'; reason?: string; pendingAction?: () => void }
+  | { type: 'install_pwa' }
+  | { type: 'export' };
+
 export const App: React.FC = () => {
   const [isDbReady, setIsDbReady] = useState(false);
   const [dbError, setDbError] = useState<string | null>(null);
@@ -57,19 +75,108 @@ export const App: React.FC = () => {
   // Security & Authentication States
   const [isParentAuth, setIsParentAuth] = useState<boolean>(() => isParentSessionValid());
   const [isAdminAuth, setIsAdminAuth] = useState<boolean>(() => isAdminSessionValid());
-  const [adminModalState, setAdminModalState] = useState<{
-    isOpen: boolean;
-    reason?: string;
-    pendingAction?: () => void;
-  }>({ isOpen: false });
 
-  // Trigger Admin Password verification modal if not yet authenticated
+  // Page View and Navigation History Stack (Strictly 1 view rendered at a time)
+  const [currentPageView, setCurrentPageView] = useState<PageView>(() => {
+    if (typeof window !== 'undefined') {
+      const path = window.location.pathname.toLowerCase();
+      const hash = window.location.hash.toLowerCase();
+      if (path.includes('/profile') || hash.includes('profile')) {
+        return { type: 'groom_profile' };
+      }
+    }
+    return { type: 'portal' };
+  });
+
+  const [navHistory, setNavHistory] = useState<PageView[]>([]);
+
+  // Active Bottom Sheet (Strictly 1 bottomsheet active at a time)
+  const [activeSheet, setActiveSheet] = useState<SheetState>({ type: 'none' });
+
+  // Navigate to a new page (pushes current page to history stack, closes bottom sheet)
+  const navigateTo = (view: PageView) => {
+    setActiveSheet({ type: 'none' });
+    setIsMobileFiltersOpen(false);
+
+    setNavHistory((prev) => [...prev, currentPageView]);
+    startTransition(() => {
+      setCurrentPageView(view);
+    });
+
+    if (typeof window !== 'undefined') {
+      if (view.type === 'groom_profile') {
+        if (!window.location.pathname.includes('/profile')) {
+          window.history.pushState({ page: 'groom_profile' }, '', '/profile');
+        }
+      } else {
+        if (window.location.pathname.includes('/profile')) {
+          window.history.pushState({ page: view.type }, '', '/');
+        } else {
+          window.history.pushState({ page: view.type }, '');
+        }
+      }
+    }
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
+
+  // Navigate back to previous page in history stack
+  const navigateBack = () => {
+    setActiveSheet({ type: 'none' });
+    setIsMobileFiltersOpen(false);
+
+    if (navHistory.length > 0) {
+      const prev = navHistory[navHistory.length - 1];
+      setNavHistory((h) => h.slice(0, -1));
+      startTransition(() => {
+        setCurrentPageView(prev);
+      });
+      if (typeof window !== 'undefined') {
+        if (prev.type === 'groom_profile') {
+          if (!window.location.pathname.includes('/profile')) {
+            window.history.replaceState({ page: 'groom_profile' }, '', '/profile');
+          }
+        } else {
+          if (window.location.pathname.includes('/profile')) {
+            window.history.replaceState({ page: prev.type }, '', '/');
+          }
+        }
+      }
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    } else {
+      startTransition(() => {
+        setCurrentPageView({ type: 'portal' });
+      });
+    }
+  };
+
+  // Browser hardware / popstate listener
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname.toLowerCase();
+      const hash = window.location.hash.toLowerCase();
+      if (path.includes('/profile') || hash.includes('profile')) {
+        setCurrentPageView({ type: 'groom_profile' });
+        return;
+      }
+      if (navHistory.length > 0) {
+        const prev = navHistory[navHistory.length - 1];
+        setNavHistory((h) => h.slice(0, -1));
+        setCurrentPageView(prev);
+      } else {
+        setCurrentPageView({ type: 'portal' });
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [navHistory]);
+
+  // Trigger Admin Password verification sheet if not yet authenticated
   const triggerAdminPrompt = (reason: string, onSuccessAction: () => void) => {
     if (isAdminAuth) {
       onSuccessAction();
     } else {
-      setAdminModalState({
-        isOpen: true,
+      setActiveSheet({
+        type: 'admin_login',
         reason,
         pendingAction: onSuccessAction,
       });
@@ -83,7 +190,7 @@ export const App: React.FC = () => {
       id: String(Date.now()),
       message: 'ॲडमिन मोडमधून बाहेर पडलात.',
     });
-    if (activeSection === 'kanban' || activeSection === 'analytics') {
+    if (currentPageView.type === 'kanban' || currentPageView.type === 'analytics') {
       handleSectionChange('portal');
     }
   };
@@ -99,17 +206,28 @@ export const App: React.FC = () => {
     });
   };
 
-  // Active section: 'portal' | 'booklet' | 'kanban' | 'analytics' | 'groom_profile'
-  const [activeSection, setActiveSection] = useState<'portal' | 'booklet' | 'kanban' | 'analytics' | 'groom_profile'>(() => {
-    if (typeof window !== 'undefined') {
-      const path = window.location.pathname.toLowerCase();
-      const hash = window.location.hash.toLowerCase();
-      if (path.includes('/profile') || hash.includes('profile')) {
+  const activeSection: 'portal' | 'booklet' | 'kanban' | 'analytics' | 'groom_profile' = useMemo(() => {
+    switch (currentPageView.type) {
+      case 'portal':
+      case 'profile_detail':
+      case 'comparison':
+        return 'portal';
+      case 'booklet':
+      case 'booklet_detail':
+      case 'candidate_form':
+        return 'booklet';
+      case 'kanban':
+        return 'kanban';
+      case 'analytics':
+        return 'analytics';
+      case 'groom_profile':
         return 'groom_profile';
-      }
+      case 'family_share':
+        return 'portal';
+      default:
+        return 'portal';
     }
-    return 'portal';
-  });
+  }, [currentPageView.type]);
 
   const handleSectionChange = (sec: 'portal' | 'booklet' | 'kanban' | 'analytics' | 'groom_profile') => {
     if ((sec === 'kanban' || sec === 'analytics') && !isAdminAuth) {
@@ -118,8 +236,9 @@ export const App: React.FC = () => {
           ? 'मॅचमेकिंग पाईपलाईन (Kanban) पाहण्यासाठी ॲडमिन पासवर्ड आवश्यक आहे.'
           : 'ॲनालिटिक्स डॅशबोर्ड पाहण्यासाठी ॲडमिन पासवर्ड आवश्यक आहे.',
         () => {
+          setNavHistory([]);
           startTransition(() => {
-            setActiveSection(sec);
+            setCurrentPageView({ type: sec });
             setCurrentPage(1);
           });
         }
@@ -127,8 +246,9 @@ export const App: React.FC = () => {
       return;
     }
 
+    setNavHistory([]);
     startTransition(() => {
-      setActiveSection(sec);
+      setCurrentPageView({ type: sec });
       setCurrentPage(1);
     });
 
@@ -146,31 +266,8 @@ export const App: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    const handlePopState = () => {
-      const path = window.location.pathname.toLowerCase();
-      const hash = window.location.hash.toLowerCase();
-      if (path.includes('/profile') || hash.includes('profile')) {
-        setActiveSection('groom_profile');
-      } else if (activeSection === 'groom_profile') {
-        setActiveSection('portal');
-      }
-    };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, [activeSection]);
-
-  // Candidate Add / Edit State
-  const [isAddCandidateOpen, setIsAddCandidateOpen] = useState(false);
-  const [candidateToEdit, setCandidateToEdit] = useState<BookletCandidate | null>(null);
-
-  // Family Share & Dossier State
-  const [isFamilyShareOpen, setIsFamilyShareOpen] = useState(false);
-  const [familyShareCandidate, setFamilyShareCandidate] = useState<BookletCandidate | Profile | null>(null);
-
   // PWA Install State & Handlers
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
 
   useEffect(() => {
@@ -205,7 +302,7 @@ export const App: React.FC = () => {
   }, []);
 
   const handleInstallClick = async () => {
-    const promptEvent = deferredPrompt || (window as any).deferredInstallPrompt;
+    const promptEvent = deferredPrompt || (typeof window !== 'undefined' && (window as any).deferredInstallPrompt);
     if (promptEvent) {
       promptEvent.prompt();
       try {
@@ -217,9 +314,11 @@ export const App: React.FC = () => {
         // Fallback
       }
       setDeferredPrompt(null);
-      (window as any).deferredInstallPrompt = null;
+      if (typeof window !== 'undefined') {
+        (window as any).deferredInstallPrompt = null;
+      }
     } else {
-      setIsInstallModalOpen(true);
+      setActiveSheet({ type: 'install_pwa' });
     }
   };
 
@@ -255,12 +354,6 @@ export const App: React.FC = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<'grid' | 'compact'>('grid');
-
-  // Modals
-  const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
-  const [selectedBooklet, setSelectedBooklet] = useState<BookletCandidate | null>(null);
-  const [isComparisonOpen, setIsComparisonOpen] = useState(false);
-  const [isExportOpen, setIsExportOpen] = useState(false);
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [toast, setToast] = useState<ToastMessage | null>(null);
 
@@ -298,9 +391,118 @@ export const App: React.FC = () => {
     return map;
   }, [rawBookletInteractions]);
 
-  // Comparison
-  const comparedIdSet = useMemo(() => new Set(comparisonItems.map((c) => c.nu_id)), [comparisonItems]);
-  const comparedProfiles = useMemo(() => profiles.filter((p) => comparedIdSet.has(p.nu_id)), [profiles, comparedIdSet]);
+  const comparedIdSet = useMemo(() => {
+    return new Set(comparisonItems.map((c) => c.nu_id));
+  }, [comparisonItems]);
+
+  const comparedProfiles = useMemo(() => {
+    return profiles.filter((p) => comparedIdSet.has(p.nu_id));
+  }, [profiles, comparedIdSet]);
+
+  const isBooklet = activeSection === 'booklet';
+
+  // Filtering Portal Profiles
+  const filteredPortalProfiles = useMemo(() => {
+    return profiles.filter((p) => {
+      const inter = portalInteractionsMap[p.nu_id];
+      const status = inter?.status || 'default';
+
+      if (portalFilters.statusTab !== 'all') {
+        if (portalFilters.statusTab === 'review') {
+          if (status !== 'review') return false;
+        } else if (status !== portalFilters.statusTab) {
+          return false;
+        }
+      }
+
+      if (p.age < portalFilters.minAge || p.age > portalFilters.maxAge) return false;
+      if (p.income_num < portalFilters.minIncome || p.income_num > portalFilters.maxIncome) return false;
+
+      if (portalFilters.hasPhotosOnly && (!p.photos || p.photos.length === 0)) return false;
+
+      if (portalFilters.selectedGotras.length > 0 && !portalFilters.selectedGotras.includes(p.gotra)) return false;
+      if (portalFilters.excludedGotras.length > 0 && portalFilters.excludedGotras.includes(p.gotra)) return false;
+
+      if (portalFilters.selectedDistricts.length > 0 && (!p.nativeDistrict || !portalFilters.selectedDistricts.includes(p.nativeDistrict))) return false;
+      if (portalFilters.selectedCities.length > 0 && (!p.currentCity || !portalFilters.selectedCities.includes(p.currentCity))) return false;
+
+      if (portalFilters.selectedEducations.length > 0) {
+        const matchesEdu = portalFilters.selectedEducations.some((edu) =>
+          p.education.toLowerCase().includes(edu.toLowerCase())
+        );
+        if (!matchesEdu) return false;
+      }
+
+      if (portalFilters.maritalStatus !== 'all') {
+        if (p.maritalStatus?.toLowerCase() !== portalFilters.maritalStatus.toLowerCase()) return false;
+      }
+
+      if (portalFilters.searchQuery.trim()) {
+        const query = portalFilters.searchQuery.toLowerCase();
+        const fullContent = `${p.name} ${p.gotra} ${p.currentCity} ${p.nativePlace} ${p.education} ${p.occupation} ${p.nu_id}`.toLowerCase();
+        if (!fullContent.includes(query)) return false;
+      }
+
+      return true;
+    }).sort((a, b) => {
+      switch (portalFilters.sortBy) {
+        case 'age_asc': return a.age - b.age;
+        case 'age_desc': return b.age - a.age;
+        case 'income_desc': return b.income_num - a.income_num;
+        case 'income_asc': return a.income_num - b.income_num;
+        case 'name_asc': return a.name.localeCompare(b.name);
+        case 'updated_desc':
+          return (portalInteractionsMap[b.nu_id]?.updatedAt || 0) - (portalInteractionsMap[a.nu_id]?.updatedAt || 0);
+        default: return 0;
+      }
+    });
+  }, [profiles, portalInteractionsMap, portalFilters]);
+
+  // Filtering Booklet Candidates
+  const filteredBookletCandidates = useMemo(() => {
+    return bookletCandidates.filter((c) => {
+      const inter = bookletInteractionsMap[c.id];
+      const status = inter?.status || 'default';
+
+      if (bookletFilters.statusTab !== 'all') {
+        if (bookletFilters.statusTab === 'review') {
+          if (status !== 'review') return false;
+        } else if (status !== bookletFilters.statusTab) {
+          return false;
+        }
+      }
+
+      if (c.age < bookletFilters.minAge || c.age > bookletFilters.maxAge) return false;
+
+      if (bookletFilters.selectedGotras.length > 0 && !bookletFilters.selectedGotras.includes(c.gotra)) return false;
+      if (bookletFilters.excludedGotras.length > 0 && bookletFilters.excludedGotras.includes(c.gotra)) return false;
+
+      if (bookletFilters.selectedMulgaons.length > 0 && !bookletFilters.selectedMulgaons.includes(c.mulgaon)) return false;
+
+      if (bookletFilters.searchQuery.trim()) {
+        const rawQ = bookletFilters.searchQuery.toLowerCase().trim();
+        const asciiQ = marathiToAscii(rawQ);
+        const nameAscii = marathiToAscii(c.name.toLowerCase());
+        const rawContent = `${c.name} ${c.gotra} ${c.mulgaon} ${c.edu} ${c.contact} ${c.sr}`.toLowerCase();
+
+        const matchesRaw = rawContent.includes(rawQ);
+        const matchesAscii = nameAscii.includes(asciiQ) || c.id.toLowerCase().includes(rawQ);
+
+        if (!matchesRaw && !matchesAscii) return false;
+      }
+
+      return true;
+    }).sort((a, b) => {
+      switch (bookletFilters.sortBy) {
+        case 'sr_asc': return (Number(a.sr) || 0) - (Number(b.sr) || 0);
+        case 'sr_desc': return (Number(b.sr) || 0) - (Number(a.sr) || 0);
+        case 'age_asc': return a.age - b.age;
+        case 'age_desc': return b.age - a.age;
+        case 'name_asc': return a.name.localeCompare(b.name, 'mr');
+        default: return 0;
+      }
+    });
+  }, [bookletCandidates, bookletInteractionsMap, bookletFilters]);
 
   // Stats calculation
   const portalStats = useMemo(() => {
@@ -308,178 +510,40 @@ export const App: React.FC = () => {
     let review = 0;
     let not_interested = 0;
     let contacted = 0;
-    for (const inter of rawInteractions) {
-      if (inter.status === 'shortlisted') shortlisted++;
-      else if (inter.status === 'review') review++;
-      else if (inter.status === 'not_interested') not_interested++;
-      else if (inter.status === 'contacted') contacted++;
+
+    for (const p of profiles) {
+      const s = portalInteractionsMap[p.nu_id]?.status;
+      if (s === 'shortlisted') shortlisted++;
+      else if (s === 'review') review++;
+      else if (s === 'not_interested') not_interested++;
+      else if (s === 'contacted') contacted++;
     }
-    const reviewed = shortlisted + review + not_interested + contacted;
-    return {
-      total: profiles.length,
-      shortlisted,
-      review,
-      not_interested,
-      contacted,
-      unreviewed: Math.max(0, profiles.length - reviewed),
-    };
-  }, [profiles.length, rawInteractions]);
+
+    const unreviewed = profiles.length - (shortlisted + review + not_interested + contacted);
+    return { total: profiles.length, shortlisted, review, not_interested, contacted, unreviewed };
+  }, [profiles, portalInteractionsMap]);
 
   const bookletStats = useMemo(() => {
     let shortlisted = 0;
     let review = 0;
     let not_interested = 0;
     let contacted = 0;
-    for (const inter of rawBookletInteractions) {
-      if (inter.status === 'shortlisted') shortlisted++;
-      else if (inter.status === 'review') review++;
-      else if (inter.status === 'not_interested') not_interested++;
-      else if (inter.status === 'contacted') contacted++;
+
+    for (const c of bookletCandidates) {
+      const s = bookletInteractionsMap[c.id]?.status;
+      if (s === 'shortlisted') shortlisted++;
+      else if (s === 'review') review++;
+      else if (s === 'not_interested') not_interested++;
+      else if (s === 'contacted') contacted++;
     }
-    const reviewed = shortlisted + review + not_interested + contacted;
-    return {
-      total: bookletCandidates.length,
-      shortlisted,
-      review,
-      not_interested,
-      contacted,
-      unreviewed: Math.max(0, bookletCandidates.length - reviewed),
-    };
-  }, [bookletCandidates.length, rawBookletInteractions]);
 
-  // Reset pagination when search filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [portalFilters, bookletFilters]);
+    const unreviewed = bookletCandidates.length - (shortlisted + review + not_interested + contacted);
+    return { total: bookletCandidates.length, shortlisted, review, not_interested, contacted, unreviewed };
+  }, [bookletCandidates, bookletInteractionsMap]);
 
-  // Filter Portal Profiles
-  const filteredPortalProfiles = useMemo(() => {
-    if (!profiles || profiles.length === 0) return [];
-    const query = portalFilters.searchQuery.trim().toLowerCase();
-
-    return profiles
-      .filter((p) => {
-        const status = portalInteractionsMap[p.nu_id]?.status || 'default';
-        if (portalFilters.statusTab !== 'all' && status !== portalFilters.statusTab) return false;
-
-        if (query) {
-          const inter = portalInteractionsMap[p.nu_id];
-          const match =
-            p.name.toLowerCase().includes(query) ||
-            p.gotra.toLowerCase().includes(query) ||
-            p.mamkul.toLowerCase().includes(query) ||
-            p.education.toLowerCase().includes(query) ||
-            p.occupation.toLowerCase().includes(query) ||
-            p.currentCity.toLowerCase().includes(query) ||
-            p.nativeDistrict.toLowerCase().includes(query) ||
-            p.nativePlace.toLowerCase().includes(query) ||
-            p.nu_id.includes(query) ||
-            (inter?.notes && inter.notes.toLowerCase().includes(query)) ||
-            (inter?.tags && inter.tags.some((t) => t.toLowerCase().includes(query)));
-          if (!match) return false;
-        }
-
-        if (p.age < portalFilters.minAge || p.age > portalFilters.maxAge) return false;
-        if (portalFilters.minIncome > 0 && p.income_num < portalFilters.minIncome) return false;
-
-        if (portalFilters.selectedGotras.length > 0 && !portalFilters.selectedGotras.includes(p.gotra)) return false;
-        if (portalFilters.excludedGotras.length > 0 && portalFilters.excludedGotras.includes(p.gotra)) return false;
-
-        if (portalFilters.selectedDistricts.length > 0 && !portalFilters.selectedDistricts.includes(p.nativeDistrict)) return false;
-        if (portalFilters.selectedCities.length > 0 && !portalFilters.selectedCities.includes(p.currentCity)) return false;
-        if (portalFilters.selectedEducations.length > 0 && !portalFilters.selectedEducations.includes(p.education)) return false;
-        if (portalFilters.hasPhotosOnly && (!p.photos || p.photos.length === 0)) return false;
-
-        return true;
-      })
-      .sort((a, b) => {
-        switch (portalFilters.sortBy) {
-          case 'age_asc':
-            return a.age - b.age;
-          case 'age_desc':
-            return b.age - a.age;
-          case 'income_desc':
-            return b.income_num - a.income_num;
-          case 'income_asc':
-            return a.income_num - b.income_num;
-          case 'name_asc':
-            return a.name.localeCompare(b.name);
-          case 'updated_desc': {
-            const timeA = portalInteractionsMap[a.nu_id]?.updatedAt || 0;
-            const timeB = portalInteractionsMap[b.nu_id]?.updatedAt || 0;
-            return timeB - timeA;
-          }
-          default:
-            return 0;
-        }
-      });
-  }, [profiles, portalFilters, portalInteractionsMap]);
-
-  // Filter Booklet Candidates
-  const filteredBookletCandidates = useMemo(() => {
-    if (!bookletCandidates || bookletCandidates.length === 0) return [];
-    const query = bookletFilters.searchQuery.trim().toLowerCase();
-    const queryAscii = marathiToAscii(query);
-
-    return bookletCandidates
-      .filter((c) => {
-        const status = bookletInteractionsMap[c.id]?.status || 'default';
-        if (bookletFilters.statusTab !== 'all' && status !== bookletFilters.statusTab) return false;
-
-        if (query) {
-          const inter = bookletInteractionsMap[c.id];
-          const textCorpus = `${c.name} ${c.gotra} ${c.mamkul} ${c.mulgaon} ${c.edu} ${c.fam} ${c.contact} ${c.sr} ${(c.phones || []).join(' ')}`.toLowerCase();
-          const match =
-            textCorpus.includes(query) ||
-            marathiToAscii(textCorpus).includes(queryAscii) ||
-            (inter?.notes && inter.notes.toLowerCase().includes(query)) ||
-            (inter?.tags && inter.tags.some((t) => t.toLowerCase().includes(query)));
-          if (!match) return false;
-        }
-
-        if (c.age < bookletFilters.minAge || c.age > bookletFilters.maxAge) return false;
-
-        if (bookletFilters.selectedGotras.length > 0 && !bookletFilters.selectedGotras.includes(c.gotra)) return false;
-        if (bookletFilters.excludedGotras.length > 0 && bookletFilters.excludedGotras.includes(c.gotra)) return false;
-
-        if (bookletFilters.selectedMulgaons.length > 0 && !bookletFilters.selectedMulgaons.includes(c.mulgaon)) return false;
-
-        return true;
-      })
-      .sort((a, b) => {
-        const getSrNum = (cand: BookletCandidate) => {
-          const digits = marathiToAscii(cand.sr || '').replace(/[^\d]/g, '');
-          const n = parseInt(digits, 10);
-          return isNaN(n) ? 999999 : n;
-        };
-
-        switch (bookletFilters.sortBy) {
-          case 'sr_asc': {
-            const numA = getSrNum(a);
-            const numB = getSrNum(b);
-            return numA - numB;
-          }
-          case 'sr_desc': {
-            const numA = getSrNum(a);
-            const numB = getSrNum(b);
-            return numB - numA;
-          }
-          case 'age_asc':
-            return a.age - b.age;
-          case 'age_desc':
-            return b.age - a.age;
-          case 'name_asc':
-            return a.name.localeCompare(b.name, 'mr');
-          default:
-            return 0;
-        }
-      });
-  }, [bookletCandidates, bookletFilters, bookletInteractionsMap]);
-
-  // Pagination
-  const isBooklet = activeSection === 'booklet';
+  // Pagination calculations
   const currentTotalItems = isBooklet ? filteredBookletCandidates.length : filteredPortalProfiles.length;
-  const totalPages = Math.ceil(currentTotalItems / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(currentTotalItems / ITEMS_PER_PAGE) || 1;
 
   const paginatedPortalProfiles = useMemo(() => {
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -491,101 +555,62 @@ export const App: React.FC = () => {
     return filteredBookletCandidates.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredBookletCandidates, currentPage]);
 
-  // Handlers for Portal triage
+  // Handlers
   const handlePortalStatusChange = async (nu_id: string, newStatus: TriageStatus) => {
-    const prevStatus = portalInteractionsMap[nu_id]?.status || 'default';
-    const profile = profiles.find((p) => p.nu_id === nu_id);
+    const prev = portalInteractionsMap[nu_id]?.status || 'default';
     await updateProfileStatus(nu_id, newStatus);
 
     const labels: Record<TriageStatus, string> = {
-      default: 'Reset to Unreviewed',
-      shortlisted: '⭐ Shortlisted',
-      review: '⏳ Under Review',
-      contacted: '📞 Contacted',
-      not_interested: '❌ Pass',
+      shortlisted: '⭐ शॉर्टलिस्ट केले',
+      not_interested: '❌ वगळले (Not Interested)',
+      review: '⏳ विचाराधीन ठेवले (Review Later)',
+      contacted: '📞 संपर्क साधला (Contacted)',
+      default: 'पूर्वावत केले'
     };
 
     setToast({
-      id: String(Date.now()),
-      message: `${labels[newStatus]}: ${profile?.name || 'Profile'}`,
+      id: `${nu_id}_${Date.now()}`,
+      message: `${labels[newStatus]}`,
       onUndo: async () => {
-        await updateProfileStatus(nu_id, prevStatus);
-      },
+        await updateProfileStatus(nu_id, prev);
+      }
     });
   };
 
-  // Handlers for Booklet triage
   const handleBookletStatusChange = async (id: string, newStatus: TriageStatus) => {
-    const prevStatus = bookletInteractionsMap[id]?.status || 'default';
-    const candidate = bookletCandidates.find((c) => c.id === id);
+    const prev = bookletInteractionsMap[id]?.status || 'default';
     await updateBookletStatus(id, newStatus);
 
     const labels: Record<TriageStatus, string> = {
-      default: 'रीसेट केले',
       shortlisted: '⭐ शॉर्टलिस्ट केले',
-      review: '⏳ रिव्ह्यू (विचारार्थ)',
-      contacted: '📞 संपर्क केला',
       not_interested: '❌ वगळले (Pass)',
+      review: '⏳ विचाराधीन ठेवले (Review)',
+      contacted: '📞 संपर्क साधला (Called)',
+      default: 'पूर्वावत केले'
     };
 
     setToast({
-      id: String(Date.now()),
-      message: `${labels[newStatus]}: ${candidate?.name || 'उमेदवार'}`,
+      id: `${id}_${Date.now()}`,
+      message: `${labels[newStatus]}`,
       onUndo: async () => {
-        await updateBookletStatus(id, prevStatus);
-      },
+        await updateBookletStatus(id, prev);
+      }
     });
   };
 
   const handleToggleCompare = async (nu_id: string) => {
     try {
       await toggleComparison(nu_id);
-    } catch (err: any) {
+    } catch {
       setToast({
         id: String(Date.now()),
-        message: err.message,
+        message: 'जास्तीत जास्त ४ उमेदवारांची तुलना करता येते.'
       });
     }
   };
 
-  // Handlers for Candidate CRUD & Kanban Pipeline
-  const handleSaveCandidate = async (candidate: BookletCandidate) => {
-    try {
-      const isExisting = bookletCandidates.some((c) => c.id === candidate.id);
-      if (isExisting) {
-        await updateBookletCandidate(candidate);
-        setToast({
-          id: String(Date.now()),
-          message: `बदल सेव्ह झाले: ${candidate.name}`,
-        });
-      } else {
-        await addBookletCandidate(candidate);
-        setToast({
-          id: String(Date.now()),
-          message: `नवीन उमेदवार जोडला: ${candidate.name}`,
-        });
-      }
-      setIsAddCandidateOpen(false);
-      setCandidateToEdit(null);
-    } catch (err: any) {
-      console.error('Failed to save candidate:', err);
-      setToast({
-        id: String(Date.now()),
-        message: err.message || 'उमेदवार सेव्ह करता आला नाही.',
-      });
-    }
-  };
-
-  const handleUpdatePipelineStage = async (id: string, stage: PipelineStage, isBooklet: boolean) => {
-    try {
-      await updatePipelineStage(id, stage, isBooklet);
-      setToast({
-        id: String(Date.now()),
-        message: `पाईपलाईन स्टेज अद्ययावत केले.`,
-      });
-    } catch (err: any) {
-      console.error('Failed to update stage:', err);
-    }
+  const handleUpdatePipelineStage = async (id: string, stage: PipelineStage, isBookletCandidate: boolean) => {
+    await updatePipelineStage(id, stage, isBookletCandidate);
   };
 
   const handleAddCallLog = async (
@@ -593,60 +618,94 @@ export const App: React.FC = () => {
     note: string,
     stage: PipelineStage,
     contactPerson: string | undefined,
-    isBooklet: boolean
+    isBookletCandidate: boolean
   ) => {
+    await addCallLog(id, note, stage, contactPerson, isBookletCandidate);
+    setToast({
+      id: String(Date.now()),
+      message: 'कॉल नोंद व पाइपलाइन टप्पा यशस्वीरित्या सेव्ह झाला!'
+    });
+  };
+
+  const handleSaveCandidate = async (candidate: BookletCandidate) => {
     try {
-      await addCallLog(id, note, stage, contactPerson, isBooklet);
+      const exists = await db.booklet_candidates.get(candidate.id);
+      if (exists) {
+        await updateBookletCandidate(candidate);
+        setToast({ id: String(Date.now()), message: `${candidate.name} ची माहिती यशस्वीरित्या अपडेट केली!` });
+      } else {
+        await addBookletCandidate(candidate);
+        setToast({ id: String(Date.now()), message: `${candidate.name} यांना यशस्वीरित्या जोडले!` });
+      }
+    } catch (err: any) {
+      setToast({ id: String(Date.now()), message: `त्रुटी: ${err.message}` });
+    }
+  };
+
+  const handleImportBackup = async (importedInteractions: Record<string, ProfileInteraction>, section: 'portal' | 'booklet') => {
+    try {
+      const targetTable = section === 'booklet' ? db.booklet_interactions : db.interactions;
+      for (const [id, interaction] of Object.entries(importedInteractions)) {
+        await targetTable.put({
+          ...interaction,
+          nu_id: id,
+          updatedAt: Date.now(),
+        });
+      }
       setToast({
         id: String(Date.now()),
-        message: 'कॉल नोंद यशस्वीरित्या जोडली.',
+        message: `${Object.keys(importedInteractions).length} नोंदी यशस्वीपणे रिस्टोअर झाल्या!`
       });
     } catch (err: any) {
-      console.error('Failed to add call log:', err);
+      setToast({
+        id: String(Date.now()),
+        message: `बॅकअप रिस्टोअर अयशस्वी: ${err.message}`
+      });
     }
   };
 
-  const handleImportBackup = async (imported: Record<string, ProfileInteraction>, section: 'portal' | 'booklet') => {
-    const items = Object.values(imported);
-    if (section === 'booklet') {
-      await db.booklet_interactions.bulkPut(items);
-    } else {
-      await db.interactions.bulkPut(items);
-    }
-  };
-
+  // Full-screen Royal Loading Splash Screen
   if (!isDbReady) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#700c28] via-[#881337] to-[#4c0519] flex flex-col items-center justify-between p-6 select-none animate-fade-in text-white">
-        <div className="w-full" />
-        
-        {/* Central Branded Emblem & Title */}
-        <div className="flex flex-col items-center text-center max-w-sm mx-auto">
-          <div className="relative mb-5">
-            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl shadow-black/40 flex items-center justify-center p-3 animate-pulse">
-              <img
-                src="/icon.svg"
-                alt="अनुबंध"
-                className="w-full h-full object-contain drop-shadow-lg"
-              />
+      <div className="min-h-screen bg-gradient-to-br from-[#881337] via-[#9f1239] to-[#4c0519] flex flex-col items-center justify-between p-6 select-none relative overflow-hidden text-white">
+        <div className="absolute -top-24 -left-24 w-96 h-96 bg-amber-400/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-rose-400/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="w-full pt-4 text-center">
+          <p className="text-[11px] sm:text-xs tracking-[0.35em] uppercase text-amber-200/90 font-bold">
+            ॥ श्री गणेशाय नमः ॥
+          </p>
+        </div>
+
+        <div className="flex flex-col items-center text-center my-auto px-4 max-w-sm">
+          <div className="relative mb-6">
+            <div className="w-24 h-24 rounded-3xl p-1 bg-gradient-to-tr from-amber-300 via-amber-400 to-amber-200 shadow-2xl shadow-black/40 flex items-center justify-center">
+              <div className="w-full h-full rounded-[22px] bg-gradient-to-br from-[#881337] to-[#4c0519] flex items-center justify-center p-2.5">
+                <img
+                  src="/icon.svg"
+                  alt="अनुबंध"
+                  className="w-full h-full object-contain filter drop-shadow-md"
+                />
+              </div>
             </div>
-            <div className="absolute -inset-1 rounded-3xl bg-amber-400/20 blur-md -z-10 animate-pulse" />
+            <div className="absolute inset-0 rounded-3xl bg-amber-300/30 animate-ping -z-10" />
           </div>
 
-          <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight drop-shadow-md">
+          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white font-serif mb-2 drop-shadow-sm">
             अनुबंध
           </h1>
-          <p className="text-xs sm:text-sm font-semibold text-amber-200/90 mt-1.5 drop-shadow-sm">
+
+          <p className="text-xs sm:text-sm text-amber-100/90 font-medium tracking-wide mb-6">
             दोन मनांचे आणि दोन घराण्यांचे रेशीमबंध
           </p>
 
-          {/* Loading Progress Bar */}
-          <div className="w-44 sm:w-52 h-1.5 bg-black/30 rounded-full overflow-hidden mt-8 ring-1 ring-white/10">
-            <div className="w-full h-full bg-gradient-to-r from-amber-400 via-amber-200 to-amber-400 rounded-full animate-pulse" />
+          <div className="w-56 h-1.5 bg-black/30 rounded-full overflow-hidden p-0.5 border border-white/10">
+            <div className="h-full bg-gradient-to-r from-amber-300 via-amber-200 to-amber-400 rounded-full animate-pulse" />
           </div>
-          <span className="text-[11px] text-rose-200/60 font-medium mt-2.5">
-            प्रारंभ होत आहे...
-          </span>
+
+          <p className="text-xs text-rose-100/70 mt-3 font-semibold">
+            स्थानिक डेटाबेस लोड होत आहे...
+          </p>
 
           {dbError && (
             <div className="text-xs text-rose-200 bg-rose-950/80 border border-rose-500/40 p-3 rounded-2xl mt-4 max-w-xs">
@@ -655,7 +714,6 @@ export const App: React.FC = () => {
           )}
         </div>
 
-        {/* Footer Credit */}
         <div className="text-center pb-2">
           <p className="text-[11px] text-rose-200/50 font-medium">
             Created by Shubham Kharche
@@ -666,7 +724,7 @@ export const App: React.FC = () => {
   }
 
   // Public Groom Profile Page (Accessible WITHOUT PIN, isolated from portal)
-  if (activeSection === 'groom_profile') {
+  if (currentPageView.type === 'groom_profile') {
     return (
       <div className="min-h-screen bg-[#eeeae5] selection:bg-rose-500 selection:text-white">
         <GroomProfilePage
@@ -678,10 +736,10 @@ export const App: React.FC = () => {
           onInstall={handleInstallClick}
           isStandalone={isStandalone}
         />
-        {/* PWA Install Modal */}
+        {/* PWA Install Guide Bottom Sheet */}
         <InstallPwaModal
-          isOpen={isInstallModalOpen}
-          onClose={() => setIsInstallModalOpen(false)}
+          isOpen={activeSheet.type === 'install_pwa'}
+          onClose={() => setActiveSheet({ type: 'none' })}
           onNativeInstall={handleInstallClick}
           canNativeInstall={Boolean(deferredPrompt || (typeof window !== 'undefined' && (window as any).deferredInstallPrompt))}
         />
@@ -710,14 +768,128 @@ export const App: React.FC = () => {
           onInstall={handleInstallClick}
           isStandalone={isStandalone}
         />
-        {/* PWA Install Modal */}
+        {/* PWA Install Guide Bottom Sheet */}
         <InstallPwaModal
-          isOpen={isInstallModalOpen}
-          onClose={() => setIsInstallModalOpen(false)}
+          isOpen={activeSheet.type === 'install_pwa'}
+          onClose={() => setActiveSheet({ type: 'none' })}
           onNativeInstall={handleInstallClick}
           canNativeInstall={Boolean(deferredPrompt || (typeof window !== 'undefined' && (window as any).deferredInstallPrompt))}
         />
         {/* Toast */}
+        {toast && <Toast toast={toast} onClose={() => setToast(null)} />}
+      </div>
+    );
+  }
+
+  // Dedicated Full-Page View 1: Candidate Deep-Dive (ProfileDetailPage)
+  if (currentPageView.type === 'profile_detail') {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col selection:bg-rose-500 selection:text-white">
+        <ProfileDetailPage
+          profile={currentPageView.profile}
+          interaction={portalInteractionsMap[currentPageView.profile.nu_id]}
+          onBack={navigateBack}
+          onStatusChange={handlePortalStatusChange}
+          onRatingChange={(id, r) => updateProfileRating(id, r)}
+          onNotesChange={(id, n) => updateProfileNotes(id, n)}
+          onAddTag={(id, t) => addProfileTag(id, t)}
+          onRemoveTag={(id, t) => removeProfileTag(id, t)}
+          onToggleCompare={handleToggleCompare}
+          isCompared={comparedIdSet.has(currentPageView.profile.nu_id)}
+          onShareFamily={(p) => navigateTo({ type: 'family_share', candidate: p })}
+        />
+        {toast && <Toast toast={toast} onClose={() => setToast(null)} />}
+      </div>
+    );
+  }
+
+  // Dedicated Full-Page View 2: Booklet Candidate Deep-Dive (BookletDetailPage)
+  if (currentPageView.type === 'booklet_detail') {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col selection:bg-rose-500 selection:text-white">
+        <BookletDetailPage
+          candidate={currentPageView.candidate}
+          interaction={bookletInteractionsMap[currentPageView.candidate.id]}
+          onBack={navigateBack}
+          onStatusChange={handleBookletStatusChange}
+          onRatingChange={(id, r) => updateBookletRating(id, r)}
+          onNotesChange={(id, n) => updateBookletNotes(id, n)}
+          onAddTag={(id, t) => addBookletTag(id, t)}
+          onRemoveTag={(id, t) => removeBookletTag(id, t)}
+          onEdit={(cand) => {
+            triggerAdminPrompt('उमेदवार माहिती संपादित करण्यासाठी ॲडमिन पासवर्ड आवश्यक आहे.', () => {
+              navigateTo({ type: 'candidate_form', candidateToEdit: cand });
+            });
+          }}
+          onShareFamily={(cand) => navigateTo({ type: 'family_share', candidate: cand })}
+        />
+        {/* Admin Login Bottom Sheet */}
+        <AdminLoginModal
+          isOpen={activeSheet.type === 'admin_login'}
+          reasonMessage={activeSheet.type === 'admin_login' ? activeSheet.reason : undefined}
+          onClose={() => setActiveSheet({ type: 'none' })}
+          onLoginSuccess={() => {
+            setIsAdminAuth(true);
+            setToast({
+              id: String(Date.now()),
+              message: 'ॲडमिन प्रवेश यशस्वी झाला!',
+            });
+            if (activeSheet.type === 'admin_login' && activeSheet.pendingAction) {
+              activeSheet.pendingAction();
+            }
+            setActiveSheet({ type: 'none' });
+          }}
+        />
+        {toast && <Toast toast={toast} onClose={() => setToast(null)} />}
+      </div>
+    );
+  }
+
+  // Dedicated Full-Page View 3: Side-by-Side Comparison (ComparisonPage)
+  if (currentPageView.type === 'comparison') {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col selection:bg-rose-500 selection:text-white">
+        <ComparisonPage
+          profiles={comparedProfiles}
+          interactions={portalInteractionsMap}
+          onBack={navigateBack}
+          onRemoveFromCompare={handleToggleCompare}
+          onClearCompare={clearComparison}
+          onStatusChange={handlePortalStatusChange}
+          onSelectProfile={(p) => navigateTo({ type: 'profile_detail', profile: p })}
+        />
+        {toast && <Toast toast={toast} onClose={() => setToast(null)} />}
+      </div>
+    );
+  }
+
+  // Dedicated Full-Page View 4: Family Share & Printable Dossier (FamilySharePage)
+  if (currentPageView.type === 'family_share') {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col selection:bg-rose-500 selection:text-white">
+        <FamilySharePage
+          onBack={navigateBack}
+          initialCandidate={currentPageView.candidate}
+          portalProfiles={profiles}
+          portalInteractions={portalInteractionsMap}
+          bookletCandidates={bookletCandidates}
+          bookletInteractions={bookletInteractionsMap}
+          onShowToast={(msg) => setToast({ id: Date.now().toString(), message: msg })}
+        />
+        {toast && <Toast toast={toast} onClose={() => setToast(null)} />}
+      </div>
+    );
+  }
+
+  // Dedicated Full-Page View 5: Candidate Add / Edit Form (CandidateFormPage)
+  if (currentPageView.type === 'candidate_form') {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col selection:bg-rose-500 selection:text-white">
+        <CandidateFormPage
+          onBack={navigateBack}
+          candidateToEdit={currentPageView.candidateToEdit}
+          onSave={handleSaveCandidate}
+        />
         {toast && <Toast toast={toast} onClose={() => setToast(null)} />}
       </div>
     );
@@ -753,17 +925,15 @@ export const App: React.FC = () => {
         }}
         stats={activeStats}
         comparisonCount={comparisonItems.length}
-        onOpenComparison={() => setIsComparisonOpen(true)}
-        onOpenExport={() => setIsExportOpen(true)}
+        onOpenComparison={() => navigateTo({ type: 'comparison' })}
+        onOpenExport={() => setActiveSheet({ type: 'export' })}
         onOpenAddCandidate={() => {
           triggerAdminPrompt('नवीन उमेदवार जोडण्यासाठी ॲडमिन पासवर्ड आवश्यक आहे.', () => {
-            setCandidateToEdit(null);
-            setIsAddCandidateOpen(true);
+            navigateTo({ type: 'candidate_form' });
           });
         }}
         onOpenFamilyShare={() => {
-          setFamilyShareCandidate(null);
-          setIsFamilyShareOpen(true);
+          navigateTo({ type: 'family_share' });
         }}
         onToggleMobileFilters={() => setIsMobileFiltersOpen(true)}
         viewMode={viewMode}
@@ -785,7 +955,7 @@ export const App: React.FC = () => {
             bookletCandidates={bookletCandidates}
             bookletInteractions={bookletInteractionsMap}
             onNavigateToSection={(sec) => {
-              setActiveSection(sec);
+              handleSectionChange(sec);
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
           />
@@ -799,8 +969,8 @@ export const App: React.FC = () => {
             bookletInteractions={bookletInteractionsMap}
             onUpdateStage={handleUpdatePipelineStage}
             onAddCallLog={handleAddCallLog}
-            onSelectPortal={(profile) => setSelectedProfile(profile)}
-            onSelectBooklet={(candidate) => setSelectedBooklet(candidate)}
+            onSelectPortal={(profile) => navigateTo({ type: 'profile_detail', profile })}
+            onSelectBooklet={(candidate) => navigateTo({ type: 'booklet_detail', candidate })}
           />
         </div>
       ) : (
@@ -856,13 +1026,10 @@ export const App: React.FC = () => {
                       key={candidate.id}
                       candidate={candidate}
                       interaction={bookletInteractionsMap[candidate.id]}
-                      onSelect={() => setSelectedBooklet(candidate)}
+                      onSelect={() => navigateTo({ type: 'booklet_detail', candidate })}
                       onStatusChange={handleBookletStatusChange}
                       onRatingChange={(id, r) => updateBookletRating(id, r)}
-                      onShareFamily={(cand) => {
-                        setFamilyShareCandidate(cand);
-                        setIsFamilyShareOpen(true);
-                      }}
+                      onShareFamily={(cand) => navigateTo({ type: 'family_share', candidate: cand })}
                     />
                   ))}
                 </div>
@@ -908,15 +1075,12 @@ export const App: React.FC = () => {
                     profile={profile}
                     interaction={portalInteractionsMap[profile.nu_id]}
                     isCompared={comparedIdSet.has(profile.nu_id)}
-                    onSelect={() => setSelectedProfile(profile)}
+                    onSelect={() => navigateTo({ type: 'profile_detail', profile })}
                     onStatusChange={handlePortalStatusChange}
                     onRatingChange={(id, r) => updateProfileRating(id, r)}
                     onToggleCompare={handleToggleCompare}
                     compact={viewMode === 'compact'}
-                    onShareFamily={(p) => {
-                      setFamilyShareCandidate(p);
-                      setIsFamilyShareOpen(true);
-                    }}
+                    onShareFamily={(p) => navigateTo({ type: 'family_share', candidate: p })}
                   />
                 ))}
               </div>
@@ -1031,64 +1195,17 @@ export const App: React.FC = () => {
         </div>
       </footer>
 
-      {/* Portal Profile Deep-Dive Modal */}
-      <ProfileModal
-        profile={selectedProfile}
-        interaction={selectedProfile ? portalInteractionsMap[selectedProfile.nu_id] : undefined}
-        isOpen={Boolean(selectedProfile)}
-        onClose={() => setSelectedProfile(null)}
-        onStatusChange={handlePortalStatusChange}
-        onRatingChange={(id, r) => updateProfileRating(id, r)}
-        onNotesChange={(id, n) => updateProfileNotes(id, n)}
-        onAddTag={(id, t) => addProfileTag(id, t)}
-        onRemoveTag={(id, t) => removeProfileTag(id, t)}
-        onToggleCompare={handleToggleCompare}
-        isCompared={selectedProfile ? comparedIdSet.has(selectedProfile.nu_id) : false}
-        onShareFamily={(p) => {
-          setFamilyShareCandidate(p);
-          setIsFamilyShareOpen(true);
-        }}
+      {/* Floating PWA Install Prompt Banner */}
+      <InstallFloatingBanner
+        onInstall={handleInstallClick}
+        isStandalone={isStandalone}
       />
 
-      {/* Booklet Candidate Deep-Dive Modal */}
-      <BookletModal
-        candidate={selectedBooklet}
-        interaction={selectedBooklet ? bookletInteractionsMap[selectedBooklet.id] : undefined}
-        isOpen={Boolean(selectedBooklet)}
-        onClose={() => setSelectedBooklet(null)}
-        onStatusChange={handleBookletStatusChange}
-        onRatingChange={(id, r) => updateBookletRating(id, r)}
-        onNotesChange={(id, n) => updateBookletNotes(id, n)}
-        onAddTag={(id, t) => addBookletTag(id, t)}
-        onRemoveTag={(id, t) => removeBookletTag(id, t)}
-        onEdit={(cand) => {
-          triggerAdminPrompt('उमेदवार माहिती संपादित करण्यासाठी ॲडमिन पासवर्ड आवश्यक आहे.', () => {
-            setCandidateToEdit(cand);
-            setIsAddCandidateOpen(true);
-          });
-        }}
-        onShareFamily={(cand) => {
-          setFamilyShareCandidate(cand);
-          setIsFamilyShareOpen(true);
-        }}
-      />
-
-      {/* Side-by-Side Comparison Modal */}
-      <ComparisonModal
-        isOpen={isComparisonOpen}
-        onClose={() => setIsComparisonOpen(false)}
-        profiles={comparedProfiles}
-        interactions={portalInteractionsMap}
-        onRemoveFromCompare={handleToggleCompare}
-        onClearCompare={clearComparison}
-        onStatusChange={handlePortalStatusChange}
-      />
-
-      {/* Export / Backup Modal */}
+      {/* Export / Backup Bottom Sheet */}
       <ExportModal
-        isOpen={isExportOpen}
-        onClose={() => setIsExportOpen(false)}
-        activeSection={activeSection === 'portal' ? 'portal' : 'booklet'}
+        isOpen={activeSheet.type === 'export'}
+        onClose={() => setActiveSheet({ type: 'none' })}
+        activeSection={isBooklet ? 'booklet' : 'portal'}
         allProfiles={profiles}
         filteredProfiles={filteredPortalProfiles}
         interactions={portalInteractionsMap}
@@ -1098,60 +1215,29 @@ export const App: React.FC = () => {
         onImportBackup={handleImportBackup}
       />
 
-      {/* Candidate Add / Edit Modal */}
-      <CandidateFormModal
-        isOpen={isAddCandidateOpen}
-        onClose={() => {
-          setIsAddCandidateOpen(false);
-          setCandidateToEdit(null);
-        }}
-        candidateToEdit={candidateToEdit}
-        onSave={handleSaveCandidate}
-      />
-
-      {/* Family Discussion Dossier & PDF Share Modal */}
-      <FamilyShareModal
-        isOpen={isFamilyShareOpen}
-        onClose={() => {
-          setIsFamilyShareOpen(false);
-          setFamilyShareCandidate(null);
-        }}
-        initialCandidate={familyShareCandidate}
-        portalProfiles={profiles}
-        portalInteractions={portalInteractionsMap}
-        bookletCandidates={bookletCandidates}
-        bookletInteractions={bookletInteractionsMap}
-        onShowToast={(msg) => setToast({ id: Date.now().toString(), message: msg })}
-      />
-
-      {/* Floating PWA Install Prompt Banner */}
-      <InstallFloatingBanner
-        onInstall={handleInstallClick}
-        isStandalone={isStandalone}
-      />
-
-      {/* PWA Install Guide Modal */}
+      {/* PWA Install Guide Bottom Sheet */}
       <InstallPwaModal
-        isOpen={isInstallModalOpen}
-        onClose={() => setIsInstallModalOpen(false)}
+        isOpen={activeSheet.type === 'install_pwa'}
+        onClose={() => setActiveSheet({ type: 'none' })}
         onNativeInstall={handleInstallClick}
         canNativeInstall={Boolean(deferredPrompt || (typeof window !== 'undefined' && (window as any).deferredInstallPrompt))}
       />
 
-      {/* Admin Login Modal */}
+      {/* Admin Login Bottom Sheet */}
       <AdminLoginModal
-        isOpen={adminModalState.isOpen}
-        reasonMessage={adminModalState.reason}
-        onClose={() => setAdminModalState({ isOpen: false })}
+        isOpen={activeSheet.type === 'admin_login'}
+        reasonMessage={activeSheet.type === 'admin_login' ? activeSheet.reason : undefined}
+        onClose={() => setActiveSheet({ type: 'none' })}
         onLoginSuccess={() => {
           setIsAdminAuth(true);
           setToast({
             id: String(Date.now()),
             message: 'ॲडमिन प्रवेश यशस्वी झाला!',
           });
-          if (adminModalState.pendingAction) {
-            adminModalState.pendingAction();
+          if (activeSheet.type === 'admin_login' && activeSheet.pendingAction) {
+            activeSheet.pendingAction();
           }
+          setActiveSheet({ type: 'none' });
         }}
       />
 

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  X,
   CheckCircle2,
   Share,
   PlusSquare,
@@ -9,6 +8,7 @@ import {
   Download,
   Sparkles
 } from 'lucide-react';
+import { BottomSheet } from './BottomSheet';
 
 interface InstallPwaModalProps {
   isOpen: boolean;
@@ -31,42 +31,26 @@ export const InstallPwaModal: React.FC<InstallPwaModalProps> = ({
     return 'desktop';
   });
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
-      <div
-        className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-lg max-h-[92vh] flex flex-col overflow-hidden relative"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="p-5 bg-gradient-to-r from-rose-600 via-pink-600 to-rose-700 text-white flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img
-              src="/icon.svg"
-              alt="अनुबंध"
-              className="w-12 h-12 rounded-2xl shadow-md border-2 border-white/30 flex-shrink-0 object-contain p-0.5 bg-white/10"
-            />
-            <div>
-              <h3 className="text-base sm:text-lg font-black tracking-tight">
-                अनुबंध ॲप इन्स्टॉल करा
-              </h3>
-              <p className="text-xs text-rose-100 font-medium">
-                दोन मनांचे आणि दोन घराण्यांचे रेशीमबंध • ऑफलाइन ॲप
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-1.5 rounded-xl text-white/80 hover:text-white hover:bg-white/20 transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
+    <BottomSheet
+      isOpen={isOpen}
+      onClose={onClose}
+      title="अनुबंध ॲप इन्स्टॉल करा"
+      subtitle="दोन मनांचे आणि दोन घराण्यांचे रेशीमबंध • ऑफलाइन ॲप"
+      icon={
+        <img
+          src="/icon.svg"
+          alt="अनुबंध"
+          className="w-6 h-6 rounded-lg object-contain"
+        />
+      }
+      maxWidth="max-w-lg"
+      maxHeight="max-h-[88vh]"
+    >
+      <div className="space-y-4 text-xs">
         {/* Quick Direct 1-Click Install Button */}
         {canNativeInstall && onNativeInstall && (
-          <div className="p-4 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border-b border-emerald-200/80 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="p-3.5 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200/80 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center flex-shrink-0 shadow-sm">
                 <Sparkles className="w-4 h-4 animate-pulse" />
@@ -94,12 +78,12 @@ export const InstallPwaModal: React.FC<InstallPwaModalProps> = ({
         )}
 
         {/* Device selector tabs */}
-        <div className="p-4 bg-slate-50 border-b border-slate-100 flex items-center gap-1 text-xs">
+        <div className="p-1 bg-slate-100 rounded-2xl flex items-center gap-1 text-xs">
           <button
             onClick={() => setDeviceTab('android')}
             className={`flex-1 py-2 px-2 rounded-xl font-bold transition-all flex items-center justify-center gap-1.5 ${
               deviceTab === 'android'
-                ? 'bg-white text-slate-900 shadow-sm border border-slate-200'
+                ? 'bg-white text-slate-900 shadow-xs border border-slate-200/60'
                 : 'text-slate-500 hover:text-slate-900'
             }`}
           >
@@ -109,33 +93,33 @@ export const InstallPwaModal: React.FC<InstallPwaModalProps> = ({
             onClick={() => setDeviceTab('ios')}
             className={`flex-1 py-2 px-2 rounded-xl font-bold transition-all flex items-center justify-center gap-1.5 ${
               deviceTab === 'ios'
-                ? 'bg-white text-slate-900 shadow-sm border border-slate-200'
+                ? 'bg-white text-slate-900 shadow-xs border border-slate-200/60'
                 : 'text-slate-500 hover:text-slate-900'
             }`}
           >
-            <span>🍏 iPhone / iPad</span>
+            <span>🍏 iPhone</span>
           </button>
           <button
             onClick={() => setDeviceTab('desktop')}
             className={`flex-1 py-2 px-2 rounded-xl font-bold transition-all flex items-center justify-center gap-1.5 ${
               deviceTab === 'desktop'
-                ? 'bg-white text-slate-900 shadow-sm border border-slate-200'
+                ? 'bg-white text-slate-900 shadow-xs border border-slate-200/60'
                 : 'text-slate-500 hover:text-slate-900'
             }`}
           >
             <Laptop className="w-3.5 h-3.5" />
-            <span>💻 संगणक / लॅपटॉप</span>
+            <span>💻 संगणक</span>
           </button>
         </div>
 
         {/* Step-by-step instructions based on device */}
-        <div className="p-5 space-y-4 text-xs overflow-y-auto flex-1">
+        <div className="space-y-3">
           {deviceTab === 'android' && (
-            <div className="space-y-3">
-              <h4 className="font-bold text-slate-900 text-sm flex items-center gap-1.5">
-                <span>Android फोनमध्ये Chrome द्वारे कसे इन्स्टॉल करावे:</span>
+            <div className="space-y-2.5">
+              <h4 className="font-bold text-slate-900 text-xs">
+                Android फोनमध्ये Chrome द्वारे कसे इन्स्टॉल करावे:
               </h4>
-              <ol className="space-y-2.5 text-slate-700">
+              <ol className="space-y-2 text-slate-700">
                 <li className="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
                   <span className="w-5 h-5 rounded-full bg-rose-100 text-rose-800 font-bold flex items-center justify-center text-[11px] flex-shrink-0 mt-0.5">
                     १
@@ -167,7 +151,7 @@ export const InstallPwaModal: React.FC<InstallPwaModalProps> = ({
                   <div>
                     <span className="font-semibold block text-slate-900">Install वर टॅप करा</span>
                     <span className="text-[11px] text-slate-500">
-                      ॲप तुमच्या मोबाईल होम स्क्रीनवर प्ले स्टोअरच्या ॲपप्रमाणे दिसेल व ऑफलाइन चालेल.
+                      ॲप तुमच्या मोबाईल होम स्क्रीनवर स्वतंत्र ॲपप्रमाणे दिसेल व ऑफलाइन चालेल.
                     </span>
                   </div>
                 </li>
@@ -176,11 +160,11 @@ export const InstallPwaModal: React.FC<InstallPwaModalProps> = ({
           )}
 
           {deviceTab === 'ios' && (
-            <div className="space-y-3">
-              <h4 className="font-bold text-slate-900 text-sm flex items-center gap-1.5">
-                <span>iPhone / iPad वर Safari द्वारे कसे जोडावे:</span>
+            <div className="space-y-2.5">
+              <h4 className="font-bold text-slate-900 text-xs">
+                iPhone / iPad वर Safari द्वारे कसे जोडावे:
               </h4>
-              <ol className="space-y-2.5 text-slate-700">
+              <ol className="space-y-2 text-slate-700">
                 <li className="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
                   <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-800 font-bold flex items-center justify-center text-[11px] flex-shrink-0 mt-0.5">
                     १
@@ -221,11 +205,11 @@ export const InstallPwaModal: React.FC<InstallPwaModalProps> = ({
           )}
 
           {deviceTab === 'desktop' && (
-            <div className="space-y-3">
-              <h4 className="font-bold text-slate-900 text-sm flex items-center gap-1.5">
-                <span>संगणक / लॅपटॉपवर (Chrome / Edge):</span>
+            <div className="space-y-2.5">
+              <h4 className="font-bold text-slate-900 text-xs">
+                संगणक / लॅपटॉपवर (Chrome / Edge):
               </h4>
-              <ol className="space-y-2.5 text-slate-700">
+              <ol className="space-y-2 text-slate-700">
                 <li className="flex items-start gap-2.5 p-2.5 rounded-xl bg-slate-50 border border-slate-100">
                   <span className="w-5 h-5 rounded-full bg-purple-100 text-purple-800 font-bold flex items-center justify-center text-[11px] flex-shrink-0 mt-0.5">
                     १
@@ -254,29 +238,28 @@ export const InstallPwaModal: React.FC<InstallPwaModalProps> = ({
           )}
 
           {/* Benefits Box */}
-          <div className="p-3 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/80 space-y-1.5">
+          <div className="p-3 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/80 space-y-1">
             <span className="text-[11px] font-bold text-amber-900 flex items-center gap-1">
               <CheckCircle2 className="w-3.5 h-3.5 text-amber-700" />
               ॲपचे फायदे:
             </span>
-            <ul className="text-[11px] text-slate-600 space-y-1 list-disc list-inside">
+            <ul className="text-[11px] text-slate-600 space-y-0.5 list-disc list-inside">
               <li>इंटरनेट बंद असतानाही सर्व प्रोफाईल्स व संपर्क नंबर उघडतात.</li>
-              <li>मोबाईलमध्ये जागा (Storage) नगण्य लागते (&lt; 3 MB).</li>
-              <li>नवीन स्थळे आपोआप अपडेट होतात.</li>
+              <li>मोबाईलमध्ये जागा नगण्य लागते (&lt; 3 MB).</li>
+              <li>नवीन स्थळे आपोआप सिंक होतात.</li>
             </ul>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+        <div className="pt-2 flex justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition-colors"
+            className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition-colors text-center"
           >
             समजले (Got it)
           </button>
         </div>
       </div>
-    </div>
+    </BottomSheet>
   );
 };

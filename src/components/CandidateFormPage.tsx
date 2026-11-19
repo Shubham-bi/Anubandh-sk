@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { X, UserPlus, Save, User, MapPin, Phone, GraduationCap, Users, Heart } from 'lucide-react';
+import { ArrowLeft, UserPlus, Save, User, MapPin, Phone, GraduationCap, Users } from 'lucide-react';
 import { BookletCandidate } from '../types/candidate';
 
-interface CandidateFormModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+interface CandidateFormPageProps {
+  onBack: () => void;
   candidateToEdit?: BookletCandidate | null;
   onSave: (candidate: BookletCandidate) => void;
 }
 
-export const CandidateFormModal: React.FC<CandidateFormModalProps> = ({
-  isOpen,
-  onClose,
+export const CandidateFormPage: React.FC<CandidateFormPageProps> = ({
+  onBack,
   candidateToEdit,
   onSave,
 }) => {
@@ -37,6 +35,7 @@ export const CandidateFormModal: React.FC<CandidateFormModalProps> = ({
   });
 
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
     if (candidateToEdit) {
       // Pre-fill existing candidate
       const contactLines = (candidateToEdit.contact || '').split('\n');
@@ -87,9 +86,16 @@ export const CandidateFormModal: React.FC<CandidateFormModalProps> = ({
         age: 25,
       });
     }
-  }, [candidateToEdit, isOpen]);
+  }, [candidateToEdit]);
 
-  if (!isOpen) return null;
+  // Handle escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onBack();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onBack]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -131,42 +137,52 @@ export const CandidateFormModal: React.FC<CandidateFormModalProps> = ({
     };
 
     onSave(newCandidate);
-    onClose();
+    onBack();
   };
 
   const isEdit = Boolean(candidateToEdit);
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 md:p-6 animate-in fade-in">
-      <div
-        className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[94vh] flex flex-col overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className="p-4 sm:px-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/90 sticky top-0 z-10">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-rose-100 text-rose-700">
-              <UserPlus className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="font-extrabold text-base text-slate-900">
-                {isEdit ? 'उमेदवार माहिती संपादित करा (Edit Profile)' : 'नवीन उमेदवार जोडा (Add Candidate)'}
-              </h3>
-              <p className="text-xs text-slate-500">
-                पुस्तिका किंवा नवीन स्थळाची माहिती नोंदवा
-              </p>
+    <div className="min-h-screen bg-slate-50 flex flex-col animate-in fade-in duration-200">
+      {/* Sticky Top Header */}
+      <div className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/90 px-3 sm:px-6 py-2.5 sm:py-3 shadow-xs">
+        <div className="max-w-3xl mx-auto flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={onBack}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4 text-slate-600" />
+              <span>मागे (Back)</span>
+            </button>
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 rounded-xl bg-rose-100 text-rose-700 hidden sm:block">
+                <UserPlus className="w-4 h-4" />
+              </div>
+              <div>
+                <h1 className="font-extrabold text-sm sm:text-base text-slate-900 leading-tight">
+                  {isEdit ? 'उमेदवार माहिती संपादित करा' : 'नवीन उमेदवार जोडा'}
+                </h1>
+                <p className="text-[11px] text-slate-500 font-medium">
+                  पुस्तिका किंवा नवीन स्थळाची माहिती नोंदवा
+                </p>
+              </div>
             </div>
           </div>
+
           <button
-            onClick={onClose}
-            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200"
+            onClick={handleSubmit}
+            className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-sm shadow-rose-600/30 transition-all"
           >
-            <X className="w-5 h-5" />
+            <Save className="w-3.5 h-3.5" />
+            <span>जतन करा (Save)</span>
           </button>
         </div>
+      </div>
 
-        {/* Form Body */}
-        <form onSubmit={handleSubmit} className="overflow-y-auto flex-1 p-4 sm:p-6 space-y-5 text-xs">
+      {/* Form Content */}
+      <div className="flex-1 max-w-3xl w-full mx-auto p-3 sm:p-6 space-y-5">
+        <form onSubmit={handleSubmit} className="bg-white rounded-3xl shadow-sm border border-slate-200/90 p-4 sm:p-6 space-y-6 text-xs">
           {/* Section: Basic Info */}
           <div className="space-y-3">
             <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
@@ -219,7 +235,7 @@ export const CandidateFormModal: React.FC<CandidateFormModalProps> = ({
                 <label className="font-bold text-slate-700 block mb-1">उंची (Height)</label>
                 <input
                   type="text"
-                  placeholder="५'४''"
+                  placeholder="उदा. ५'४''"
                   value={formData.height}
                   onChange={(e) => setFormData({ ...formData, height: e.target.value })}
                   className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold focus:bg-white focus:ring-2 focus:ring-rose-500"
@@ -228,22 +244,20 @@ export const CandidateFormModal: React.FC<CandidateFormModalProps> = ({
 
               <div>
                 <label className="font-bold text-slate-700 block mb-1">वर्ण (Complexion)</label>
-                <select
+                <input
+                  type="text"
+                  placeholder="उदा. गोरा, सावळा"
                   value={formData.complexion}
                   onChange={(e) => setFormData({ ...formData, complexion: e.target.value })}
                   className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold focus:bg-white focus:ring-2 focus:ring-rose-500"
-                >
-                  <option value="गोरा">गोरा (Fair)</option>
-                  <option value="गहूवर्ण">गहूवर्ण (Wheatish)</option>
-                  <option value="सावळा">सावळा</option>
-                </select>
+                />
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">रक्तगट (Blood)</label>
+                <label className="font-bold text-slate-700 block mb-1">रक्तगट (Blood Group)</label>
                 <input
                   type="text"
-                  placeholder="उदा. ओ+, एबी+, बी+"
+                  placeholder="उदा. ओ+, बी+, ए+"
                   value={formData.blood}
                   onChange={(e) => setFormData({ ...formData, blood: e.target.value })}
                   className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold focus:bg-white focus:ring-2 focus:ring-rose-500"
@@ -252,10 +266,10 @@ export const CandidateFormModal: React.FC<CandidateFormModalProps> = ({
             </div>
           </div>
 
-          {/* Section: Gotra & Native Town */}
+          {/* Section: Kundali & Gotra */}
           <div className="space-y-3 pt-3 border-t border-slate-100">
             <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-rose-500" /> गोत्र व मूळगाव (Gotra & Origin)
+              <MapPin className="w-3.5 h-3.5 text-amber-500" /> गोत्र व जन्म तपशील (Horoscope & Native)
             </h4>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -263,7 +277,8 @@ export const CandidateFormModal: React.FC<CandidateFormModalProps> = ({
                 <label className="font-bold text-slate-700 block mb-1">गोत्र (Gotra) *</label>
                 <input
                   type="text"
-                  placeholder="उदा. कौशिक, शांडिल्य, भारद्वाज..."
+                  required
+                  placeholder="उदा. भारद्वाज, कश्यप, वसिष्ठ"
                   value={formData.gotra}
                   onChange={(e) => setFormData({ ...formData, gotra: e.target.value })}
                   className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold focus:bg-white focus:ring-2 focus:ring-rose-500"
@@ -274,7 +289,7 @@ export const CandidateFormModal: React.FC<CandidateFormModalProps> = ({
                 <label className="font-bold text-slate-700 block mb-1">मामकूळ (Mamkul)</label>
                 <input
                   type="text"
-                  placeholder="उदा. नारखेडे, पाटील..."
+                  placeholder="उदा. सरोदे, बोंडे, कोलते"
                   value={formData.mamkul}
                   onChange={(e) => setFormData({ ...formData, mamkul: e.target.value })}
                   className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold focus:bg-white focus:ring-2 focus:ring-rose-500"
@@ -282,70 +297,100 @@ export const CandidateFormModal: React.FC<CandidateFormModalProps> = ({
               </div>
 
               <div>
-                <label className="font-bold text-slate-700 block mb-1">मूळगाव (Mulgaon / Native)</label>
+                <label className="font-bold text-slate-700 block mb-1">मुळगाव (Native Village)</label>
                 <input
                   type="text"
-                  placeholder="उदा. मलकापूर, पुणे, जळगाव..."
+                  placeholder="उदा. सावदा, फैजपूर, वरणगाव"
                   value={formData.mulgaon}
                   onChange={(e) => setFormData({ ...formData, mulgaon: e.target.value })}
                   className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold focus:bg-white focus:ring-2 focus:ring-rose-500"
                 />
               </div>
             </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">जन्म तारीख (Birth Date)</label>
+                <input
+                  type="text"
+                  placeholder="उदा. १२-०८-१९९९ किंवा 12/08/1999"
+                  value={formData.date}
+                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                  className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold focus:bg-white focus:ring-2 focus:ring-rose-500"
+                />
+              </div>
+
+              <div>
+                <label className="font-bold text-slate-700 block mb-1">जन्म वेळ (Birth Time)</label>
+                <input
+                  type="text"
+                  placeholder="उदा. स. ०८:४५ किंवा दु. ०२:१५"
+                  value={formData.time}
+                  onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                  className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold focus:bg-white focus:ring-2 focus:ring-rose-500"
+                />
+              </div>
+            </div>
           </div>
 
-          {/* Section: Education, Job & Family */}
+          {/* Section: Education & Career */}
           <div className="space-y-3 pt-3 border-t border-slate-100">
             <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-              <GraduationCap className="w-3.5 h-3.5 text-rose-500" /> शिक्षण व नोकरी (Career & Family)
+              <GraduationCap className="w-3.5 h-3.5 text-blue-500" /> शिक्षण व नोकरी (Education & Profession)
             </h4>
 
             <div>
               <label className="font-bold text-slate-700 block mb-1">
-                शिक्षण व नोकरी / व्यवसाय (Education & Job details)
+                शिक्षण व नोकरी सविस्तर तपशील *
               </label>
               <textarea
-                rows={2}
-                placeholder="उदा. बी.ई. कॉम्प्युटर, नो- सिनियर सिस्टीम इंजिनिअर इन्फोसिस पुणे, रु. ६ लाख वार्षिक"
+                rows={3}
+                required
+                placeholder="उदा. BE (Computer), Software Engineer at Infosys Pune, वार्षिक पॅकेज १२ लाख"
                 value={formData.edu}
                 onChange={(e) => setFormData({ ...formData, edu: e.target.value })}
                 className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium focus:bg-white focus:ring-2 focus:ring-rose-500"
               />
             </div>
+          </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="font-bold text-slate-700 block mb-1 flex items-center gap-1">
-                  <Users className="w-3.5 h-3.5 text-slate-400" /> कौटुंबिक माहिती (भाऊ / बहिण)
-                </label>
-                <input
-                  type="text"
-                  placeholder="उदा. भाऊ- १ अविवाहित, बहिण- नाही"
-                  value={formData.fam}
-                  onChange={(e) => setFormData({ ...formData, fam: e.target.value })}
-                  className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium focus:bg-white focus:ring-2 focus:ring-rose-500"
-                />
-              </div>
+          {/* Section: Family & Expectations */}
+          <div className="space-y-3 pt-3 border-t border-slate-100">
+            <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+              <Users className="w-3.5 h-3.5 text-purple-500" /> कौटुंबिक माहिती व अपेक्षा (Family & Expectations)
+            </h4>
 
-              <div>
-                <label className="font-bold text-slate-700 block mb-1 flex items-center gap-1">
-                  <Heart className="w-3.5 h-3.5 text-slate-400" /> अपेक्षा (Expectations)
-                </label>
-                <input
-                  type="text"
-                  placeholder="उदा. अनुरूप, पदवीधर"
-                  value={formData.exp}
-                  onChange={(e) => setFormData({ ...formData, exp: e.target.value })}
-                  className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium focus:bg-white focus:ring-2 focus:ring-rose-500"
-                />
-              </div>
+            <div>
+              <label className="font-bold text-slate-700 block mb-1">
+                कौटुंबिक माहिती (भाऊ, बहीण, शेती/इस्टेट)
+              </label>
+              <textarea
+                rows={2}
+                placeholder="उदा. १ भाऊ (इंजिनिअर), १ बहीण (विवाहित), शेती ५ एकर बागायत"
+                value={formData.fam}
+                onChange={(e) => setFormData({ ...formData, fam: e.target.value })}
+                className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium focus:bg-white focus:ring-2 focus:ring-rose-500"
+              />
+            </div>
+
+            <div>
+              <label className="font-bold text-slate-700 block mb-1">
+                अपेक्षा (Expectations)
+              </label>
+              <input
+                type="text"
+                placeholder="उदा. अनुरूप, पदवीधर, नोकरी करणारी किंवा गृहिणी चालतील"
+                value={formData.exp}
+                onChange={(e) => setFormData({ ...formData, exp: e.target.value })}
+                className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium focus:bg-white focus:ring-2 focus:ring-rose-500"
+              />
             </div>
           </div>
 
-          {/* Section: Contact Person, Address & Mobile */}
+          {/* Section: Contacts */}
           <div className="space-y-3 pt-3 border-t border-slate-100">
             <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-              <Phone className="w-3.5 h-3.5 text-rose-500" /> पालक व संपर्क तपशील (Guardian & Contacts)
+              <Phone className="w-3.5 h-3.5 text-emerald-500" /> संपर्क तपशील (Contact Details)
             </h4>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -395,11 +440,11 @@ export const CandidateFormModal: React.FC<CandidateFormModalProps> = ({
           </div>
 
           {/* Action Buttons */}
-          <div className="pt-4 pb-2 border-t border-slate-200 flex items-center justify-end gap-2.5 sticky bottom-0 bg-white z-10">
+          <div className="pt-4 border-t border-slate-200 flex items-center justify-end gap-2.5">
             <button
               type="button"
-              onClick={onClose}
-              className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50"
+              onClick={onBack}
+              className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 transition-colors"
             >
               रद्द करा (Cancel)
             </button>

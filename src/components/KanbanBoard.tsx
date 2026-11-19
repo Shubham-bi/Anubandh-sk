@@ -11,10 +11,10 @@ import {
   MessageCircle,
   Clock,
   PlusCircle,
-  Search,
-  XCircle
+  Search
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { BottomSheet } from './BottomSheet';
 
 interface KanbanBoardProps {
   portalProfiles: Profile[];
@@ -495,78 +495,66 @@ export const KanbanBoardComponent: React.FC<KanbanBoardProps> = ({
         })}
       </div>
 
-      {/* Call / Interaction Log Dialog */}
-      {activeLogItem && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in">
-          <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-md p-6 space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <div>
-                <h3 className="font-extrabold text-base text-slate-900">
-                  चर्चा / फोन नोंद (Call Discussion Log)
-                </h3>
-                <p className="text-xs text-rose-600 font-semibold mt-0.5">
-                  {activeLogItem.name} ({activeLogItem.city})
-                </p>
-              </div>
-              <button
-                onClick={() => setActiveLogItem(null)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-700"
+      {/* Call / Interaction Log Bottom Sheet */}
+      <BottomSheet
+        isOpen={Boolean(activeLogItem)}
+        onClose={() => setActiveLogItem(null)}
+        title="चर्चा / फोन नोंद (Call Discussion Log)"
+        subtitle={activeLogItem ? `${activeLogItem.name} (${activeLogItem.city})` : ''}
+        icon={<Phone className="w-5 h-5 text-rose-600" />}
+        maxWidth="max-w-md"
+      >
+        {activeLogItem && (
+          <form onSubmit={handleSaveLog} className="space-y-4 text-xs">
+            <div>
+              <label className="font-bold text-slate-700 block mb-1">
+                नवीन टप्पा निवडा (Move Pipeline Stage)
+              </label>
+              <select
+                value={logTargetStage}
+                onChange={(e) => setLogTargetStage(e.target.value as PipelineStage)}
+                className="w-full p-2.5 rounded-xl bg-slate-50 border border-slate-200 font-semibold text-slate-800"
               >
-                <XCircle className="w-5 h-5" />
-              </button>
+                {PIPELINE_STAGES.map((s) => (
+                  <option key={s.id} value={s.id}>
+                    {s.icon} {s.titleMr} ({s.title})
+                  </option>
+                ))}
+              </select>
             </div>
 
-            <form onSubmit={handleSaveLog} className="space-y-4 text-xs">
-              <div>
-                <label className="font-bold text-slate-700 block mb-1">
-                  नवीन टप्पा निवडा (Move Pipeline Stage)
-                </label>
-                <select
-                  value={logTargetStage}
-                  onChange={(e) => setLogTargetStage(e.target.value as PipelineStage)}
-                  className="w-full p-2 rounded-xl bg-slate-50 border border-slate-200 font-semibold"
-                >
-                  {PIPELINE_STAGES.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.icon} {s.titleMr} ({s.title})
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <div>
+              <label className="font-bold text-slate-700 block mb-1">
+                झालेली चर्चा व महत्त्वाचे मुद्दे (Discussion Summary) *
+              </label>
+              <textarea
+                rows={4}
+                required
+                placeholder="उदा. वडिलांशी बोलणे झाले. त्यांनी मुलगा पुण्यात असल्यास रविवारी भेटायला सांगितले..."
+                value={logNote}
+                onChange={(e) => setLogNote(e.target.value)}
+                className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium focus:bg-white focus:ring-2 focus:ring-rose-500"
+              />
+            </div>
 
-              <div>
-                <label className="font-bold text-slate-700 block mb-1">
-                  झालेली चर्चा व महत्त्वाचे मुद्दे (Discussion Summary) *
-                </label>
-                <textarea
-                  rows={4}
-                  required
-                  placeholder="उदा. वडिलांशी बोलणे झाले. त्यांनी मुलगा पुण्यात असल्यास रविवारी भेटायला सांगितले..."
-                  value={logNote}
-                  onChange={(e) => setLogNote(e.target.value)}
-                  className="w-full p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs font-medium focus:bg-white focus:ring-2 focus:ring-rose-500"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={() => setActiveLogItem(null)}
-                  className="px-3 py-2 rounded-xl border border-slate-200 font-semibold text-slate-600"
-                >
-                  रद्द करा
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold transition-colors"
-                >
-                  नोंद जतन करा (Save Log)
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setActiveLogItem(null)}
+                className="px-3.5 py-2 rounded-xl border border-slate-200 font-semibold text-slate-600 hover:bg-slate-50"
+              >
+                रद्द करा
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold transition-colors shadow-sm"
+              >
+                नोंद जतन करा (Save Log)
+              </button>
+            </div>
+          </form>
+        )}
+      </BottomSheet>
     </div>
   );
 };

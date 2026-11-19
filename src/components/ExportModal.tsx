@@ -1,8 +1,9 @@
 import React, { useRef, useState } from 'react';
-import { X, Download, Upload, FileSpreadsheet, Database, Check } from 'lucide-react';
+import { Download, Upload, FileSpreadsheet, Database, Check } from 'lucide-react';
 import { Profile, ProfileInteraction } from '../types/profile';
 import { BookletCandidate } from '../types/candidate';
 import { generateCSV, generateBookletCSV, downloadFile } from '../utils/formatters';
+import { BottomSheet } from './BottomSheet';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -31,8 +32,6 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [importStatus, setImportStatus] = useState<string | null>(null);
-
-  if (!isOpen) return null;
 
   const isBooklet = activeSection === 'booklet';
 
@@ -78,17 +77,14 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
   const handleExportBackupJSON = () => {
     const dateStr = new Date().toISOString().split('T')[0];
-    const payload = {
+    const dataToExport = {
+      version: '1.0',
       exportedAt: new Date().toISOString(),
       section: activeSection,
       interactions: isBooklet ? bookletInteractions : interactions,
-      shortlistedCount: isBooklet ? shortlistedBooklet.length : shortlistedPortal.length,
     };
-    downloadFile(
-      JSON.stringify(payload, null, 2),
-      `LSM_${isBooklet ? 'Booklet' : 'Portal'}_Decisions_Backup_${dateStr}.json`,
-      'application/json'
-    );
+    const jsonStr = JSON.stringify(dataToExport, null, 2);
+    downloadFile(jsonStr, `LSM_Backup_${activeSection}_${dateStr}.json`, 'application/json');
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -124,33 +120,18 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   const sectionLabel = isBooklet ? 'Booklet / Melawa (पुस्तिका)' : 'Online Portal (वेब पोर्टल)';
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-in fade-in">
-      <div className="bg-white rounded-3xl shadow-2xl border border-slate-200 w-full max-w-lg max-h-[92vh] flex flex-col overflow-y-auto p-5 sm:p-6 space-y-5 sm:space-y-6">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-rose-50 text-rose-600">
-              <Download className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="font-extrabold text-base text-slate-900">Export & Backup</h3>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700">
-                  {sectionLabel}
-                </span>
-              </div>
-              <p className="text-xs text-slate-500">Download spreadsheets or sync your triage decisions</p>
-            </div>
-          </div>
-          <button
-            onClick={onClose}
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
+    <BottomSheet
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Export & Backup"
+      subtitle={sectionLabel}
+      icon={<Download className="w-5 h-5 text-rose-600" />}
+      maxWidth="max-w-lg"
+      maxHeight="max-h-[88vh]"
+    >
+      <div className="space-y-4">
         {/* CSV Export Options */}
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
             Export to Excel / CSV Spreadsheet
           </h4>
@@ -158,11 +139,11 @@ export const ExportModal: React.FC<ExportModalProps> = ({
           <button
             onClick={handleExportShortlistedCSV}
             disabled={currentShortlistedCount === 0}
-            className="w-full p-3 rounded-2xl border border-emerald-200 bg-emerald-50/50 hover:bg-emerald-50 flex items-center justify-between transition-colors disabled:opacity-50 disabled:cursor-not-allowed group"
+            className="w-full p-3 rounded-2xl border border-emerald-200 bg-emerald-50/50 hover:bg-emerald-50 flex items-center justify-between transition-colors disabled:opacity-50 disabled:cursor-not-allowed group text-left"
           >
             <div className="flex items-center gap-3">
               <FileSpreadsheet className="w-5 h-5 text-emerald-600" />
-              <div className="text-left">
+              <div>
                 <span className="font-bold text-xs text-slate-800 block">Export Shortlisted</span>
                 <span className="text-[11px] text-slate-500">
                   {currentShortlistedCount} selected as Shortlist (⭐)
@@ -176,11 +157,11 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
           <button
             onClick={handleExportFilteredCSV}
-            className="w-full p-3 rounded-2xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50 flex items-center justify-between transition-colors group"
+            className="w-full p-3 rounded-2xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50 flex items-center justify-between transition-colors group text-left"
           >
             <div className="flex items-center gap-3">
               <FileSpreadsheet className="w-5 h-5 text-slate-500 group-hover:text-slate-700" />
-              <div className="text-left">
+              <div>
                 <span className="font-bold text-xs text-slate-800 block">Export Active Filtered List</span>
                 <span className="text-[11px] text-slate-500">
                   {currentFilteredCount} profiles matching current filters
@@ -194,11 +175,11 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
           <button
             onClick={handleExportAllCSV}
-            className="w-full p-3 rounded-2xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50 flex items-center justify-between transition-colors group"
+            className="w-full p-3 rounded-2xl border border-slate-200 hover:border-slate-300 hover:bg-slate-50 flex items-center justify-between transition-colors group text-left"
           >
             <div className="flex items-center gap-3">
               <FileSpreadsheet className="w-5 h-5 text-slate-500 group-hover:text-slate-700" />
-              <div className="text-left">
+              <div>
                 <span className="font-bold text-xs text-slate-800 block">Export Complete {isBooklet ? 'Booklet' : 'Portal'}</span>
                 <span className="text-[11px] text-slate-500">{currentTotalCount} candidates total</span>
               </div>
@@ -210,7 +191,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
         </div>
 
         {/* JSON Backup & Restore */}
-        <div className="pt-2 border-t border-slate-100 space-y-3">
+        <div className="pt-2 border-t border-slate-100 space-y-2.5">
           <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
             Triage Backup & Restore
           </h4>
@@ -254,6 +235,6 @@ export const ExportModal: React.FC<ExportModalProps> = ({
           )}
         </div>
       </div>
-    </div>
+    </BottomSheet>
   );
 };
