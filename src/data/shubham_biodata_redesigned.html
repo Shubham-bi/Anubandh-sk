@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="शुभम अनिल खर्चे यांची वैयक्तिक व कौटुंबिक माहिती">
+<title>वैयक्तिक माहिती | शुभम अनिल खर्चे</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap');
+  :root {
+    --ink: #343434;
+    --muted: #686868;
+    --accent: #b94c2e;
+    --accent-soft: #f8eee8;
+    --line: #d8c9bd;
+    --paper: #fffefa;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 28px 14px;
+    color: var(--ink);
+    background: #eeeae5;
+    font-family: "Noto Sans Devanagari", "Nirmala UI", "Mangal", sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .sheet {
+    position: relative;
+    width: 724px;
+    max-width: 100%;
+    min-height: 1024px;
+    margin: 0 auto;
+    padding: 34px 38px 38px;
+    background: #ffffff;
+    border: 2px solid #222222;
+    outline: 1px solid #444444;
+    outline-offset: -5px;
+    box-shadow: 0 10px 32px rgba(45, 35, 25, .12);
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+  .corner-flourish {
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    pointer-events: none;
+  }
+  .corner-tl { top: 6px; left: 6px; }
+  .corner-tr { top: 6px; right: 6px; transform: scaleX(-1); }
+  .corner-bl { bottom: 6px; left: 6px; transform: scaleY(-1); }
+  .corner-br { bottom: 6px; right: 6px; transform: scale(-1, -1); }
+  .header {
+    text-align: center;
+    margin: 0 auto 12px;
+    position: relative;
+    z-index: 1;
+  }
+  .ganesh {
+    display: block;
+    width: 66px;
+    height: 66px;
+    object-fit: contain;
+    margin: 0 auto 4px;
+  }
+  .invocation {
+    margin: 0;
+    color: #1e293b;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: .3px;
+  }
+  .ornament {
+    display: none;
+  }
+  .section { margin: 0 0 16px; }
+  .section-title {
+    text-align: center;
+    margin: 16px 0 10px;
+    color: #1e293b;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: .2px;
+  }
+  .details-box {
+    max-width: 480px;
+    margin: 0 auto;
+  }
+  .details {
+    display: grid;
+    grid-template-columns: 135px 20px 1fr;
+    column-gap: 6px;
+    row-gap: 6.5px;
+    align-items: start;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+  .label { font-weight: 500; color: #1e293b; white-space: nowrap; }
+  .colon { color: #1e293b; text-align: center; font-weight: 500; }
+  .value { min-width: 0; overflow-wrap: anywhere; font-weight: 500; color: #1e293b; }
+  .subvalue {
+    display: block;
+    margin-top: 1px;
+    color: #1e293b;
+    font-size: 14px;
+  }
+  .contacts {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 2px;
+  }
+  .contact-item {
+    text-align: center;
+    font-size: 14.5px;
+    line-height: 1.45;
+  }
+  .contact-name-place {
+    font-weight: 500;
+    color: #1e293b;
+  }
+  .contact-phone {
+    font-weight: 500;
+    color: #1e293b;
+    letter-spacing: .2px;
+  }
+  .bottom-rule {
+    display: none;
+  }
+  @media (max-width: 600px) {
+    body { padding: 0; background: var(--paper); }
+    .sheet {
+      width: 100%;
+      min-height: 100vh;
+      padding: 28px 24px 38px;
+      border: 0;
+      outline: 0;
+      box-shadow: none;
+    }
+    .sheet::before { top: 8px; left: 8px; font-size: 25px; }
+    .sheet::after { top: 8px; right: 8px; font-size: 25px; }
+    .corner-bottom { left: 8px; right: 8px; bottom: 8px; font-size: 25px; }
+    .ganesh { width: 58px; height: 58px; }
+    .invocation { font-size: 15px; }
+    .section-title { font-size: 17px; margin-bottom: 10px; }
+    .details {
+      grid-template-columns: minmax(105px, 36%) 10px minmax(0, 1fr);
+      column-gap: 6px;
+      row-gap: 6px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .subvalue { font-size: 12.5px; }
+    .contacts { grid-template-columns: 1fr; gap: 8px; }
+    .contact { padding: 8px 10px; font-size: 13.5px; }
+    .section { margin-bottom: 18px; }
+  }
+  @media print {
+    @page { size: A4 portrait; margin: 10mm; }
+    body { padding: 0; background: #fff; }
+    .share-action-bar, .toast-notification { display: none !important; }
+    .sheet {
+      width: 100%;
+      max-width: none;
+      min-height: 277mm;
+      padding: 12mm 15mm 14mm;
+      border: 1px solid #999;
+      outline: 1px solid #c9c4bd;
+      outline-offset: -6px;
+      box-shadow: none;
+    }
+    .contact { break-inside: avoid; }
+    .section { break-inside: avoid; }
+  }
+
+  /* Floating Bottom Action Bar for WhatsApp Image Sharing */
+  .share-action-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-top: 1.5px solid #d8c9bd;
+    padding: 10px 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    box-shadow: 0 -4px 18px rgba(45, 35, 25, 0.15);
+    z-index: 9999;
+  }
+  .sbtn {
+    border: none;
+    border-radius: 9px;
+    padding: 9px 15px;
+    font-size: 13.5px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .sbtn:active {
+    transform: scale(0.97);
+  }
+  .sbtn-wa {
+    background: #16a34a;
+    color: #ffffff;
+  }
+  .sbtn-wa:hover {
+    background: #15803d;
+  }
+  .sbtn-dl {
+    background: #0284c7;
+    color: #ffffff;
+  }
+  .sbtn-dl:hover {
+    background: #0369a1;
+  }
+  .sbtn-share {
+    background: #4f46e5;
+    color: #ffffff;
+  }
+  .sbtn-share:hover {
+    background: #4338ca;
+  }
+  .sbtn-copy {
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    color: #1e293b;
+  }
+  .sbtn-copy:hover {
+    background: #f1f5f9;
+  }
+  .sbtn-home {
+    background: #881337;
+    color: #ffffff;
+  }
+  .sbtn-home:hover {
+    background: #9f1239;
+  }
+  /* Share Preview Modal Overlay (5-Step Share Flow) */
+  .share-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+  }
+  .share-modal-overlay.open {
+    display: flex;
+  }
+  .share-modal-box {
+    background: #ffffff;
+    width: 100%;
+    max-width: 520px;
+    max-height: 92vh;
+    border-radius: 18px;
+    overflow-y: auto;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+  }
+  .share-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 18px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #fff;
+  }
+  .share-modal-title {
+    font-size: 15px;
+    font-weight: 800;
+    color: #881337;
+  }
+  .share-modal-close {
+    background: none;
+    border: none;
+    font-size: 26px;
+    color: #64748b;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 4px;
+  }
+  .share-modal-content {
+    padding: 16px;
+    text-align: center;
+    background: #f8fafc;
+    flex: 1;
+  }
+  .share-modal-preview-img {
+    max-width: 100%;
+    max-height: 55vh;
+    border-radius: 10px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.14);
+    margin-bottom: 14px;
+  }
+  .share-modal-btn-row {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .toast-notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e293b;
+    color: #ffffff;
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: 13.5px;
+    font-weight: 600;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    z-index: 100000;
+    opacity: 0;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    pointer-events: none;
+    max-width: 90%;
+    text-align: center;
+  }
+  .toast-notification.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(5px);
+  }
+  body {
+    padding-bottom: 80px;
+  }
+</style>
+</head>
+<body>
+<main class="sheet">
+  <!-- Corner Ornamental Flourishes (Matching Reference Design) -->
+  <svg class="corner-flourish corner-tl" viewBox="0 0 110 110" aria-hidden="true">
+    <path d="M 8 100 C 8 75 12 55 22 40 C 32 25 45 16 65 12 C 80 9 95 8 104 8" fill="none" stroke="#333333" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M 12 85 C 12 65 18 48 30 35 C 42 22 58 14 85 12" fill="none" stroke="#555555" stroke-width="1" stroke-linecap="round"/>
+    <path d="M 10 10 C 18 10 24 16 24 24 C 24 32 18 38 10 38 C 18 38 24 44 24 52 C 24 60 18 66 10 66" fill="none" stroke="#333333" stroke-width="1.4"/>
+    <path d="M 10 10 C 10 18 16 24 24 24 C 32 24 38 18 38 10 C 38 18 44 24 52 24 C 60 24 66 18 66 10" fill="none" stroke="#333333" stroke-width="1.4"/>
+    <path d="M 18 18 Q 38 38 52 52 Q 40 46 28 34 Z" fill="#333333"/>
+    <path d="M 22 22 Q 46 36 62 42 Q 46 44 32 40 Z" fill="#444444"/>
+    <path d="M 22 22 Q 36 46 42 62 Q 44 46 40 32 Z" fill="#444444"/>
+    <circle cx="28" cy="28" r="3.2" fill="#222222"/>
+    <circle cx="48" cy="18" r="2.4" fill="#333333"/>
+    <circle cx="18" cy="48" r="2.4" fill="#333333"/>
+    <circle cx="72" cy="14" r="2" fill="#444444"/>
+    <circle cx="14" cy="72" r="2" fill="#444444"/>
+    <circle cx="94" cy="10" r="1.8" fill="#555555"/>
+    <circle cx="10" cy="94" r="1.8" fill="#555555"/>
+  </svg>
+  <svg class="corner-flourish corner-tr" viewBox="0 0 110 110" aria-hidden="true">
+    <path d="M 8 100 C 8 75 12 55 22 40 C 32 25 45 16 65 12 C 80 9 95 8 104 8" fill="none" stroke="#333333" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M 12 85 C 12 65 18 48 30 35 C 42 22 58 14 85 12" fill="none" stroke="#555555" stroke-width="1" stroke-linecap="round"/>
+    <path d="M 10 10 C 18 10 24 16 24 24 C 24 32 18 38 10 38 C 18 38 24 44 24 52 C 24 60 18 66 10 66" fill="none" stroke="#333333" stroke-width="1.4"/>
+    <path d="M 10 10 C 10 18 16 24 24 24 C 32 24 38 18 38 10 C 38 18 44 24 52 24 C 60 24 66 18 66 10" fill="none" stroke="#333333" stroke-width="1.4"/>
+    <path d="M 18 18 Q 38 38 52 52 Q 40 46 28 34 Z" fill="#333333"/>
+    <path d="M 22 22 Q 46 36 62 42 Q 46 44 32 40 Z" fill="#444444"/>
+    <path d="M 22 22 Q 36 46 42 62 Q 44 46 40 32 Z" fill="#444444"/>
+    <circle cx="28" cy="28" r="3.2" fill="#222222"/>
+    <circle cx="48" cy="18" r="2.4" fill="#333333"/>
+    <circle cx="18" cy="48" r="2.4" fill="#333333"/>
+    <circle cx="72" cy="14" r="2" fill="#444444"/>
+    <circle cx="14" cy="72" r="2" fill="#444444"/>
+    <circle cx="94" cy="10" r="1.8" fill="#555555"/>
+    <circle cx="10" cy="94" r="1.8" fill="#555555"/>
+  </svg>
+  <svg class="corner-flourish corner-bl" viewBox="0 0 110 110" aria-hidden="true">
+    <path d="M 8 100 C 8 75 12 55 22 40 C 32 25 45 16 65 12 C 80 9 95 8 104 8" fill="none" stroke="#333333" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M 12 85 C 12 65 18 48 30 35 C 42 22 58 14 85 12" fill="none" stroke="#555555" stroke-width="1" stroke-linecap="round"/>
+    <path d="M 10 10 C 18 10 24 16 24 24 C 24 32 18 38 10 38 C 18 38 24 44 24 52 C 24 60 18 66 10 66" fill="none" stroke="#333333" stroke-width="1.4"/>
+    <path d="M 10 10 C 10 18 16 24 24 24 C 32 24 38 18 38 10 C 38 18 44 24 52 24 C 60 24 66 18 66 10" fill="none" stroke="#333333" stroke-width="1.4"/>
+    <path d="M 18 18 Q 38 38 52 52 Q 40 46 28 34 Z" fill="#333333"/>
+    <path d="M 22 22 Q 46 36 62 42 Q 46 44 32 40 Z" fill="#444444"/>
+    <path d="M 22 22 Q 36 46 42 62 Q 44 46 40 32 Z" fill="#444444"/>
+    <circle cx="28" cy="28" r="3.2" fill="#222222"/>
+    <circle cx="48" cy="18" r="2.4" fill="#333333"/>
+    <circle cx="18" cy="48" r="2.4" fill="#333333"/>
+    <circle cx="72" cy="14" r="2" fill="#444444"/>
+    <circle cx="14" cy="72" r="2" fill="#444444"/>
+    <circle cx="94" cy="10" r="1.8" fill="#555555"/>
+    <circle cx="10" cy="94" r="1.8" fill="#555555"/>
+  </svg>
+  <svg class="corner-flourish corner-br" viewBox="0 0 110 110" aria-hidden="true">
+    <path d="M 8 100 C 8 75 12 55 22 40 C 32 25 45 16 65 12 C 80 9 95 8 104 8" fill="none" stroke="#333333" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M 12 85 C 12 65 18 48 30 35 C 42 22 58 14 85 12" fill="none" stroke="#555555" stroke-width="1" stroke-linecap="round"/>
+    <path d="M 10 10 C 18 10 24 16 24 24 C 24 32 18 38 10 38 C 18 38 24 44 24 52 C 24 60 18 66 10 66" fill="none" stroke="#333333" stroke-width="1.4"/>
+    <path d="M 10 10 C 10 18 16 24 24 24 C 32 24 38 18 38 10 C 38 18 44 24 52 24 C 60 24 66 18 66 10" fill="none" stroke="#333333" stroke-width="1.4"/>
+    <path d="M 18 18 Q 38 38 52 52 Q 40 46 28 34 Z" fill="#333333"/>
+    <path d="M 22 22 Q 46 36 62 42 Q 46 44 32 40 Z" fill="#444444"/>
+    <path d="M 22 22 Q 36 46 42 62 Q 44 46 40 32 Z" fill="#444444"/>
+    <circle cx="28" cy="28" r="3.2" fill="#222222"/>
+    <circle cx="48" cy="18" r="2.4" fill="#333333"/>
+    <circle cx="18" cy="48" r="2.4" fill="#333333"/>
+    <circle cx="72" cy="14" r="2" fill="#444444"/>
+    <circle cx="14" cy="72" r="2" fill="#444444"/>
+    <circle cx="94" cy="10" r="1.8" fill="#555555"/>
+    <circle cx="10" cy="94" r="1.8" fill="#555555"/>
+  </svg>
+
+  <header class="header">
+    <img class="ganesh" alt="श्री गणेश" src="data:image/jpeg;base64,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">
+    <p class="invocation">॥ श्री गणेशाय नमः ॥</p>
+  </header>
+
+  <section class="section" aria-labelledby="personal-title">
+    <h1 class="section-title" id="personal-title">वैयक्तिक माहिती</h1>
+    <div class="details-box">
+      <div class="details">
+        <div class="label">मुलाचे नाव</div><div class="colon">:</div><div class="value">शुभम अनिल खर्चे</div>
+        <div class="label">जन्मनाव</div><div class="colon">:</div><div class="value">धनंजय</div>
+        <div class="label">जन्म तारीख</div><div class="colon">:</div><div class="value">25/08/1996</div>
+        <div class="label">जन्म वेळ</div><div class="colon">:</div><div class="value">सकाळी 11.56</div>
+        <div class="label">जन्म ठिकाण</div><div class="colon">:</div><div class="value">शेलगाव बाजार</div>
+        <div class="label">गोत्र</div><div class="colon">:</div><div class="value">वशिष्ठ</div>
+        <div class="label">वर्ण</div><div class="colon">:</div><div class="value">गोरा</div>
+        <div class="label">रक्तगट</div><div class="colon">:</div><div class="value">B+ve</div>
+        <div class="label">शिक्षण</div><div class="colon">:</div><div class="value">B.E. Mechanical</div>
+        <div class="label">नोकरी</div><div class="colon">:</div><div class="value">Sr. QA Engineer<span class="subvalue">Shaurya Technosoft Pvt Ltd, Pune</span></div>
+        <div class="label">वार्षिक उत्पन्न</div><div class="colon">:</div><div class="value">7.8 LPA</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="family-title">
+    <h2 class="section-title" id="family-title">कौटुंबिक माहिती</h2>
+    <div class="details-box">
+      <div class="details">
+        <div class="label">वडिलांचे नाव</div><div class="colon">:</div><div class="value">कै. अनिल पुंजाजी खर्चे</div>
+        <div class="label">आईचे नाव</div><div class="colon">:</div><div class="value">श्रीमती अनिता अनिल खर्चे</div>
+        <div class="label">व्यवसाय</div><div class="colon">:</div><div class="value">शेती - 5.5 एकर</div>
+        <div class="label">बहीण/भाऊ</div><div class="colon">:</div><div class="value">बहीण 2 विवाहित</div>
+        <div class="label">मामकुळ</div><div class="colon">:</div><div class="value">चोपडे, दाताळा</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="contact-title">
+    <h2 class="section-title" id="contact-title">संपर्क</h2>
+    <div class="contacts">
+      <div class="contact-item">
+        <span class="contact-idx" style="display:none">१.</span>
+        <div class="contact-name-place">श्री. विजय पुंजाजी खर्चे, शेलगाव बाजार</div>
+        <div class="contact-phone">मो. नं. 9420539396</div>
+      </div>
+      <div class="contact-item">
+        <span class="contact-idx" style="display:none">२.</span>
+        <div class="contact-name-place">श्री. गजानन नरहरी खर्चे, शेलगाव बाजार</div>
+        <div class="contact-phone">मो. नं. 9422152231</div>
+      </div>
+      <div class="contact-item">
+        <span class="contact-idx" style="display:none">३.</span>
+        <div class="contact-name-place">श्री. महेंद्र प्रल्हाद पाटील, मलकापूर</div>
+        <div class="contact-phone">मो. नं. 9921639872</div>
+      </div>
+      <div class="contact-item">
+        <span class="contact-idx" style="display:none">४.</span>
+        <div class="contact-name-place">श्री. उमेश एकनाथ फेंगडे, वाडी- पोफळी</div>
+        <div class="contact-phone">मो. नं. 9604458015</div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Floating Toast Notification -->
+<div id="toastBox" class="toast-notification"></div>
+
+<!-- Share Preview Modal (5-Step Share Workflow) -->
+<div id="sharePreviewModal" class="share-modal-overlay" onclick="closeSharePreviewModal()">
+  <div class="share-modal-box" onclick="event.stopPropagation()">
+    <div class="share-modal-header">
+      <div class="share-modal-title">🖼️ विवाह परिचय पत्रिका (इमेज कार्ड)</div>
+      <button type="button" class="share-modal-close" onclick="closeSharePreviewModal()">&times;</button>
+    </div>
+    <div class="share-modal-content">
+      <div id="shareModalLoading" style="padding: 30px; color: #64748b;">
+        <div style="font-size: 26px; margin-bottom: 8px;">🎨</div>
+        <div>इमेज कार्ड तयार होत आहे, कृपया प्रतीक्षा करा...</div>
+      </div>
+      <div id="shareModalContainer" style="display: none;">
+        <img id="shareModalPreviewImg" class="share-modal-preview-img" src="" alt="शुभम खर्चे विवाह पत्रिका कार्ड" />
+      </div>
+      <div class="share-modal-btn-row">
+        <button type="button" class="sbtn sbtn-wa" onclick="shareFromModalWhatsApp()">
+          <span>💬 WhatsApp वर पाठवा</span>
+        </button>
+        <button type="button" class="sbtn sbtn-share" onclick="shareFromModalNative()">
+          <span>📤 इतर ॲप्स (Share)</span>
+        </button>
+        <button type="button" class="sbtn sbtn-dl" onclick="downloadSheetImage()">
+          <span>📥 इमेज डाऊनलोड</span>
+        </button>
+        <button type="button" class="sbtn sbtn-copy" onclick="closeSharePreviewModal()">
+          <span>बंद करा</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Floating Action Bar for WhatsApp Image Sharing -->
+<div class="share-action-bar">
+  <button type="button" class="sbtn sbtn-wa" onclick="shareOnWhatsAppAsImage()" title="WhatsApp वर थेट इमेज व मेसेज शेअर करा">
+    <span>💬 WhatsApp वर इमेज पाठवा</span>
+  </button>
+  <button type="button" class="sbtn sbtn-share" onclick="shareToAnyApp()" title="इतर ॲप्सवर इमेज व मेसेज शेअर करा">
+    <span>📤 इतर ॲप्स (Share)</span>
+  </button>
+  <button type="button" class="sbtn sbtn-dl" onclick="downloadSheetImage()" title="बायोडाटा इमेज PNG डाऊनलोड करा">
+    <span>📥 इमेज डाऊनलोड</span>
+  </button>
+  <button type="button" class="sbtn sbtn-copy" onclick="copySheetImageToClipboard()" title="इमेज क्लिपबोर्डवर कॉपी करा">
+    <span>📋 इमेज कॉपी</span>
+  </button>
+  <button type="button" class="sbtn sbtn-copy" onclick="copyPageLink()" title="वेबपेज लिंक कॉपी करा">
+    <span>🔗 लिंक कॉपी</span>
+  </button>
+  <button type="button" class="sbtn sbtn-home" onclick="window.location.href='./index.html'" title="अनुबंध ट्रॅकर ॲप उघडा">
+    <span>💍 अनुबंध ॲप</span>
+  </button>
+</div>
+
+<script src="./js/html2canvas.min.js"></script>
+<script src="./js/config.js"></script>
+<script src="./js/messages.js"></script>
+<script>
+  const PROPOSAL_TEXT = (typeof AnubandhMessages !== 'undefined' && AnubandhMessages.buildGenericShareMessage) 
+    ? AnubandhMessages.buildGenericShareMessage() 
+    : '';
+
+  let toastTimer = null;
+  function showToast(msg) {
+    const box = document.getElementById('toastBox');
+    if (!box) return;
+    box.textContent = msg;
+    box.classList.add('show');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => {
+      box.classList.remove('show');
+    }, 3200);
+  }
+
+  let cachedShareBlob = null;
+  let cachedShareDataUrl = null;
+  let cachedShareFile = null;
+
+  // Step 2 & 3: Generate high quality photo via dynamic Canvas (html2canvas) so updates reflect everywhere
+  async function prepareShareCardData() {
+    if (cachedShareBlob && cachedShareFile && cachedShareDataUrl) {
+      return { blob: cachedShareBlob, dataUrl: cachedShareDataUrl, file: cachedShareFile };
+    }
+
+    // Prioritize live Canvas generation from current DOM sheet
+    if (window.html2canvas) {
+      try {
+        const sheet = document.querySelector('.sheet');
+        const canvas = await html2canvas(sheet, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: '#fffefa'
+        });
+        cachedShareDataUrl = canvas.toDataURL('image/png');
+        cachedShareBlob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+        cachedShareFile = new File([cachedShareBlob], 'shubham_biodata_redesigned.png', { type: 'image/png' });
+        return { blob: cachedShareBlob, dataUrl: cachedShareDataUrl, file: cachedShareFile };
+      } catch (err) {
+        console.warn('html2canvas dynamic generation error, trying fallback:', err);
+      }
+    }
+
+    // Fallback to static asset if html2canvas not ready
+    try {
+      const resp = await fetch('./assets/shubham_biodata_redesigned.png');
+      if (resp.ok) {
+        cachedShareBlob = await resp.blob();
+        cachedShareDataUrl = './assets/shubham_biodata_redesigned.png';
+        cachedShareFile = new File([cachedShareBlob], 'shubham_biodata_redesigned.png', { type: 'image/png' });
+        return { blob: cachedShareBlob, dataUrl: cachedShareDataUrl, file: cachedShareFile };
+      }
+    } catch(e) {
+      console.warn('Pre-rendered card fetch error:', e);
+    }
+    return null;
+  }
+
+  // Pre-cache on page load so ShareModal opens instantly with zero lag
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(prepareShareCardData, 400);
+  });
+
+  // Step 1: User clicks "Share" -> Step 4: ShareModal opens with <img src={shareDataUrl} />
+  async function openSharePreviewModal() {
+    const modal = document.getElementById('sharePreviewModal');
+    const loading = document.getElementById('shareModalLoading');
+    const container = document.getElementById('shareModalContainer');
+    const img = document.getElementById('shareModalPreviewImg');
+    modal.classList.add('open');
+
+    if (cachedShareDataUrl && cachedShareFile) {
+      img.src = cachedShareDataUrl;
+      loading.style.display = 'none';
+      container.style.display = 'block';
+      return;
+    }
+
+    loading.style.display = 'block';
+    container.style.display = 'none';
+
+    const data = await prepareShareCardData();
+    if (data) {
+      img.src = data.dataUrl;
+      loading.style.display = 'none';
+      container.style.display = 'block';
+    } else {
+      loading.innerHTML = '<div style="color:#ef4444;">इमेज लोड करण्यात अडचण आली. कृपया पुन्हा प्रयत्न करा.</div>';
+    }
+  }
+
+  function closeSharePreviewModal() {
+    const modal = document.getElementById('sharePreviewModal');
+    if (modal) modal.classList.remove('open');
+  }
+
+  // Step 5: Inside ShareModal, user clicks "WhatsApp वर पाठवा"
+  async function shareFromModalWhatsApp() {
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const waUrl = `https://wa.me/?text=${encodeURIComponent(PROPOSAL_TEXT)}`;
+
+    // Try Level 1: Native Mobile Share with pre-cached File (User gesture active!)
+    if (navigator.canShare && cachedShareFile) {
+      try {
+        if (navigator.canShare({ files: [cachedShareFile] })) {
+          await navigator.share({
+            files: [cachedShareFile],
+            title: 'चि. शुभम अनिल खर्चे - विवाह परिचय पत्रिका',
+            text: PROPOSAL_TEXT
+          });
+          showToast('✅ WhatsApp वर इमेज व मेसेज शेअर झाला!');
+          return;
+        }
+      } catch (e) {
+        if (e.name === 'AbortError') return;
+        console.warn('Share with file failed, attempting file-only:', e);
+      }
+
+      // Try Level 2: File-only share
+      try {
+        if (navigator.canShare({ files: [cachedShareFile] })) {
+          await navigator.share({
+            files: [cachedShareFile],
+            title: 'चि. शुभम अनिल खर्चे - विवाह परिचय पत्रिका'
+          });
+          showToast('✅ इमेज शेअर झाली!');
+          return;
+        }
+      } catch (e2) {
+        if (e2.name === 'AbortError') return;
+      }
+    }
+
+    // Level 3: Text-only native share
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'चि. शुभम अनिल खर्चे - विवाह परिचय पत्रिका',
+          text: PROPOSAL_TEXT
+        });
+        showToast('✅ मेसेज शेअर झाला!');
+        return;
+      } catch (e3) {
+        if (e3.name === 'AbortError') return;
+      }
+    }
+
+    // Level 4: Direct WhatsApp navigation (On mobile, window.location.href NEVER gets blocked!)
+    if (isMobile) {
+      window.location.href = waUrl;
+    } else {
+      await copySheetImageToClipboard();
+      window.open(waUrl, '_blank');
+      showToast('📸 इमेज क्लिपबोर्डवर कॉपी झाली! WhatsApp मध्ये Paste (Ctrl+V) करा.');
+    }
+  }
+
+  // Step 5 alternative: User clicks "इतर ॲप्स (Share)"
+  async function shareFromModalNative() {
+    if (navigator.canShare && cachedShareFile) {
+      try {
+        if (navigator.canShare({ files: [cachedShareFile] })) {
+          await navigator.share({
+            files: [cachedShareFile],
+            title: 'चि. शुभम अनिल खर्चे - विवाह परिचय पत्रिका',
+            text: PROPOSAL_TEXT
+          });
+          showToast('✅ इमेज व मेसेज इतर ॲपमध्ये शेअर झाला!');
+          return;
+        }
+      } catch (e) {
+        if (e.name === 'AbortError') return;
+      }
+    }
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'चि. शुभम अनिल खर्चे - विवाह परिचय पत्रिका',
+          text: PROPOSAL_TEXT
+        });
+        showToast('✅ मेसेज शेअर झाला!');
+        return;
+      } catch (e) {
+        if (e.name === 'AbortError') return;
+      }
+    }
+
+    await copySheetImageToClipboard();
+    showToast('📸 इमेज क्लिपबोर्डवर कॉपी झाली!');
+  }
+
+  // Floating Action Bar Buttons
+  function shareOnWhatsAppAsImage() {
+    openSharePreviewModal();
+  }
+
+  function shareToAnyApp() {
+    openSharePreviewModal();
+  }
+
+  async function generateSheetBlob() {
+    const data = await prepareShareCardData();
+    return data ? data.blob : null;
+  }
+
+  async function downloadSheetImage() {
+    showToast('⏳ इमेज डाऊनलोड होत आहे...');
+    try {
+      const data = await prepareShareCardData();
+      if (!data) throw new Error('Data not ready');
+      const url = data.dataUrl && data.dataUrl.startsWith('data:') ? data.dataUrl : (cachedShareBlob ? URL.createObjectURL(cachedShareBlob) : './shubham_biodata_redesigned.png');
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'shubham_biodata_redesigned.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showToast('✅ बायोडाटा इमेज डाऊनलोड झाली!');
+    } catch(e) {
+      showToast('डाऊनलोड करताना त्रुटी आली.');
+    }
+  }
+
+  async function copySheetImageToClipboard() {
+    try {
+      if (!navigator.clipboard || !window.ClipboardItem) {
+        showToast('⚠️ आपल्या ब्राउझरमध्ये इमेज क्लिपबोर्ड सपोर्ट नाही.');
+        return;
+      }
+      showToast('⏳ इमेज क्लिपबोर्डवर कॉपी होत आहे...');
+      const data = await prepareShareCardData();
+      if (!data || !data.blob) throw new Error('No blob');
+      await navigator.clipboard.write([
+        new ClipboardItem({ 'image/png': data.blob })
+      ]);
+      showToast('✅ बायोडाटा इमेज क्लिपबोर्डवर कॉपी झाली! (Ctrl+V ने पेस्ट करा)');
+    } catch (err) {
+      showToast('इमेज कॉपी करताना त्रुटी आली.');
+    }
+  }
+
+  function copyPageLink() {
+    // const url = 'https://shubham-bi.github.io/Anubandh/Shubham_Kharche';
+    const url = (typeof AnubandhConfig !== 'undefined' && AnubandhConfig.PROFILE_URL) 
+      ? AnubandhConfig.PROFILE_URL 
+      : ((typeof window !== 'undefined' && window.location && window.location.origin) 
+          ? (window.location.origin.replace(/\/+$/, '') + '/profile') 
+          : '/profile');
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(url).then(() => {
+        showToast('✅ लिंक कॉपी झाली!');
+      });
+    } else {
+      prompt('लिंक कॉपी करा:', url);
+    }
+  }
+</script>
+</body>
+</html>

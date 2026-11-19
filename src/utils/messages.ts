@@ -6,7 +6,24 @@
  * २. सामान्य शोध मेसेज (नातेवाईक व परिचितांना पाठवताना - Generic Share Message)
  */
 
-export const BIODATA_URL = 'https://anubandh-shubham-kharche.vercel.app/profile';
+/**
+ * Dynamically resolves the groom biodata URL at runtime using window.location.origin
+ * Avoids any hardcoded domain so it works across localhost, local network IPs, staging, and production.
+ */
+export function getBiodataUrl(): string {
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    const origin = window.location.origin.replace(/\/+$/, '');
+    return `${origin}/profile`;
+  }
+  return '/profile';
+}
+
+/**
+ * Backward compatibility alias for getBiodataUrl()
+ */
+export const BIODATA_URL = typeof window !== 'undefined' && window.location?.origin
+  ? `${window.location.origin.replace(/\/+$/, '')}/profile`
+  : '/profile';
 
 export const DEFAULT_GROOM = {
   name: 'शुभम अनिल खर्चे',
@@ -85,7 +102,7 @@ export function buildCandidateProposalMessage(params: CandidateProposalParams = 
   const groomSalary = params.groomSalary || DEFAULT_GROOM.salary;
   const groomDob = params.groomDob || DEFAULT_GROOM.dob;
   const groomGotra = params.groomGotra || DEFAULT_GROOM.gotra;
-  const url = params.biodataUrl || BIODATA_URL;
+  const url = params.biodataUrl || getBiodataUrl();
 
   // Optional CMS Custom Template override
   if (params.customTemplate && params.customTemplate.trim()) {
@@ -165,7 +182,7 @@ export function buildGenericShareMessage(params: GenericShareParams = {}): strin
   const groomCompany = params.groomCompany || DEFAULT_GROOM.company;
   const groomSalary = params.groomSalary || DEFAULT_GROOM.salary;
   const groomDob = params.groomDob || DEFAULT_GROOM.dob;
-  const url = params.biodataUrl || BIODATA_URL;
+  const url = params.biodataUrl || getBiodataUrl();
 
   if (params.customTemplate && params.customTemplate.trim()) {
     const vars: Record<string, string> = {

@@ -15,7 +15,11 @@
   'use strict';
 
   const cfg = (typeof globalThis !== 'undefined' && globalThis.AnubandhConfig) ? globalThis.AnubandhConfig : (typeof AnubandhConfig !== 'undefined' ? AnubandhConfig : null);
-  const BIODATA_URL = (cfg && cfg.PROFILE_URL) ? cfg.PROFILE_URL : 'https://anubandh-shubham-kharche.vercel.app/profile';
+  const BIODATA_URL = (cfg && cfg.PROFILE_URL)
+    ? cfg.PROFILE_URL
+    : ((typeof window !== 'undefined' && window.location && window.location.origin)
+        ? (window.location.origin.replace(/\/+$/, '') + '/profile')
+        : '/profile');
 
   const DEFAULT_GROOM = {
     name: 'शुभम अनिल खर्चे',
