@@ -146,7 +146,9 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
     }
   };
 
-  const whatsAppUrl = profile.mobile1 ? getWhatsAppLink(profile.mobile1, profile.name) : null;
+  const whatsAppUrl = profile.mobile1
+    ? getWhatsAppLink(profile.mobile1, profile.name, profile.fatherName, profile.nu_id)
+    : null;
   const phoneUrl = profile.mobile1 ? getTelLink(profile.mobile1) : null;
   const fatherPhoneUrl = profile.fatherMobile ? getTelLink(profile.fatherMobile) : null;
 

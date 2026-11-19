@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Profile, ProfileInteraction } from '../types/profile';
 import { BookletCandidate, parseCandidateContacts } from '../types/candidate';
+import { buildCandidateProposalMessage, buildGenericShareMessage } from '../utils/messages';
 import {
   X,
   Printer,
@@ -18,6 +19,7 @@ import {
 
 interface UnifiedShareItem {
   id: string;
+  srNo?: string;
   isBooklet: boolean;
   name: string;
   age: number;
@@ -63,6 +65,7 @@ export const FamilyShareModal: React.FC<FamilyShareModalProps> = ({
 }) => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<'preview' | 'whatsapp'>('preview');
+  const [messageTemplate, setMessageTemplate] = useState<'proposal' | 'dossier' | 'generic'>('proposal');
   const [includeContacts, setIncludeContacts] = useState(true);
   const [includeNotes, setIncludeNotes] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
@@ -126,6 +129,7 @@ export const FamilyShareModal: React.FC<FamilyShareModalProps> = ({
 
       map.set(p.nu_id, {
         id: p.nu_id,
+        srNo: p.nu_id,
         isBooklet: false,
         name: p.name,
         age: p.age || 25,
@@ -155,6 +159,7 @@ export const FamilyShareModal: React.FC<FamilyShareModalProps> = ({
       const parsed = parseCandidateContacts(b.contact, b.phones);
       map.set(b.id, {
         id: b.id,
+        srNo: b.sr,
         isBooklet: true,
         name: b.name,
         age: b.age || 25,
@@ -192,6 +197,18 @@ export const FamilyShareModal: React.FC<FamilyShareModalProps> = ({
 
   // Format WhatsApp Message for a candidate
   const generateWhatsAppMessage = (item: UnifiedShareItem): string => {
+    if (messageTemplate === 'proposal') {
+      return buildCandidateProposalMessage({
+        candidateName: item.name,
+        guardianName: item.contacts[0]?.name || '',
+        listNumber: item.srNo || ''
+      });
+    }
+
+    if (messageTemplate === 'generic') {
+      return buildGenericShareMessage();
+    }
+
     const lines: string[] = [];
     lines.push('*॥ श्री गणेशाय नमः ॥*');
     lines.push('*अनुबंध | दोन मनांचे आणि दोन घराण्यांचे रेशीमबंध*');
@@ -228,7 +245,7 @@ export const FamilyShareModal: React.FC<FamilyShareModalProps> = ({
     }
 
     lines.push('--------------------------------');
-    lines.push('_LSM Matrimony - लेवा शुभ मंगल_');
+    lines.push('_Anubandh अनुबंध | LSM Matrimony_');
     return lines.join('\n');
   };
 
@@ -544,10 +561,50 @@ export const FamilyShareModal: React.FC<FamilyShareModalProps> = ({
           ) : (
             /* WhatsApp Formatted Text Preview & 1-Click Share */
             <div className="space-y-4 max-w-2xl mx-auto">
+              {/* Message Template Picker */}
+              <div className="bg-white p-2.5 rounded-2xl border border-slate-200/90 shadow-xs flex flex-wrap items-center gap-1.5 text-xs">
+                <span className="text-[11px] font-bold text-slate-500 mr-1 pl-1">मेसेज मसुदा:</span>
+                <button
+                  type="button"
+                  onClick={() => setMessageTemplate('proposal')}
+                  className={`px-3 py-1.5 rounded-xl font-bold transition-all ${
+                    messageTemplate === 'proposal'
+                      ? 'bg-rose-600 text-white shadow-xs'
+                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  }`}
+                >
+                  📨 मुलीच्या पालकांसाठी प्रस्ताव
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setMessageTemplate('dossier')}
+                  className={`px-3 py-1.5 rounded-xl font-bold transition-all ${
+                    messageTemplate === 'dossier'
+                      ? 'bg-emerald-600 text-white shadow-xs'
+                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  }`}
+                >
+                  📋 चर्चा पत्रिका सारांश
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setMessageTemplate('generic')}
+                  className={`px-3 py-1.5 rounded-xl font-bold transition-all ${
+                    messageTemplate === 'generic'
+                      ? 'bg-amber-600 text-white shadow-xs'
+                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  }`}
+                >
+                  🌐 नातेवाईकांसाठी शोध मेसेज
+                </button>
+              </div>
+
               <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-800 flex items-center gap-2 font-medium">
                 <Share2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
                 <span>
-                  खालील मजकूर WhatsApp वर पाठवण्यासाठी अगदी तयार आहे. <strong>'WhatsApp वर पाठवा'</strong> वर क्लिक करा किंवा कॉपी करून फॅमिली ग्रुपवर टाका.
+                  खालील मजकूर WhatsApp वर पाठवण्यासाठी अगदी तयार आहे. <strong>'WhatsApp वर पाठवा'</strong> वर क्लिक करा किंवा कॉपी करून पाठवा.
                 </span>
               </div>
 

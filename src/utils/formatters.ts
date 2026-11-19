@@ -1,5 +1,6 @@
 import { Profile, ProfileInteraction } from '../types/profile';
 import { BookletCandidate, cleanMarathiPhone } from '../types/candidate';
+import { buildCandidateProposalMessage } from './messages';
 
 export function formatINR(val: number): string {
   if (!val || val === 0) return 'Not Specified';
@@ -17,12 +18,16 @@ export function cleanPhone(raw: string): string {
   return raw.replace(/[^\d]/g, '');
 }
 
-export function getWhatsAppLink(phone: string, profileName: string): string {
+export function getWhatsAppLink(phone: string, profileName: string, fatherName?: string, srNo?: string): string {
   const digits = cleanPhone(phone);
   if (!digits) return '';
   const countryPhone = digits.length === 10 ? `91${digits}` : digits;
-  const text = encodeURIComponent(`Namaste, regarding the matrimonial profile of ${profileName} on Leva Shubh Mangal.`);
-  return `https://wa.me/${countryPhone}?text=${text}`;
+  const message = buildCandidateProposalMessage({
+    candidateName: profileName,
+    guardianName: fatherName,
+    srNo: srNo
+  });
+  return `https://wa.me/${countryPhone}?text=${encodeURIComponent(message)}`;
 }
 
 export function getTelLink(phone: string): string {

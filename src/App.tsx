@@ -121,7 +121,7 @@ export const App: React.FC = () => {
     selectedGotras: [],
     excludedGotras: [],
     selectedMulgaons: [],
-    sortBy: 'age_asc',
+    sortBy: 'sr_asc',
   });
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -318,7 +318,28 @@ export const App: React.FC = () => {
         return true;
       })
       .sort((a, b) => {
+        const getSrNum = (cand: BookletCandidate) => {
+          const digits = marathiToAscii(cand.sr || '').replace(/[^\d]/g, '');
+          const n = parseInt(digits, 10);
+          return isNaN(n) ? 999999 : n;
+        };
+
         switch (bookletFilters.sortBy) {
+          case 'sr_asc': {
+            const numA = getSrNum(a);
+            const numB = getSrNum(b);
+            // Place 0 / test candidate at the end of the ascending list
+            if (numA === 0) return 1;
+            if (numB === 0) return -1;
+            return numA - numB;
+          }
+          case 'sr_desc': {
+            const numA = getSrNum(a);
+            const numB = getSrNum(b);
+            if (numA === 0) return 1;
+            if (numB === 0) return -1;
+            return numB - numA;
+          }
           case 'age_asc':
             return a.age - b.age;
           case 'age_desc':
@@ -648,7 +669,7 @@ export const App: React.FC = () => {
                         selectedGotras: [],
                         excludedGotras: [],
                         selectedMulgaons: [],
-                        sortBy: 'age_asc',
+                        sortBy: 'sr_asc',
                       })
                     }
                     className="mt-4 px-4 py-2 rounded-xl bg-amber-600 text-white text-xs font-bold hover:bg-amber-700 transition-colors"

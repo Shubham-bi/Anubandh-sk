@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Filter, RotateCcw, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Filter, RotateCcw, X, ChevronDown, ChevronUp, ArrowDownUp } from 'lucide-react';
 import { BookletCandidate } from '../types/candidate';
 import { TriageStatus } from '../types/profile';
 
@@ -11,7 +11,7 @@ export interface BookletFilterState {
   selectedGotras: string[];
   excludedGotras: string[];
   selectedMulgaons: string[];
-  sortBy: 'age_asc' | 'age_desc' | 'name_asc';
+  sortBy: 'sr_asc' | 'sr_desc' | 'age_asc' | 'age_desc' | 'name_asc';
 }
 
 interface BookletFilterSidebarProps {
@@ -38,6 +38,7 @@ export const BookletFilterSidebar: React.FC<BookletFilterSidebarProps> = ({
   const [gotraMode, setGotraMode] = useState<'include' | 'exclude'>('include');
 
   const [expandedSections, setExpandedSections] = useState({
+    sort: true,
     age: true,
     gotra: true,
     mulgaon: true,
@@ -80,7 +81,7 @@ export const BookletFilterSidebar: React.FC<BookletFilterSidebarProps> = ({
       selectedGotras: [],
       excludedGotras: [],
       selectedMulgaons: [],
-      sortBy: 'age_asc',
+      sortBy: 'sr_asc',
     });
   };
 
@@ -158,8 +159,35 @@ export const BookletFilterSidebar: React.FC<BookletFilterSidebarProps> = ({
         </div>
 
         <div className="p-4 space-y-5 text-sm divide-y divide-slate-100">
-          {/* Age Filter */}
+          {/* Sort By / क्रमवारी */}
           <div className="pt-2">
+            <button
+              onClick={() => toggleSection('sort')}
+              className="w-full flex items-center justify-between font-bold text-xs uppercase tracking-wider text-slate-600 hover:text-slate-900 mb-2"
+            >
+              <span className="flex items-center gap-1.5">
+                <ArrowDownUp className="w-3.5 h-3.5 text-rose-600" />
+                <span>क्रमवारी (Sort By)</span>
+              </span>
+              {expandedSections.sort ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            </button>
+            {expandedSections.sort && (
+              <select
+                value={filters.sortBy}
+                onChange={(e) => onFilterChange({ ...filters, sortBy: e.target.value as any })}
+                className="w-full text-xs py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 font-bold text-slate-800"
+              >
+                <option value="sr_asc">📖 अ.क्र. १ ते १८१ (पुस्तिका चढता क्रम / Ascending)</option>
+                <option value="sr_desc">📖 अ.क्र. १८१ ते १ (पुस्तिका उतरता क्रम / Descending)</option>
+                <option value="age_asc">🎂 वय: कमी ते जास्त (Youngest First)</option>
+                <option value="age_desc">🎂 वय: जास्त ते कमी (Oldest First)</option>
+                <option value="name_asc">👤 नाव: अ ते ज्ञ (Name: A to Z)</option>
+              </select>
+            )}
+          </div>
+
+          {/* Age Filter */}
+          <div className="pt-4">
             <button
               onClick={() => toggleSection('age')}
               className="w-full flex items-center justify-between font-bold text-xs uppercase tracking-wider text-slate-600 hover:text-slate-900 mb-2"

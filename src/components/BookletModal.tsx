@@ -15,11 +15,14 @@ import {
   User,
   FileText,
   Edit,
-  Share2
+  Share2,
+  Copy,
+  Check
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { BookletCandidate, parseCandidateContacts } from '../types/candidate';
 import { ProfileInteraction, TriageStatus } from '../types/profile';
+import { getProposalWhatsAppUrl, buildCandidateProposalMessage } from '../utils/messages';
 
 interface BookletModalProps {
   candidate: BookletCandidate | null;
@@ -51,6 +54,7 @@ export const BookletModal: React.FC<BookletModalProps> = ({
   const [localNotes, setLocalNotes] = useState('');
   const [newTagInput, setNewTagInput] = useState('');
   const [showRawText, setShowRawText] = useState(false);
+  const [copiedContactIdx, setCopiedContactIdx] = useState<number | null>(null);
 
   useEffect(() => {
     if (interaction?.notes) {
@@ -279,12 +283,22 @@ export const BookletModal: React.FC<BookletModalProps> = ({
             {/* List of Contact Persons */}
             <div className="grid grid-cols-1 gap-3">
               {contacts.map((person, idx) => {
+                const proposalParams = {
+                  candidateName: candidate.name,
+                  guardianName: person.name,
+                  listNumber: candidate.sr
+                };
                 const waLink = person.phoneClean
-                  ? `https://wa.me/91${person.phoneClean}?text=${encodeURIComponent(
-                      `नमस्ते, ${candidate.name} यांच्या स्थळाबाबत (${person.name}).`
-                    )}`
+                  ? getProposalWhatsAppUrl(person.phoneClean, proposalParams)
                   : null;
                 const callLink = person.phoneClean ? `tel:${person.phoneClean}` : null;
+
+                const handleCopyProposal = () => {
+                  const message = buildCandidateProposalMessage(proposalParams);
+                  navigator.clipboard.writeText(message);
+                  setCopiedContactIdx(idx);
+                  setTimeout(() => setCopiedContactIdx(null), 2500);
+                };
 
                 return (
                   <div
@@ -319,27 +333,47 @@ export const BookletModal: React.FC<BookletModalProps> = ({
                       )}
                     </div>
 
-                    {/* WhatsApp & Call Buttons for this person */}
+                    {/* WhatsApp, Copy & Call Buttons for this person */}
                     {person.phoneClean && (
-                      <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+                      <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
                         {waLink && (
                           <a
                             href={waLink}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors shadow-xs"
+                            className="flex-1 min-w-[130px] flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors shadow-xs"
                           >
                             <MessageCircle className="w-4 h-4" />
-                            <span>WhatsApp करा ({person.phoneClean})</span>
+                            <span>WhatsApp प्रस्ताव पाठवा</span>
                           </a>
                         )}
+
+                        <button
+                          type="button"
+                          onClick={handleCopyProposal}
+                          className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-bold transition-colors border border-amber-300/80 shadow-xs"
+                          title="पालकांसाठी प्रस्ताव मेसेज कॉपी करा"
+                        >
+                          {copiedContactIdx === idx ? (
+                            <>
+                              <Check className="w-4 h-4 text-emerald-700" />
+                              <span className="text-emerald-800">कॉपी झाले!</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-4 h-4 text-amber-700" />
+                              <span>मेसेज कॉपी</span>
+                            </>
+                          )}
+                        </button>
+
                         {callLink && (
                           <a
                             href={callLink}
-                            className="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors shadow-xs"
+                            className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors shadow-xs"
                           >
                             <Phone className="w-4 h-4" />
-                            <span>कॉल करा</span>
+                            <span>कॉल</span>
                           </a>
                         )}
                       </div>

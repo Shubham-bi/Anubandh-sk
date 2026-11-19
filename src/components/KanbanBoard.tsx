@@ -5,6 +5,7 @@ import {
 } from '../types/pipeline';
 import { Profile, ProfileInteraction } from '../types/profile';
 import { BookletCandidate, parseCandidateContacts } from '../types/candidate';
+import { getProposalWhatsAppUrl } from '../utils/messages';
 import {
   Phone,
   MessageCircle,
@@ -301,9 +302,16 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                 {items.length > 0 ? (
                   items.map((item) => {
                     const waLink = item.primaryPhone
-                      ? `https://wa.me/91${item.primaryPhone.slice(-10)}?text=${encodeURIComponent(
-                          `नमस्ते, ${item.name} यांच्या स्थळाबाबत.`
-                        )}`
+                      ? getProposalWhatsAppUrl(item.primaryPhone.slice(-10), {
+                          candidateName: item.name,
+                          guardianName: item.contactPerson,
+                          listNumber:
+                            item.isBooklet && item.rawBooklet
+                              ? item.rawBooklet.sr
+                              : item.rawPortal
+                              ? item.rawPortal.nu_id
+                              : ''
+                        })
                       : null;
                     const telLink = item.primaryPhone ? `tel:${item.primaryPhone}` : null;
 

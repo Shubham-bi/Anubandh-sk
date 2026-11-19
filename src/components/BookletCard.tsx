@@ -16,6 +16,7 @@ import {
 import confetti from 'canvas-confetti';
 import { BookletCandidate, parseCandidateContacts } from '../types/candidate';
 import { ProfileInteraction, TriageStatus } from '../types/profile';
+import { getProposalWhatsAppUrl } from '../utils/messages';
 
 interface BookletCardProps {
   candidate: BookletCandidate;
@@ -202,9 +203,11 @@ export const BookletCard: React.FC<BookletCardProps> = ({
             <div className="space-y-2">
               {contacts.map((contact, idx) => {
                 const waLink = contact.phoneClean
-                  ? `https://wa.me/91${contact.phoneClean}?text=${encodeURIComponent(
-                      `नमस्ते, ${candidate.name} यांच्या स्थळाबाबत (${contact.name}).`
-                    )}`
+                  ? getProposalWhatsAppUrl(contact.phoneClean, {
+                      candidateName: candidate.name,
+                      guardianName: contact.name,
+                      listNumber: candidate.sr
+                    })
                   : null;
                 const callLink = contact.phoneClean ? `tel:${contact.phoneClean}` : null;
 
