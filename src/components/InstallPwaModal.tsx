@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   X,
-  Smartphone,
   CheckCircle2,
   Share,
   PlusSquare,
@@ -37,9 +36,11 @@ export const InstallPwaModal: React.FC<InstallPwaModalProps> = ({
         {/* Header */}
         <div className="p-5 bg-gradient-to-r from-rose-600 to-pink-600 text-white flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white shadow-md">
-              <Smartphone className="w-6 h-6" />
-            </div>
+            <img
+              src="/icon.svg"
+              alt="Anubandh अनुबंध"
+              className="w-11 h-11 rounded-2xl shadow-md border border-white/20 flex-shrink-0 object-contain"
+            />
             <div>
               <h3 className="text-base sm:text-lg font-black tracking-tight">
                 Anubandh अनुबंध ॲप इन्स्टॉल करा

@@ -37,7 +37,7 @@ import { KanbanBoard } from './components/KanbanBoard';
 import { AnalyticsDashboard } from './components/AnalyticsDashboard';
 import { FamilyShareModal } from './components/FamilyShareModal';
 import { Toast, ToastMessage } from './components/Toast';
-import { ChevronLeft, ChevronRight, Inbox, Sparkles } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Inbox } from 'lucide-react';
 
 const ITEMS_PER_PAGE = 24;
 
@@ -435,9 +435,11 @@ export const App: React.FC = () => {
   if (!isDbReady) {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-rose-600 to-pink-500 animate-pulse flex items-center justify-center text-white mb-4 shadow-lg shadow-rose-500/30">
-          <Sparkles className="w-8 h-8" />
-        </div>
+        <img
+          src="/icon.svg"
+          alt="Anubandh अनुबंध"
+          className="w-16 h-16 rounded-2xl animate-pulse shadow-lg shadow-rose-600/30 mb-4 object-contain"
+        />
         <h2 className="text-xl font-black text-slate-800">Anubandh अनुबंध</h2>
         <p className="text-xs font-semibold text-rose-600 mt-1">दोन मनांचे आणि दोन घराण्यांचे रेशीमबंध</p>
         {dbError && (

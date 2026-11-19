@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Heart, Search, Filter, Layers, Download, CheckSquare, Sparkles, X, Smartphone, Plus, BarChart3, Users } from 'lucide-react';
+import { Search, Filter, Layers, Download, CheckSquare, Sparkles, X, Smartphone, Plus, BarChart3, Users } from 'lucide-react';
 import { TriageStatus } from '../types/profile';
 import { InstallPwaModal } from './InstallPwaModal';
 
@@ -101,9 +101,11 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex items-center justify-between h-14 sm:h-16 gap-1.5 sm:gap-3">
           {/* Logo & Title */}
           <div className="flex items-center gap-2 sm:gap-2.5 flex-shrink min-w-0">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-rose-600 to-pink-500 flex items-center justify-center text-white shadow-md shadow-rose-500/20 flex-shrink-0">
-              <Heart className="w-4 h-4 sm:w-5 sm:h-5 fill-white" />
-            </div>
+            <img
+              src="/icon.svg"
+              alt="Anubandh अनुबंध"
+              className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl shadow-md shadow-rose-600/25 flex-shrink-0 object-contain"
+            />
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 min-w-0">
                 <span className="font-extrabold text-sm sm:text-lg text-slate-900 tracking-tight truncate">Anubandh अनुबंध</span>
