@@ -13,7 +13,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { getBiodataUrl, buildGenericShareMessage } from '../utils/messages';
-import { SHUBHAM_BIODATA, GANESH_IMG_DATA } from '../data/shubhamBiodataData';
+import { SHUBHAM_BIODATA, GANESH_IMG_DATA } from '../constants/shubhamBiodataData';
 import {
   getGeneratedBiodataImage,
   downloadBiodataCanvasImage,
@@ -191,7 +191,7 @@ export const GroomProfilePage: React.FC<GroomProfilePageProps> = ({ onBackToPort
             </button>
           ) : (
             <div className="flex items-center gap-2">
-              <img src="/icon.svg" alt="Anubandh" className="w-6 h-6 rounded-md object-contain" />
+              <img src="/icon.svg" alt="अनुबंध" className="w-6 h-6 rounded-md object-contain" />
               <span className="font-extrabold text-xs sm:text-sm text-slate-800">अनुबंध • वर परिचय</span>
             </div>
           )}

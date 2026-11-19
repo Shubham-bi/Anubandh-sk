@@ -119,27 +119,7 @@ function generateAnubandhPng(size) {
         b = Math.round(b * 0.3 + 36 * 0.7);
       }
 
-      // 3. Tilak / Chandrabindu at top (size * 0.5, size * 0.16)
-      const tilakDy = (y - height * 0.16);
-      const tilakDx = (x - width * 0.5);
-      const tilakDist = Math.hypot(tilakDx, tilakDy);
-      // Bindi dot
-      if (tilakDist <= size * 0.028) {
-        r = 254; g = 240; b = 138; // Bright Gold
-      } else if (tilakDist <= size * 0.038) {
-        // Anti-alias fringe
-        const f = (tilakDist - size * 0.028) / (size * 0.01);
-        r = Math.round(254 * (1 - f) + r * f);
-        g = Math.round(240 * (1 - f) + g * f);
-        b = Math.round(138 * (1 - f) + b * f);
-      }
-      // Crescent below bindi
-      if (y > height * 0.18 && y < height * 0.22 && Math.abs(tilakDx) < size * 0.065) {
-        const crescentY = height * 0.19 + (tilakDx * tilakDx) / (size * 0.18);
-        if (Math.abs(y - crescentY) < size * 0.012) {
-          r = 245; g = 158; b = 11; // Saffron Gold
-        }
-      }
+      // (Top dot/tilak removed as requested to keep clean 'अ')
 
       // 4. Two Intertwined Wedding Rings / Silk Knot (रेशीमगाठ)
       const d1 = Math.hypot(x - cx1, y - cyKnot);

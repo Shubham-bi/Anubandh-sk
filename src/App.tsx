@@ -532,10 +532,10 @@ export const App: React.FC = () => {
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
         <img
           src="/icon.svg"
-          alt="Anubandh अनुबंध"
+          alt="अनुबंध"
           className="w-16 h-16 rounded-2xl animate-pulse shadow-lg shadow-rose-600/30 mb-4 object-contain"
         />
-        <h2 className="text-xl font-black text-slate-800">Anubandh अनुबंध</h2>
+        <h2 className="text-xl font-black text-slate-800">अनुबंध</h2>
         <p className="text-xs font-semibold text-rose-600 mt-1">दोन मनांचे आणि दोन घराण्यांचे रेशीमबंध</p>
         <p className="text-[11px] text-slate-400 font-medium mt-1">Created by Shubham Kharche</p>
         {dbError && (
@@ -834,8 +834,8 @@ export const App: React.FC = () => {
       <footer className="mt-auto border-t border-slate-200/80 bg-white/80 backdrop-blur-sm py-4 sm:py-5 px-4 text-center text-xs text-slate-500">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5">
           <div className="flex items-center gap-2">
-            <img src="/icon.svg" alt="Anubandh अनुबंध" className="w-5 h-5 rounded-md object-contain" />
-            <span className="font-extrabold text-slate-800">Anubandh अनुबंध</span>
+            <img src="/icon.svg" alt="अनुबंध" className="w-5 h-5 rounded-md object-contain" />
+            <span className="font-extrabold text-slate-800">अनुबंध</span>
             <span className="text-slate-300">•</span>
             <span className="text-slate-500 text-[11px]">दोन मनांचे आणि दोन घराण्यांचे रेशीमबंध</span>
           </div>

@@ -245,7 +245,7 @@ export const FamilyShareModal: React.FC<FamilyShareModalProps> = ({
     }
 
     lines.push('--------------------------------');
-    lines.push('_Anubandh अनुबंध | LSM Matrimony_');
+    lines.push('_अनुबंध | LSM Matrimony_');
     return lines.join('\n');
   };
 

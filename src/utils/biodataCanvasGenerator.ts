@@ -1,4 +1,4 @@
-import { SHUBHAM_BIODATA, GANESH_IMG_DATA } from '../data/shubhamBiodataData';
+import { SHUBHAM_BIODATA, GANESH_IMG_DATA } from '../constants/shubhamBiodataData';
 
 /**
  * Loads an image from a data URI or URL as an HTMLImageElement

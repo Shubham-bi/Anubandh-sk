@@ -51,7 +51,7 @@ export const InstallFloatingBanner: React.FC<InstallFloatingBannerProps> = ({
           <div className="relative flex-shrink-0">
             <img
               src="/icon.svg"
-              alt="Anubandh App Logo"
+              alt="अनुबंध"
               className="w-10 h-10 rounded-xl shadow-md border border-amber-400/30 object-contain p-0.5 bg-white/10"
             />
             <span className="absolute -top-1 -right-1 flex h-3 w-3">
@@ -63,7 +63,7 @@ export const InstallFloatingBanner: React.FC<InstallFloatingBannerProps> = ({
           <div className="min-w-0 leading-tight">
             <div className="flex items-center gap-1.5">
               <span className="font-extrabold text-xs sm:text-sm text-white truncate">
-                Anubandh ॲप इन्स्टॉल करा
+                अनुबंध ॲप इन्स्टॉल करा
               </span>
               <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-400/20 text-amber-300 border border-amber-400/30 flex-shrink-0">
                 PWA

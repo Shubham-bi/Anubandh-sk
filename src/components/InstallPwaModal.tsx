@@ -44,12 +44,12 @@ export const InstallPwaModal: React.FC<InstallPwaModalProps> = ({
           <div className="flex items-center gap-3">
             <img
               src="/icon.svg"
-              alt="Anubandh अनुबंध"
+              alt="अनुबंध"
               className="w-12 h-12 rounded-2xl shadow-md border-2 border-white/30 flex-shrink-0 object-contain p-0.5 bg-white/10"
             />
             <div>
               <h3 className="text-base sm:text-lg font-black tracking-tight">
-                Anubandh अनुबंध ॲप इन्स्टॉल करा
+                अनुबंध ॲप इन्स्टॉल करा
               </h3>
               <p className="text-xs text-rose-100 font-medium">
                 दोन मनांचे आणि दोन घराण्यांचे रेशीमबंध • ऑफलाइन PWA

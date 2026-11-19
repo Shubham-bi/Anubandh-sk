@@ -15,11 +15,7 @@
   'use strict';
 
   const cfg = (typeof globalThis !== 'undefined' && globalThis.AnubandhConfig) ? globalThis.AnubandhConfig : (typeof AnubandhConfig !== 'undefined' ? AnubandhConfig : null);
-  const BIODATA_URL = (cfg && cfg.PROFILE_URL)
-    ? cfg.PROFILE_URL
-    : ((typeof window !== 'undefined' && window.location && window.location.origin)
-        ? (window.location.origin.replace(/\/+$/, '') + '/profile')
-        : '/profile');
+  const BIODATA_URL = (cfg && cfg.PROFILE_URL) ? cfg.PROFILE_URL : 'https://anubandh-shubham-kharche.vercel.app/profile';
 
   const DEFAULT_GROOM = {
     name: 'शुभम अनिल खर्चे',
@@ -28,8 +24,7 @@
     company: 'Shaurya Technosoft Pvt. Ltd., Pune',
     salary: '7.8 LPA',
     dob: '25/08/1996',
-    gotra: 'वशिष्ठ',
-    height: '5\' 6" (5.6 inch)'
+    gotra: 'वशिष्ठ'
   };
 
   /**
@@ -104,10 +99,6 @@
     if (params.includeGotra) {
       groomLines.push(`• गोत्र: ${groomGotra}`);
     }
-    const groomHeight = params.groomHeight || DEFAULT_GROOM.height;
-    if (params.includeHeight !== false && groomHeight) {
-      groomLines.push(`• उंची: ${groomHeight}`);
-    }
 
     let footerNote = 'धन्यवाद! 🙏';
     if (params.includeFamilyFooter) {
@@ -142,8 +133,6 @@ ${footerNote}`;
     const groomCompany = params.groomCompany || DEFAULT_GROOM.company;
     const groomSalary = params.groomSalary || DEFAULT_GROOM.salary;
     const groomDob = params.groomDob || DEFAULT_GROOM.dob;
-    const groomGotra = params.groomGotra || DEFAULT_GROOM.gotra;
-    const groomHeight = params.groomHeight || DEFAULT_GROOM.height;
     const url = params.biodataUrl || BIODATA_URL;
 
     // Optional CMS Custom Template override
@@ -155,8 +144,6 @@ ${footerNote}`;
         groom_company: groomCompany,
         groom_salary: groomSalary,
         groom_dob: groomDob,
-        groom_gotra: groomGotra,
-        groom_height: groomHeight,
         profile_url: url
       };
       return params.customTemplate.replace(/\{(\w+)\}/g, (match, key) => (vars[key] !== undefined ? vars[key] : match));
@@ -174,8 +161,6 @@ ${footerNote}`;
 • नोकरी: ${groomJob}, ${groomCompany}
 • वार्षिक पॅकेज: ${groomSalary}
 • जन्मतारीख: ${groomDob}
-• गोत्र: ${groomGotra}
-• उंची: ${groomHeight}
 
 मुलाचा (${groomName}) बायोडाटा सोबत जोडलेला आहे. अधिक माहिती खालील लिंकवर पाहता येईल:
 ${url}

@@ -65,12 +65,12 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="flex items-center gap-2 sm:gap-2.5 flex-shrink min-w-0">
             <img
               src="/icon.svg"
-              alt="Anubandh अनुबंध"
+              alt="अनुबंध"
               className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl shadow-md shadow-rose-600/25 flex-shrink-0 object-contain"
             />
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 min-w-0">
-                <span className="font-extrabold text-sm sm:text-lg text-slate-900 tracking-tight truncate">Anubandh अनुबंध</span>
+                <span className="font-extrabold text-sm sm:text-lg text-slate-900 tracking-tight truncate">अनुबंध</span>
                 <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded-full bg-rose-100 text-rose-700 flex-shrink-0">PWA</span>
               </div>
               <p className="text-[11px] text-slate-500 hidden sm:block font-medium truncate">

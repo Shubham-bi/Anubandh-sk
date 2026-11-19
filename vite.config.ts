@@ -7,11 +7,11 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg', 'icon.svg'],
       manifest: {
         id: 'anubandh-pwa',
-        name: 'Anubandh अनुबंध',
-        short_name: 'Anubandh अनुबंध',
+        name: 'अनुबंध',
+        short_name: 'अनुबंध',
         description: 'अनुबंध | दोन मनांचे आणि दोन घराण्यांचे रेशीमबंध',
         start_url: '/',
         scope: '/',
@@ -20,6 +20,12 @@ export default defineConfig({
         display: 'standalone',
         orientation: 'portrait-primary',
         icons: [
+          {
+            src: '/icon.svg',
+            sizes: '512x512',
+            type: 'image/svg+xml',
+            purpose: 'any maskable',
+          },
           {
             src: '/pwa-192x192.png',
             sizes: '192x192',

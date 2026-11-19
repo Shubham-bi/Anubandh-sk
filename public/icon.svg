@@ -1,159 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
-    <!-- Background Royal Crimson Gradient -->
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#9f1239" />
-      <stop offset="45%" stop-color="#be123c" />
-      <stop offset="100%" stop-color="#4c0519" />
+      <stop offset="0%" style="stop-color:#881337;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#be123c;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e11d48;stop-opacity:1" />
     </linearGradient>
-
-    <!-- Golden Aura Glow -->
-    <radialGradient id="goldAura" cx="50%" cy="45%" r="60%">
-      <stop offset="0%" stop-color="#fef08a" stop-opacity="0.3" />
-      <stop offset="50%" stop-color="#f59e0b" stop-opacity="0.12" />
-      <stop offset="100%" stop-color="#9f1239" stop-opacity="0" />
-    </radialGradient>
-
-    <!-- Gold Ribbon Gradient -->
-    <linearGradient id="goldRibbon" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#fef08a" />
-      <stop offset="35%" stop-color="#fbbf24" />
-      <stop offset="70%" stop-color="#f59e0b" />
-      <stop offset="100%" stop-color="#b45309" />
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fef08a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:1" />
     </linearGradient>
-
-    <!-- Rose Pearl Ribbon Gradient -->
-    <linearGradient id="pearlRibbon" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#ffffff" />
-      <stop offset="40%" stop-color="#ffe4e6" />
-      <stop offset="75%" stop-color="#fda4af" />
-      <stop offset="100%" stop-color="#f43f5e" />
-    </linearGradient>
-
-    <!-- Border Ring Gradient -->
-    <linearGradient id="goldRing" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#fde047" stop-opacity="0.6" />
-      <stop offset="50%" stop-color="#f59e0b" stop-opacity="0.2" />
-      <stop offset="100%" stop-color="#fb7185" stop-opacity="0.4" />
-    </linearGradient>
-
-    <!-- Shadow Filter for depth -->
-    <filter id="knotShadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.45" />
-    </filter>
-
-    <filter id="glowFilter" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="6" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.35" />
     </filter>
   </defs>
 
-  <!-- 1. Squircle App Background -->
-  <rect width="512" height="512" rx="116" fill="url(#bgGrad)" />
+  <!-- App Icon Background -->
+  <rect width="512" height="512" rx="115" fill="url(#bgGrad)" />
 
-  <!-- 2. Inner Golden Border Highlight -->
-  <rect x="8" y="8" width="496" height="496" rx="108" fill="none" stroke="url(#goldRing)" stroke-width="3.5" />
+  <!-- Gold Decorative Border Ring -->
+  <circle cx="256" cy="256" r="215" fill="none" stroke="url(#goldGrad)" stroke-width="10" opacity="0.8" />
+  <circle cx="256" cy="256" r="195" fill="none" stroke="#ffffff" stroke-width="2" stroke-dasharray="8 8" opacity="0.6" />
 
-  <!-- 3. Soft Ambient Golden Glow -->
-  <circle cx="256" cy="220" r="190" fill="url(#goldAura)" />
+  <!-- Auspicious Kalash / Reshimgath Knot Emblem -->
+  <!-- Two Interlocked Golden Rings (Reshim Bandh) at the bottom -->
+  <circle cx="215" cy="380" r="42" fill="none" stroke="url(#goldGrad)" stroke-width="12" />
+  <circle cx="297" cy="380" r="42" fill="none" stroke="url(#goldGrad)" stroke-width="12" />
 
-  <!-- 4. The Sacred Anubandh Knot (दोन मनांचे रेशीमबंध) -->
-  <g filter="url(#knotShadow)">
-    <!-- Left Heart / Knot Loop (Sacred Gold Ribbon) -->
-    <path
-      d="M 256,290
-         C 210,345 135,355 90,305
-         C 45,255 50,175 105,135
-         C 160,95 230,135 256,195
-         C 265,175 285,145 315,130"
-      fill="none"
-      stroke="url(#goldRibbon)"
-      stroke-width="34"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    />
-
-    <!-- Right Heart / Knot Loop (Pearl Rose Ribbon, Intertwined) -->
-    <path
-      d="M 256,290
-         C 302,345 377,355 422,305
-         C 467,255 462,175 407,135
-         C 352,95 282,135 256,195
-         C 247,175 227,145 197,130"
-      fill="none"
-      stroke="url(#pearlRibbon)"
-      stroke-width="34"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    />
-
-    <!-- Central Sacred Silk Knot / रेशीमगाठ Connection Overlap -->
-    <path
-      d="M 226,220
-         C 240,200 272,200 286,220
-         C 295,235 290,265 256,295
-         C 222,265 217,235 226,220 Z"
-      fill="url(#goldRibbon)"
-      stroke="#ffffff"
-      stroke-width="4"
-    />
-
-    <!-- Auspicious Mangalya Star / Radiant Sparkle in Center -->
-    <g transform="translate(256, 248)" filter="url(#glowFilter)">
-      <!-- 4-pointed sparkle -->
-      <path
-        d="M 0,-24 Q 0,-3 21,0 Q 0,3 0,24 Q 0,3 -21,0 Q 0,-3 0,-24 Z"
-        fill="#ffffff"
-      />
-      <circle cx="0" cy="0" r="4.5" fill="#fef08a" />
-    </g>
-  </g>
-
-  <!-- 5. Traditional Auspicious Tilak / Chandrabindu accent at top -->
-  <g transform="translate(256, 75)">
-    <!-- Red Chandrakor / Tilak -->
-    <path
-      d="M -16,-4 C -10,8 10,8 16,-4 C 10,4 -10,4 -16,-4 Z"
-      fill="#f59e0b"
-    />
-    <circle cx="0" cy="-8" r="5" fill="#fef08a" />
-  </g>
-
-  <!-- 6. Devanagari Calligraphic Text: अनुबंध -->
-  <g transform="translate(256, 420)">
-    <!-- Subtitle glow backing -->
-    <text
-      x="0"
-      y="0"
-      font-family="'Plus Jakarta Sans', 'Noto Sans Devanagari', 'Yatra One', 'Arial Unicode MS', sans-serif"
-      font-size="46"
-      font-weight="900"
-      letter-spacing="5"
-      text-anchor="middle"
-      fill="#000000"
-      opacity="0.35"
-      dx="0"
-      dy="3"
-    >
-      अनुबंध
-    </text>
-    <!-- Foreground Golden-Pearl Typography -->
-    <text
-      x="0"
-      y="0"
-      font-family="'Plus Jakarta Sans', 'Noto Sans Devanagari', 'Yatra One', 'Arial Unicode MS', sans-serif"
-      font-size="46"
-      font-weight="900"
-      letter-spacing="5"
-      text-anchor="middle"
-      fill="url(#goldRibbon)"
-      stroke="#4c0519"
-      stroke-width="1.5"
-    >
-      अनुबंध
-    </text>
-    <!-- Tagline dot flourish -->
-    <circle cx="-90" cy="-14" r="3" fill="#fef08a" />
-    <circle cx="90" cy="-14" r="3" fill="#fef08a" />
-  </g>
+  <!-- Devanagari 'अ' for अनुबंध in Crisp Clean White (Without any dot/anusvara on top) -->
+  <text x="256" y="295" font-family="-apple-system, BlinkMacSystemFont, 'Noto Sans Devanagari', 'Mangal', 'Segoe UI', sans-serif" font-size="220" font-weight="900" fill="#ffffff" text-anchor="middle" filter="url(#shadow)">अ</text>
 </svg>
