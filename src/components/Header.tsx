@@ -1,5 +1,19 @@
 import React from 'react';
-import { Search, Filter, Layers, Download, CheckSquare, Sparkles, X, Plus, BarChart3, Users } from 'lucide-react';
+import {
+  Search,
+  Filter,
+  Layers,
+  Download,
+  CheckSquare,
+  Sparkles,
+  X,
+  Plus,
+  BarChart3,
+  Users,
+  Lock,
+  ShieldCheck,
+  LogOut
+} from 'lucide-react';
 import { TriageStatus } from '../types/profile';
 
 interface HeaderProps {
@@ -27,6 +41,10 @@ interface HeaderProps {
   onToggleMobileFilters: () => void;
   viewMode: 'grid' | 'compact';
   onViewModeChange: (mode: 'grid' | 'compact') => void;
+  isAdminAuthenticated?: boolean;
+  onAdminLoginRequest?: (reason?: string) => void;
+  onAdminLogout?: () => void;
+  onParentLogout?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -46,7 +64,11 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenFamilyShare,
   onToggleMobileFilters,
   viewMode,
-  onViewModeChange
+  onViewModeChange,
+  isAdminAuthenticated = false,
+  onAdminLoginRequest,
+  onAdminLogout,
+  onParentLogout,
 }) => {
   const tabs: { id: 'all' | TriageStatus; label: string; count: number; color: string; icon?: string }[] = [
     { id: 'all', label: 'All Profiles', count: stats.total, color: 'bg-slate-100 text-slate-700 hover:bg-slate-200' },
@@ -171,6 +193,45 @@ export const Header: React.FC<HeaderProps> = ({
               <Users className="w-3.5 h-3.5 text-rose-600" />
               <span className="hidden md:inline">कौटुंबिक पत्रिका</span>
             </button>
+
+            {/* Admin status / Login Trigger */}
+            {isAdminAuthenticated ? (
+              <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-900 text-xs font-bold shadow-xs">
+                <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" />
+                <span className="hidden md:inline">ॲडमिन</span>
+                {onAdminLogout && (
+                  <button
+                    onClick={onAdminLogout}
+                    className="p-1 rounded-md hover:bg-indigo-100 text-indigo-700 hover:text-rose-600 transition-colors ml-0.5"
+                    title="ॲडमिन मोडमधून बाहेर पडा (Logout Admin)"
+                  >
+                    <LogOut className="w-3 h-3" />
+                  </button>
+                )}
+              </div>
+            ) : (
+              onAdminLoginRequest && (
+                <button
+                  onClick={() => onAdminLoginRequest('ॲडमिन पॅनेलमध्ये प्रवेश करण्यासाठी पासवर्ड टाका.')}
+                  className="flex items-center gap-1 px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition-colors"
+                  title="ॲडमिन लॉगिन (Admin Login)"
+                >
+                  <Lock className="w-3.5 h-3.5 text-slate-500" />
+                  <span className="hidden md:inline">ॲडमिन</span>
+                </button>
+              )
+            )}
+
+            {/* Parent PIN Lock / Re-lock Button */}
+            {onParentLogout && (
+              <button
+                onClick={onParentLogout}
+                className="p-1.5 sm:p-2 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 border border-transparent hover:border-rose-200 transition-colors"
+                title="ॲप लॉक करा (Lock App with PIN)"
+              >
+                <Lock className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
         </div>
 
@@ -236,7 +297,13 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
 
             <button
-              onClick={() => onSectionChange('kanban')}
+              onClick={() => {
+                if (!isAdminAuthenticated && onAdminLoginRequest) {
+                  onAdminLoginRequest('मॅचमेकिंग पाईपलाईन (Kanban) पाहण्यासाठी ॲडमिन पासवर्ड आवश्यक आहे.');
+                } else {
+                  onSectionChange('kanban');
+                }
+              }}
               className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                 activeSection === 'kanban'
                   ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/30'
@@ -244,10 +311,19 @@ export const Header: React.FC<HeaderProps> = ({
               }`}
             >
               <span>📋 पाईपलाईन (Kanban)</span>
+              {!isAdminAuthenticated && (
+                <Lock className="w-3 h-3 text-slate-400" />
+              )}
             </button>
 
             <button
-              onClick={() => onSectionChange('analytics')}
+              onClick={() => {
+                if (!isAdminAuthenticated && onAdminLoginRequest) {
+                  onAdminLoginRequest('ॲनालिटिक्स डॅशबोर्ड (Analytics) पाहण्यासाठी ॲडमिन पासवर्ड आवश्यक आहे.');
+                } else {
+                  onSectionChange('analytics');
+                }
+              }}
               className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                 activeSection === 'analytics'
                   ? 'bg-purple-600 text-white shadow-sm shadow-purple-600/30'
@@ -256,6 +332,9 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <BarChart3 className="w-3.5 h-3.5" />
               <span>📊 ॲनालिटिक्स</span>
+              {!isAdminAuthenticated && (
+                <Lock className="w-3 h-3 text-slate-400" />
+              )}
             </button>
 
             <button
@@ -272,13 +351,22 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           <button
-            onClick={onOpenAddCandidate}
+            onClick={() => {
+              if (!isAdminAuthenticated && onAdminLoginRequest) {
+                onAdminLoginRequest('नवीन उमेदवार जोडण्यासाठी ॲडमिन पासवर्ड आवश्यक आहे.');
+              } else {
+                onOpenAddCandidate();
+              }
+            }}
             className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-600/20 transition-all whitespace-nowrap ml-auto"
             title="नवीन उमेदवार जोडा (Add New Candidate)"
           >
             <Plus className="w-4 h-4" />
             <span className="hidden sm:inline">नवीन उमेदवार</span>
             <span className="sm:hidden">जोडा</span>
+            {!isAdminAuthenticated && (
+              <Lock className="w-3 h-3 text-emerald-200" />
+            )}
           </button>
         </div>
 

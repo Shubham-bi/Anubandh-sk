@@ -22,9 +22,13 @@ import {
 
 interface GroomProfilePageProps {
   onBackToPortal?: () => void;
+  isParentAuthenticated?: boolean;
 }
 
-export const GroomProfilePage: React.FC<GroomProfilePageProps> = ({ onBackToPortal }) => {
+export const GroomProfilePage: React.FC<GroomProfilePageProps> = ({
+  onBackToPortal,
+  isParentAuthenticated = false,
+}) => {
   const [copiedLink, setCopiedLink] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -181,7 +185,7 @@ export const GroomProfilePage: React.FC<GroomProfilePageProps> = ({ onBackToPort
       <div className="max-w-[760px] mx-auto space-y-4">
         {/* Top Control Bar */}
         <header className="no-print flex items-center justify-between gap-2 bg-white/95 backdrop-blur-md px-3 sm:px-4 py-2.5 rounded-2xl border border-[#d8c9bd] shadow-sm">
-          {onBackToPortal ? (
+          {onBackToPortal && isParentAuthenticated ? (
             <button
               onClick={onBackToPortal}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-all"

@@ -40,6 +40,9 @@ import { GroomProfilePage } from './components/GroomProfilePage';
 import { InstallPwaModal } from './components/InstallPwaModal';
 import { InstallFloatingBanner } from './components/InstallFloatingBanner';
 import { Toast, ToastMessage } from './components/Toast';
+import { PinLockScreen } from './components/PinLockScreen';
+import { AdminLoginModal } from './components/AdminLoginModal';
+import { isParentSessionValid, isAdminSessionValid, logoutParent, logoutAdmin } from './utils/auth';
 import { ChevronLeft, ChevronRight, Inbox } from 'lucide-react';
 
 const ITEMS_PER_PAGE = 24;
@@ -47,6 +50,51 @@ const ITEMS_PER_PAGE = 24;
 export const App: React.FC = () => {
   const [isDbReady, setIsDbReady] = useState(false);
   const [dbError, setDbError] = useState<string | null>(null);
+
+  // Security & Authentication States
+  const [isParentAuth, setIsParentAuth] = useState<boolean>(() => isParentSessionValid());
+  const [isAdminAuth, setIsAdminAuth] = useState<boolean>(() => isAdminSessionValid());
+  const [adminModalState, setAdminModalState] = useState<{
+    isOpen: boolean;
+    reason?: string;
+    pendingAction?: () => void;
+  }>({ isOpen: false });
+
+  // Trigger Admin Password verification modal if not yet authenticated
+  const triggerAdminPrompt = (reason: string, onSuccessAction: () => void) => {
+    if (isAdminAuth) {
+      onSuccessAction();
+    } else {
+      setAdminModalState({
+        isOpen: true,
+        reason,
+        pendingAction: onSuccessAction,
+      });
+    }
+  };
+
+  const handleAdminLogout = () => {
+    logoutAdmin();
+    setIsAdminAuth(false);
+    setToast({
+      id: String(Date.now()),
+      message: 'ॲडमिन मोडमधून बाहेर पडलात.',
+    });
+    if (activeSection === 'kanban' || activeSection === 'analytics') {
+      handleSectionChange('portal');
+    }
+  };
+
+  const handleParentLogout = () => {
+    logoutParent();
+    logoutAdmin();
+    setIsParentAuth(false);
+    setIsAdminAuth(false);
+    setToast({
+      id: String(Date.now()),
+      message: 'अनुबंध ॲप सुरक्षितपणे लॉक केले आहे.',
+    });
+  };
 
   // Active section: 'portal' | 'booklet' | 'kanban' | 'analytics' | 'groom_profile'
   const [activeSection, setActiveSection] = useState<'portal' | 'booklet' | 'kanban' | 'analytics' | 'groom_profile'>(() => {
@@ -61,6 +109,19 @@ export const App: React.FC = () => {
   });
 
   const handleSectionChange = (sec: 'portal' | 'booklet' | 'kanban' | 'analytics' | 'groom_profile') => {
+    if ((sec === 'kanban' || sec === 'analytics') && !isAdminAuth) {
+      triggerAdminPrompt(
+        sec === 'kanban'
+          ? 'मॅचमेकिंग पाईपलाईन (Kanban) पाहण्यासाठी ॲडमिन पासवर्ड आवश्यक आहे.'
+          : 'ॲनालिटिक्स डॅशबोर्ड पाहण्यासाठी ॲडमिन पासवर्ड आवश्यक आहे.',
+        () => {
+          setActiveSection(sec);
+          setCurrentPage(1);
+        }
+      );
+      return;
+    }
+
     setActiveSection(sec);
     setCurrentPage(1);
     if (typeof window !== 'undefined') {
@@ -566,6 +627,64 @@ export const App: React.FC = () => {
     );
   }
 
+  // Public Groom Profile Page (Accessible WITHOUT PIN, isolated from portal)
+  if (activeSection === 'groom_profile') {
+    return (
+      <div className="min-h-screen bg-[#eeeae5] selection:bg-rose-500 selection:text-white">
+        <GroomProfilePage
+          onBackToPortal={isParentAuth ? () => handleSectionChange('portal') : undefined}
+          isParentAuthenticated={isParentAuth}
+        />
+        {/* Floating PWA Install Banner */}
+        <InstallFloatingBanner
+          onInstall={handleInstallClick}
+          isStandalone={isStandalone}
+        />
+        {/* PWA Install Modal */}
+        <InstallPwaModal
+          isOpen={isInstallModalOpen}
+          onClose={() => setIsInstallModalOpen(false)}
+          onNativeInstall={handleInstallClick}
+          canNativeInstall={Boolean(deferredPrompt || (typeof window !== 'undefined' && (window as any).deferredInstallPrompt))}
+        />
+        {/* Toast */}
+        {toast && <Toast toast={toast} onClose={() => setToast(null)} />}
+      </div>
+    );
+  }
+
+  // Parent PIN Lock Screen (if 7-day session expired or not authenticated)
+  if (!isParentAuth) {
+    return (
+      <div className="min-h-screen bg-slate-50 selection:bg-rose-500 selection:text-white">
+        <PinLockScreen
+          onUnlock={() => {
+            setIsParentAuth(true);
+            setToast({
+              id: String(Date.now()),
+              message: 'अनुबंध पोर्टलमध्ये स्वागत आहे!',
+            });
+          }}
+          onOpenGroomProfile={() => handleSectionChange('groom_profile')}
+        />
+        {/* Floating PWA Install Banner */}
+        <InstallFloatingBanner
+          onInstall={handleInstallClick}
+          isStandalone={isStandalone}
+        />
+        {/* PWA Install Modal */}
+        <InstallPwaModal
+          isOpen={isInstallModalOpen}
+          onClose={() => setIsInstallModalOpen(false)}
+          onNativeInstall={handleInstallClick}
+          canNativeInstall={Boolean(deferredPrompt || (typeof window !== 'undefined' && (window as any).deferredInstallPrompt))}
+        />
+        {/* Toast */}
+        {toast && <Toast toast={toast} onClose={() => setToast(null)} />}
+      </div>
+    );
+  }
+
   const activeStats = isBooklet ? bookletStats : portalStats;
   const activeStatusTab = isBooklet ? bookletFilters.statusTab : portalFilters.statusTab;
   const activeSearchQuery = isBooklet ? bookletFilters.searchQuery : portalFilters.searchQuery;
@@ -599,8 +718,10 @@ export const App: React.FC = () => {
         onOpenComparison={() => setIsComparisonOpen(true)}
         onOpenExport={() => setIsExportOpen(true)}
         onOpenAddCandidate={() => {
-          setCandidateToEdit(null);
-          setIsAddCandidateOpen(true);
+          triggerAdminPrompt('नवीन उमेदवार जोडण्यासाठी ॲडमिन पासवर्ड आवश्यक आहे.', () => {
+            setCandidateToEdit(null);
+            setIsAddCandidateOpen(true);
+          });
         }}
         onOpenFamilyShare={() => {
           setFamilyShareCandidate(null);
@@ -609,12 +730,16 @@ export const App: React.FC = () => {
         onToggleMobileFilters={() => setIsMobileFiltersOpen(true)}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
+        isAdminAuthenticated={isAdminAuth}
+        onAdminLoginRequest={(reason) => {
+          triggerAdminPrompt(reason || 'ॲडमिन पासवर्ड आवश्यक आहे.', () => {});
+        }}
+        onAdminLogout={handleAdminLogout}
+        onParentLogout={handleParentLogout}
       />
 
       {/* Main Body */}
-      {activeSection === 'groom_profile' ? (
-        <GroomProfilePage onBackToPortal={() => handleSectionChange('portal')} />
-      ) : activeSection === 'analytics' ? (
+      {activeSection === 'analytics' ? (
         <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <AnalyticsDashboard
             portalProfiles={profiles}
@@ -899,8 +1024,10 @@ export const App: React.FC = () => {
         onAddTag={(id, t) => addBookletTag(id, t)}
         onRemoveTag={(id, t) => removeBookletTag(id, t)}
         onEdit={(cand) => {
-          setCandidateToEdit(cand);
-          setIsAddCandidateOpen(true);
+          triggerAdminPrompt('उमेदवार माहिती संपादित करण्यासाठी ॲडमिन पासवर्ड आवश्यक आहे.', () => {
+            setCandidateToEdit(cand);
+            setIsAddCandidateOpen(true);
+          });
         }}
         onShareFamily={(cand) => {
           setFamilyShareCandidate(cand);
@@ -971,6 +1098,23 @@ export const App: React.FC = () => {
         onClose={() => setIsInstallModalOpen(false)}
         onNativeInstall={handleInstallClick}
         canNativeInstall={Boolean(deferredPrompt || (typeof window !== 'undefined' && (window as any).deferredInstallPrompt))}
+      />
+
+      {/* Admin Login Modal */}
+      <AdminLoginModal
+        isOpen={adminModalState.isOpen}
+        reasonMessage={adminModalState.reason}
+        onClose={() => setAdminModalState({ isOpen: false })}
+        onLoginSuccess={() => {
+          setIsAdminAuth(true);
+          setToast({
+            id: String(Date.now()),
+            message: 'ॲडमिन प्रवेश यशस्वी झाला!',
+          });
+          if (adminModalState.pendingAction) {
+            adminModalState.pendingAction();
+          }
+        }}
       />
 
       {/* Action Toast with Undo */}
