@@ -73,7 +73,9 @@ export const Header: React.FC<HeaderProps> = ({
                 <span className="font-extrabold text-sm sm:text-lg text-slate-900 tracking-tight truncate">Anubandh अनुबंध</span>
                 <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded-full bg-rose-100 text-rose-700 flex-shrink-0">PWA</span>
               </div>
-              <p className="text-[11px] text-slate-500 hidden sm:block font-medium truncate">दोन मनांचे आणि दोन घराण्यांचे रेशीमबंध</p>
+              <p className="text-[11px] text-slate-500 hidden sm:block font-medium truncate">
+                दोन मनांचे आणि दोन घराण्यांचे रेशीमबंध • <span className="text-slate-600 font-semibold">Created by Shubham Kharche</span>
+              </p>
             </div>
           </div>
 

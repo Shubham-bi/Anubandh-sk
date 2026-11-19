@@ -501,6 +501,7 @@ export const App: React.FC = () => {
         />
         <h2 className="text-xl font-black text-slate-800">Anubandh अनुबंध</h2>
         <p className="text-xs font-semibold text-rose-600 mt-1">दोन मनांचे आणि दोन घराण्यांचे रेशीमबंध</p>
+        <p className="text-[11px] text-slate-400 font-medium mt-1">Created by Shubham Kharche</p>
         {dbError && (
           <p className="text-xs text-rose-600 bg-rose-50 p-2 rounded-lg mt-3">
             Error: {dbError}
@@ -793,6 +794,25 @@ export const App: React.FC = () => {
           </main>
         </div>
       )}
+
+      {/* App Footer with Creator Attribution */}
+      <footer className="mt-auto border-t border-slate-200/80 bg-white/80 backdrop-blur-sm py-4 sm:py-5 px-4 text-center text-xs text-slate-500">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5">
+          <div className="flex items-center gap-2">
+            <img src="/icon.svg" alt="Anubandh अनुबंध" className="w-5 h-5 rounded-md object-contain" />
+            <span className="font-extrabold text-slate-800">Anubandh अनुबंध</span>
+            <span className="text-slate-300">•</span>
+            <span className="text-slate-500 text-[11px]">दोन मनांचे आणि दोन घराण्यांचे रेशीमबंध</span>
+          </div>
+
+          <div className="flex items-center gap-1.5 text-slate-600 text-xs">
+            <span>Created by</span>
+            <span className="font-black text-rose-600">Shubham Kharche</span>
+            <span className="text-slate-300">•</span>
+            <span className="text-[11px] text-slate-500 font-medium">निर्मिती: शुभम खर्चे</span>
+          </div>
+        </div>
+      </footer>
 
       {/* Portal Profile Deep-Dive Modal */}
       <ProfileModal
