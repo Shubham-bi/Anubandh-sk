@@ -1,24 +1,16 @@
 import React, { useState } from 'react';
 import {
   Phone,
-  Printer,
   Share2,
-  Copy,
-  Check,
   ArrowLeft,
-  Download,
-  Image as ImageIcon,
-  MessageCircle,
-  ExternalLink
+  Download
 } from 'lucide-react';
 import { getBiodataUrl, buildGenericShareMessage } from '../utils/messages';
 import { SHUBHAM_BIODATA, GANESH_IMG_DATA } from '../constants/shubhamBiodataData';
 import {
   getGeneratedBiodataImage,
-  downloadBiodataCanvasImage,
-  copyBiodataCanvasToClipboard
+  downloadBiodataCanvasImage
 } from '../utils/biodataCanvasGenerator';
-import { BottomSheet } from './BottomSheet';
 
 interface GroomProfilePageProps {
   onBackToPortal?: () => void;
@@ -29,11 +21,7 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
   onBackToPortal,
   isParentAuthenticated = false,
 }) => {
-  const [copiedLink, setCopiedLink] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [previewDataUrl, setPreviewDataUrl] = useState<string | null>(null);
-  const [isGeneratingCanvas, setIsGeneratingCanvas] = useState(false);
 
   // Runtime dynamic URL computation
   const dynamicProfileUrl = getBiodataUrl();
@@ -45,36 +33,12 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
     }, 3200);
   };
 
-  // Canvas is generated purely on-demand when user clicks Download, Preview or Share
-
   const handleCopyLink = async () => {
     try {
       await navigator.clipboard.writeText(dynamicProfileUrl);
-      setCopiedLink(true);
       showToast('✅ बायोडाटा लिंक कॉपी झाली!');
-      setTimeout(() => setCopiedLink(false), 2500);
     } catch {
       showToast('⚠️ लिंक कॉपी करता आली नाही');
-    }
-  };
-
-  const handlePrint = () => {
-    window.print();
-  };
-
-  const handleOpenPreviewModal = async () => {
-    setIsPreviewOpen(true);
-    if (!previewDataUrl) {
-      setIsGeneratingCanvas(true);
-      try {
-        const { dataUrl } = await getGeneratedBiodataImage();
-        setPreviewDataUrl(dataUrl);
-      } catch (e) {
-        console.error('Failed to generate canvas image:', e);
-        showToast('इमेज तयार करताना त्रुटी आली.');
-      } finally {
-        setIsGeneratingCanvas(false);
-      }
     }
   };
 
@@ -86,46 +50,6 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
     } catch (e) {
       console.error(e);
       showToast('डाऊनलोड करताना त्रुटी आली.');
-    }
-  };
-
-  const handleCopyImage = async () => {
-    showToast('⏳ इमेज क्लिपबोर्डवर कॉपी होत आहे...');
-    const success = await copyBiodataCanvasToClipboard();
-    if (success) {
-      showToast('✅ बायोडाटा इमेज क्लिपबोर्डवर कॉपी झाली! (Ctrl+V ने पेस्ट करा)');
-    } else {
-      showToast('⚠️ आपल्या ब्राउझरमध्ये थेट इमेज कॉपी सपोर्ट नाही.');
-    }
-  };
-
-  const handleShareWhatsApp = async () => {
-    const proposalText = buildGenericShareMessage({ biodataUrl: dynamicProfileUrl });
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    const waUrl = `https://wa.me/?text=${encodeURIComponent(proposalText)}`;
-
-    try {
-      const { file } = await getGeneratedBiodataImage();
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          files: [file],
-          title: 'चि. शुभम अनिल खर्चे - विवाह परिचय पत्रिका',
-          text: proposalText
-        });
-        showToast('✅ WhatsApp वर इमेज व मेसेज शेअर झाला!');
-        return;
-      }
-    } catch (e: any) {
-      if (e?.name === 'AbortError') return;
-      console.warn('File share fallback:', e);
-    }
-
-    if (isMobile) {
-      window.location.href = waUrl;
-    } else {
-      await handleCopyImage();
-      window.open(waUrl, '_blank');
-      showToast('📸 इमेज क्लिपबोर्डवर कॉपी झाली! WhatsApp मध्ये Paste (Ctrl+V) करा.');
     }
   };
 
@@ -166,7 +90,7 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-[#eeeae5] py-4 sm:py-8 px-2 sm:px-4 font-sans text-[#343434] pb-28 print:pb-0 print:bg-white print:p-0">
+    <div className="min-h-screen bg-[#eeeae5] py-4 sm:py-8 px-2 sm:px-4 font-sans text-[#343434] pb-10 print:pb-0 print:bg-white print:p-0">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed top-5 left-1/2 -translate-x-1/2 z-[100000] bg-[#1e293b] text-white px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold shadow-2xl transition-all duration-300 animate-fade-in text-center max-w-[90%]">
@@ -180,7 +104,7 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
           {onBackToPortal && isParentAuthenticated ? (
             <button
               onClick={onBackToPortal}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-all"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-all cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4 text-[#b94c2e]" />
               <span>वधू स्थळे पहा</span>
@@ -192,32 +116,26 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
             </div>
           )}
 
-          <div className="flex items-center gap-1.5">
+          {/* Action Buttons (Share and Download Icons Only) */}
+          <div className="flex items-center gap-2">
             <button
-              onClick={handleOpenPreviewModal}
-              className="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold transition-all border border-indigo-200"
-              title="कॅनव्हास कार्ड प्रिव्ह्यू"
+              type="button"
+              onClick={handleShareNative}
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-[#16a34a] flex items-center justify-center border border-emerald-200 transition-all active:scale-90 shadow-xs cursor-pointer"
+              title="शेअर करा (Share)"
+              aria-label="Share"
             >
-              <ImageIcon className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">कॅनव्हास कार्ड</span>
+              <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
 
             <button
+              type="button"
               onClick={handleDownloadImage}
-              className="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 text-xs font-bold transition-all border border-sky-200"
-              title="इमेज डाऊनलोड करा"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-rose-50 hover:bg-rose-100 text-[#881337] flex items-center justify-center border border-rose-200 transition-all active:scale-90 shadow-xs cursor-pointer"
+              title="बायोडाटा इमेज डाऊनलोड करा (Download)"
+              aria-label="Download"
             >
-              <Download className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">डाऊनलोड</span>
-            </button>
-
-            <button
-              onClick={handlePrint}
-              className="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-xs"
-              title="A4 प्रिंट करा किंवा PDF म्हणून जतन करा"
-            >
-              <Printer className="w-3.5 h-3.5" />
-              <span>प्रिंट</span>
+              <Download className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           </div>
         </header>
@@ -357,140 +275,6 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
           </section>
         </main>
       </div>
-
-      {/* Floating Bottom Action Bar */}
-      <footer className="no-print fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t-1.5 border-[#d8c9bd] py-2.5 px-3 z-[9999] shadow-[0_-4px_18px_rgba(45,35,25,0.15)] flex justify-center items-center gap-2 flex-wrap">
-        <button
-          type="button"
-          onClick={handleShareWhatsApp}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#16a34a] hover:bg-[#15803d] text-white text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all"
-          title="WhatsApp वर थेट इमेज व मेसेज शेअर करा"
-        >
-          <MessageCircle className="w-4 h-4" />
-          <span>WhatsApp वर पाठवा</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={handleOpenPreviewModal}
-          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#4f46e5] hover:bg-[#4338ca] text-white text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all"
-          title="कॅनव्हास कार्ड प्रिव्ह्यू उघडा"
-        >
-          <ImageIcon className="w-4 h-4" />
-          <span>कॅनव्हास कार्ड</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={handleDownloadImage}
-          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all"
-          title="बायोडाटा इमेज PNG डाऊनलोड करा"
-        >
-          <Download className="w-4 h-4" />
-          <span className="hidden sm:inline">इमेज डाऊनलोड</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={handleCopyImage}
-          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-slate-100 text-[#1e293b] border border-[#cbd5e1] text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all"
-          title="इमेज क्लिपबोर्डवर कॉपी करा"
-        >
-          <Copy className="w-4 h-4" />
-          <span className="hidden sm:inline">इमेज कॉपी</span>
-        </button>
-
-        <button
-          type="button"
-          onClick={handleCopyLink}
-          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-slate-100 text-[#1e293b] border border-[#cbd5e1] text-xs sm:text-sm font-bold shadow-xs active:scale-95 transition-all"
-          title="वेबपेज लिंक कॉपी करा"
-        >
-          {copiedLink ? <Check className="w-4 h-4 text-emerald-600" /> : <ExternalLink className="w-4 h-4" />}
-          <span>{copiedLink ? 'कॉपी झाले!' : 'लिंक कॉपी'}</span>
-        </button>
-      </footer>
-
-      {/* Canvas Share Card Preview Bottom Sheet */}
-      <BottomSheet
-        isOpen={isPreviewOpen}
-        onClose={() => setIsPreviewOpen(false)}
-        title="विवाह परिचय पत्रिका (कॅनव्हास कार्ड)"
-        subtitle="चि. शुभम अनिल खर्चे विवाह पत्रिका कार्ड"
-        icon={<ImageIcon className="w-5 h-5 text-[#881337]" />}
-        maxWidth="max-w-lg"
-        maxHeight="max-h-[90vh]"
-      >
-        <div className="text-center space-y-4">
-          {isGeneratingCanvas ? (
-            <div className="py-12 space-y-3">
-              <div className="animate-spin text-3xl">🎨</div>
-              <p className="text-sm font-semibold text-slate-600">
-                कॅनव्हास कार्ड तयार होत आहे, कृपया प्रतीक्षा करा...
-              </p>
-            </div>
-          ) : previewDataUrl ? (
-            <div className="space-y-4">
-              <img
-                src={previewDataUrl}
-                alt="चि. शुभम अनिल खर्चे विवाह पत्रिका कार्ड"
-                className="max-w-full max-h-[50vh] mx-auto rounded-xl shadow-lg border border-slate-200 object-contain"
-              />
-              <div className="flex items-center justify-center gap-2 flex-wrap">
-                <button
-                  type="button"
-                  onClick={handleShareWhatsApp}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#16a34a] hover:bg-[#15803d] text-white text-xs font-bold shadow-xs transition-all"
-                >
-                  <MessageCircle className="w-3.5 h-3.5" />
-                  <span>WhatsApp वर पाठवा</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleShareNative}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#4f46e5] hover:bg-[#4338ca] text-white text-xs font-bold shadow-xs transition-all"
-                >
-                  <Share2 className="w-3.5 h-3.5" />
-                  <span>इतर ॲप्स (Share)</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleDownloadImage}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#0284c7] hover:bg-[#0369a1] text-white text-xs font-bold shadow-xs transition-all"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>डाऊनलोड</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleCopyImage}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 text-xs font-bold shadow-xs transition-all"
-                >
-                  <Copy className="w-3.5 h-3.5" />
-                  <span>इमेज कॉपी</span>
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="py-8 text-rose-600 font-semibold text-sm">
-              इमेज लोड करण्यात अडचण आली. कृपया पुन्हा प्रयत्न करा.
-            </div>
-          )}
-
-          <div className="pt-2 flex justify-end">
-            <button
-              type="button"
-              onClick={() => setIsPreviewOpen(false)}
-              className="px-4 py-2 rounded-xl bg-slate-900 text-white hover:bg-slate-800 text-xs font-bold transition-all"
-            >
-              बंद करा
-            </button>
-          </div>
-        </div>
-      </BottomSheet>
     </div>
   );
 };

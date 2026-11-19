@@ -39,13 +39,13 @@ export const SHUBHAM_BIODATA: GroomBiodata = {
     { label: 'जन्म वेळ', value: 'सकाळी 11.56' },
     { label: 'जन्म ठिकाण', value: 'शेलगाव बाजार' },
     { label: 'गोत्र', value: 'वशिष्ठ' },
-    { label: 'उंची', value: "5' 6\" (5.6 inch)" },
+    { label: 'उंची', value: "5' 6\"" },
     { label: 'वर्ण', value: 'गोरा' },
     { label: 'रक्तगट', value: 'B+ve' },
     { label: 'शिक्षण', value: 'B.E. Mechanical' },
     { 
       label: 'नोकरी', 
-      value: 'Sr. QA Engineer', 
+      value: 'Sr. QA Engineer IT', 
       subvalue: 'Shaurya Technosoft Pvt Ltd, Pune' 
     },
     { label: 'वार्षिक उत्पन्न', value: '7.8 LPA' }
@@ -69,12 +69,6 @@ export const SHUBHAM_BIODATA: GroomBiodata = {
       place: 'शेलगाव बाजार',
       phone: 'मो. नं. 9422152231',
       phoneClean: '9422152231'
-    },
-    {
-      name: 'श्री. महेंद्र प्रल्हाद पाटील',
-      place: 'मलकापूर',
-      phone: 'मो. नं. 9921639872',
-      phoneClean: '9921639872'
     },
     {
       name: 'श्री. उमेश एकनाथ फेंगडे',
