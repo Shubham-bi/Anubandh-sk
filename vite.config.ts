@@ -11,9 +11,9 @@ export default defineConfig({
         enabled: true,
         type: 'module',
       },
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg', 'icon.svg', 'pwa-192x192.png', 'pwa-512x512.png', 'pwa-maskable-512.png'],
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg', 'icon.svg', 'pwa-192x192.png', 'pwa-512x512.png', 'pwa-maskable-512.png', 'pwa-maskable-192.png'],
       manifest: {
-        id: 'anubandh-pwa',
+        id: '/',
         name: 'अनुबंध',
         short_name: 'अनुबंध',
         description: 'अनुबंध | दोन मनांचे आणि दोन घराण्यांचे रेशीमबंध',
@@ -30,6 +30,12 @@ export default defineConfig({
             sizes: '192x192',
             type: 'image/png',
             purpose: 'any',
+          },
+          {
+            src: '/pwa-maskable-192.png',
+            sizes: '192x192',
+            type: 'image/png',
+            purpose: 'maskable',
           },
           {
             src: '/pwa-512x512.png',

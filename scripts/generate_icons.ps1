@@ -1,4 +1,4 @@
-﻿Add-Type -AssemblyName System.Drawing
+Add-Type -AssemblyName System.Drawing
 
 function Draw-AnubandhIcon {
     param(
@@ -116,6 +116,7 @@ Write-Host "Generating pixel-perfect Anubandh launcher and splash icons..."
 Draw-AnubandhIcon 512 "public\pwa-512x512.png" $false
 Draw-AnubandhIcon 192 "public\pwa-192x192.png" $false
 Draw-AnubandhIcon 512 "public\pwa-maskable-512.png" $true
+Draw-AnubandhIcon 192 "public\pwa-maskable-192.png" $true
 
 # 2. iOS Home Screen / Touch Icon
 Draw-AnubandhIcon 180 "public\apple-touch-icon.png" $false

@@ -156,6 +156,18 @@ export const InstallPwaModal: React.FC<InstallPwaModalProps> = ({
                   </div>
                 </li>
               </ol>
+
+              {/* Troubleshooting note for Android */}
+              <div className="p-2.5 rounded-xl bg-amber-50/90 border border-amber-200 text-amber-950 space-y-1">
+                <span className="font-bold flex items-center gap-1 text-[11px]">
+                  💡 ॲप इन्स्टॉल झाल्यावर होम स्क्रीनवर न दिसल्यास:
+                </span>
+                <ul className="text-[11px] text-amber-900 space-y-0.5 list-disc list-inside">
+                  <li>मोबाईलच्या <strong>App Drawer (सर्व ॲप्सची यादी)</strong> मध्ये वर स्वाइप करून <strong>'अनुबंध'</strong> शोधा.</li>
+                  <li>Launcher सेटिंग्जमध्ये नवीन ॲप्स थेट होम स्क्रीनवर न येण्याचा पर्याय असू शकतो. App Drawer मधून आयकॉन ओढून होम स्क्रीनवर ठेवू शकता.</li>
+                  <li>आधीचे जुने व्हर्जन असल्यास Phone Settings &gt; Apps मधून जुने ॲप Uninstall करा.</li>
+                </ul>
+              </div>
             </div>
           )}
 
