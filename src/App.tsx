@@ -110,19 +110,37 @@ export const App: React.FC = () => {
       (window.navigator as any).standalone === true;
     setIsStandalone(isStandaloneMode);
 
+    if ((window as any).deferredInstallPrompt) {
+      setDeferredPrompt((window as any).deferredInstallPrompt);
+    }
+
     const handleBeforeInstall = (e: any) => {
       e.preventDefault();
+      (window as any).deferredInstallPrompt = e;
       setDeferredPrompt(e);
     };
+
+    const handlePromptReady = () => {
+      if ((window as any).deferredInstallPrompt) {
+        setDeferredPrompt((window as any).deferredInstallPrompt);
+      }
+    };
+
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
-    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
+    window.addEventListener('pwa-prompt-ready', handlePromptReady);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
+      window.removeEventListener('pwa-prompt-ready', handlePromptReady);
+    };
   }, []);
 
   const handleInstallClick = async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
+    const promptEvent = deferredPrompt || (window as any).deferredInstallPrompt;
+    if (promptEvent) {
+      promptEvent.prompt();
       try {
-        const { outcome } = await deferredPrompt.userChoice;
+        const { outcome } = await promptEvent.userChoice;
         if (outcome === 'accepted') {
           setIsStandalone(true);
         }
@@ -130,6 +148,7 @@ export const App: React.FC = () => {
         // Fallback
       }
       setDeferredPrompt(null);
+      (window as any).deferredInstallPrompt = null;
     } else {
       setIsInstallModalOpen(true);
     }
@@ -951,7 +970,7 @@ export const App: React.FC = () => {
         isOpen={isInstallModalOpen}
         onClose={() => setIsInstallModalOpen(false)}
         onNativeInstall={handleInstallClick}
-        canNativeInstall={Boolean(deferredPrompt)}
+        canNativeInstall={Boolean(deferredPrompt || (typeof window !== 'undefined' && (window as any).deferredInstallPrompt))}
       />
 
       {/* Action Toast with Undo */}

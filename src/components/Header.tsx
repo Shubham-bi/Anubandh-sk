@@ -71,7 +71,6 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 min-w-0">
                 <span className="font-extrabold text-sm sm:text-lg text-slate-900 tracking-tight truncate">अनुबंध</span>
-                <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded-full bg-rose-100 text-rose-700 flex-shrink-0">PWA</span>
               </div>
               <p className="text-[11px] text-slate-500 hidden sm:block font-medium truncate">
                 दोन मनांचे आणि दोन घराण्यांचे रेशीमबंध • <span className="text-slate-600 font-semibold">Created by Shubham Kharche</span>

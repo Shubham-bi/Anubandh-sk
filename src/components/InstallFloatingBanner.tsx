@@ -65,9 +65,6 @@ export const InstallFloatingBanner: React.FC<InstallFloatingBannerProps> = ({
               <span className="font-extrabold text-xs sm:text-sm text-white truncate">
                 अनुबंध ॲप इन्स्टॉल करा
               </span>
-              <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-400/20 text-amber-300 border border-amber-400/30 flex-shrink-0">
-                PWA
-              </span>
             </div>
             <p className="text-[11px] text-rose-200/90 truncate mt-0.5 flex items-center gap-1">
               <Sparkles className="w-2.5 h-2.5 text-amber-300 flex-shrink-0" />

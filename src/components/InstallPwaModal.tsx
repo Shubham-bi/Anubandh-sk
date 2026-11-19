@@ -52,7 +52,7 @@ export const InstallPwaModal: React.FC<InstallPwaModalProps> = ({
                 अनुबंध ॲप इन्स्टॉल करा
               </h3>
               <p className="text-xs text-rose-100 font-medium">
-                दोन मनांचे आणि दोन घराण्यांचे रेशीमबंध • ऑफलाइन PWA
+                दोन मनांचे आणि दोन घराण्यांचे रेशीमबंध • ऑफलाइन ॲप
               </p>
             </div>
           </div>
@@ -257,7 +257,7 @@ export const InstallPwaModal: React.FC<InstallPwaModalProps> = ({
           <div className="p-3 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/80 space-y-1.5">
             <span className="text-[11px] font-bold text-amber-900 flex items-center gap-1">
               <CheckCircle2 className="w-3.5 h-3.5 text-amber-700" />
-              PWA ॲपचे फायदे:
+              ॲपचे फायदे:
             </span>
             <ul className="text-[11px] text-slate-600 space-y-1 list-disc list-inside">
               <li>इंटरनेट बंद असतानाही सर्व प्रोफाईल्स व संपर्क नंबर उघडतात.</li>

@@ -552,7 +552,7 @@ export const FamilyShareModal: React.FC<FamilyShareModalProps> = ({
 
                   {/* Footer note */}
                   <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
-                    <span>LSM Matrimony PWA • लेवा शुभ मंगल</span>
+                    <span>अनुबंध • लेवा शुभ मंगल</span>
                     <span>तारीख: {new Date().toLocaleDateString('mr-IN')}</span>
                   </div>
                 </div>
