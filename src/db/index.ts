@@ -29,6 +29,11 @@ export class LSMDatabase extends Dexie {
 export const db = new LSMDatabase();
 
 export async function initDatabase(): Promise<{ profilesCount: number; bookletCount: number }> {
+  // Purge any removed / blacklisted test profiles from existing IndexedDB
+  await db.profiles.delete('15600');
+  await db.interactions.delete('15600');
+  await db.comparison.delete('15600');
+
   let pCount = await db.profiles.count();
   if (pCount === 0) {
     console.log('Seeding Dexie IndexedDB with portal profiles...');
