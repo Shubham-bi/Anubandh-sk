@@ -106,10 +106,10 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="font-extrabold text-base sm:text-lg text-slate-900 tracking-tight">LSM Matrimony</span>
+                <span className="font-extrabold text-base sm:text-lg text-slate-900 tracking-tight">Anubandh अनुबंध</span>
                 <span className="text-[9px] sm:text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.2 rounded-full bg-rose-100 text-rose-700">PWA</span>
               </div>
-              <p className="text-[11px] text-slate-500 hidden md:block">1,224 Verified Leva Patidar Profiles</p>
+              <p className="text-[11px] text-slate-500 hidden md:block">लेवा पाटीदार विवाह मंच (Leva Shubh Mangal)</p>
             </div>
           </div>
 

@@ -9,9 +9,10 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
       manifest: {
-        name: 'Leva Shubh Mangal Profiles',
-        short_name: 'LSM Profiles',
-        description: 'Leva Patidar Matrimonial Profiles Viewer & Triage Assistant',
+        id: 'anubandh-pwa',
+        name: 'Anubandh अनुबंध - Leva Shubh Mangal',
+        short_name: 'Anubandh अनुबंध',
+        description: 'Anubandh अनुबंध - Leva Patidar Matrimonial Profiles & Matchmaking Assistant',
         theme_color: '#e11d48',
         background_color: '#f8fafc',
         display: 'standalone',
@@ -36,6 +37,7 @@ export default defineConfig({
         ],
       },
       workbox: {
+        cacheId: 'anubandh-v1',
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json}'],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         runtimeCaching: [
@@ -43,7 +45,7 @@ export default defineConfig({
             urlPattern: /^https?:\/\/.*levashubhmangal\.com\/.*/i,
             handler: 'CacheFirst',
             options: {
-              cacheName: 'lsm-images-cache',
+              cacheName: 'anubandh-images-cache',
               expiration: {
                 maxEntries: 500,
                 maxAgeSeconds: 60 * 60 * 24 * 30, // 30 Days
