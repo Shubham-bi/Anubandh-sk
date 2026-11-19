@@ -609,20 +609,50 @@ export const App: React.FC = () => {
 
   if (!isDbReady) {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-        <img
-          src="/icon.svg"
-          alt="अनुबंध"
-          className="w-16 h-16 rounded-2xl animate-pulse shadow-lg shadow-rose-600/30 mb-4 object-contain"
-        />
-        <h2 className="text-xl font-black text-slate-800">अनुबंध</h2>
-        <p className="text-xs font-semibold text-rose-600 mt-1">दोन मनांचे आणि दोन घराण्यांचे रेशीमबंध</p>
-        <p className="text-[11px] text-slate-400 font-medium mt-1">Created by Shubham Kharche</p>
-        {dbError && (
-          <p className="text-xs text-rose-600 bg-rose-50 p-2 rounded-lg mt-3">
-            Error: {dbError}
+      <div className="min-h-screen bg-gradient-to-b from-[#700c28] via-[#881337] to-[#4c0519] flex flex-col items-center justify-between p-6 select-none animate-fade-in text-white">
+        <div className="w-full" />
+        
+        {/* Central Branded Emblem & Title */}
+        <div className="flex flex-col items-center text-center max-w-sm mx-auto">
+          <div className="relative mb-5">
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl shadow-black/40 flex items-center justify-center p-3 animate-pulse">
+              <img
+                src="/icon.svg"
+                alt="अनुबंध"
+                className="w-full h-full object-contain drop-shadow-lg"
+              />
+            </div>
+            <div className="absolute -inset-1 rounded-3xl bg-amber-400/20 blur-md -z-10 animate-pulse" />
+          </div>
+
+          <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight drop-shadow-md">
+            अनुबंध
+          </h1>
+          <p className="text-xs sm:text-sm font-semibold text-amber-200/90 mt-1.5 drop-shadow-sm">
+            दोन मनांचे आणि दोन घराण्यांचे रेशीमबंध
           </p>
-        )}
+
+          {/* Loading Progress Bar */}
+          <div className="w-44 sm:w-52 h-1.5 bg-black/30 rounded-full overflow-hidden mt-8 ring-1 ring-white/10">
+            <div className="w-full h-full bg-gradient-to-r from-amber-400 via-amber-200 to-amber-400 rounded-full animate-pulse" />
+          </div>
+          <span className="text-[11px] text-rose-200/60 font-medium mt-2.5">
+            प्रारंभ होत आहे...
+          </span>
+
+          {dbError && (
+            <div className="text-xs text-rose-200 bg-rose-950/80 border border-rose-500/40 p-3 rounded-2xl mt-4 max-w-xs">
+              त्रुटी: {dbError}
+            </div>
+          )}
+        </div>
+
+        {/* Footer Credit */}
+        <div className="text-center pb-2">
+          <p className="text-[11px] text-rose-200/50 font-medium">
+            Created by Shubham Kharche
+          </p>
+        </div>
       </div>
     );
   }
