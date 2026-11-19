@@ -10,7 +10,7 @@ export default defineConfig({
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
       manifest: {
         id: 'anubandh-pwa',
-        name: 'Anubandh अनुबंध - Leva Shubh Mangal',
+        name: 'Anubandh अनुबंध',
         short_name: 'Anubandh अनुबंध',
         description: 'Anubandh अनुबंध - Leva Patidar Matrimonial Profiles & Matchmaking Assistant',
         theme_color: '#e11d48',

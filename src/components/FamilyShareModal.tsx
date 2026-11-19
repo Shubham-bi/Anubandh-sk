@@ -408,7 +408,7 @@ export const FamilyShareModal: React.FC<FamilyShareModalProps> = ({
                         <img
                           src={item.photoUrl}
                           alt={item.name}
-                          className="w-16 h-16 rounded-2xl object-cover border-2 border-white shadow-md"
+                          className="w-16 h-16 rounded-2xl object-cover object-top border-2 border-white shadow-md"
                         />
                       ) : (
                         <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 to-rose-600 text-white font-black text-2xl flex items-center justify-center shadow-md">

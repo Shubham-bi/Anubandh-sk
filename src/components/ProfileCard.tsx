@@ -12,7 +12,9 @@ import {
   Camera,
   StickyNote,
   MessageCircle,
-  Share2
+  Share2,
+  Maximize2,
+  X
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Profile, ProfileInteraction, TriageStatus } from '../types/profile';
@@ -42,6 +44,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
   onShareFamily
 }) => {
   const [imageError, setImageError] = useState(false);
+  const [showFullPhoto, setShowFullPhoto] = useState(false);
   const status = interaction?.status || 'default';
   const rating = interaction?.rating || 0;
   const hasNotes = Boolean(interaction?.notes?.trim());
@@ -116,7 +119,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
                 src={mainPhoto}
                 alt={profile.name}
                 onError={() => setImageError(true)}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-top"
                 loading="lazy"
               />
             ) : (
@@ -215,7 +218,7 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
             src={mainPhoto}
             alt={profile.name}
             onError={() => setImageError(true)}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
             loading="lazy"
           />
         ) : (
@@ -263,6 +266,20 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
 
         {/* Top-right Status Pill & Share Button */}
         <div className="absolute top-3 right-3 z-10 flex items-center gap-1.5">
+          {mainPhoto && !imageError && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowFullPhoto(true);
+              }}
+              className="p-1.5 rounded-full bg-black/50 hover:bg-black/80 text-white backdrop-blur-md transition-colors shadow-sm"
+              title="पूर्ण आकाराचा मोठा फोटो पहा (View Full Size Photo)"
+            >
+              <Maximize2 className="w-3.5 h-3.5" />
+            </button>
+          )}
+
           {onShareFamily && (
             <button
               type="button"
@@ -475,6 +492,53 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
           </button>
         </div>
       </div>
+
+      {/* Quick Full Photo Lightbox */}
+      {showFullPhoto && mainPhoto && (
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowFullPhoto(false);
+          }}
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col items-center justify-center p-3 sm:p-6 cursor-zoom-out animate-in fade-in"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-2xl flex items-center justify-between text-white mb-2 z-10"
+          >
+            <span className="font-bold text-xs sm:text-sm bg-white/15 px-3 py-1 rounded-lg">
+              {profile.name} (ID: {profile.nu_id})
+            </span>
+            <div className="flex items-center gap-2">
+              <a
+                href={mainPhoto}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs bg-white/15 hover:bg-white/25 px-2.5 py-1 rounded-lg transition-colors font-medium text-white"
+                title="Open original image in new tab"
+              >
+                मूळ फोटो
+              </a>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowFullPhoto(false);
+                }}
+                className="p-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white transition-colors"
+                title="Close"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+          <img
+            src={mainPhoto}
+            alt={profile.name}
+            className="max-w-full max-h-[85vh] object-contain object-top rounded-2xl shadow-2xl"
+          />
+        </div>
+      )}
     </div>
   );
 };

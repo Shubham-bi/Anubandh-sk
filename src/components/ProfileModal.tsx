@@ -17,7 +17,10 @@ import {
   StickyNote,
   Tag,
   Plus,
-  Share2
+  Share2,
+  ZoomIn,
+  ZoomOut,
+  ExternalLink
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Profile, ProfileInteraction, TriageStatus } from '../types/profile';
@@ -55,8 +58,13 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const [activeTab, setActiveTab] = useState<'kundali' | 'family' | 'career' | 'personal' | 'documents' | 'notes'>('kundali');
   const [currentPhotoIdx, setCurrentPhotoIdx] = useState(0);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+  const [imageFitMode, setImageFitMode] = useState<'contain' | 'cover'>('contain');
+  const [lightboxZoom, setLightboxZoom] = useState<number>(1);
   const [newTagInput, setNewTagInput] = useState('');
   const [localNotes, setLocalNotes] = useState('');
+
+  const photos = profile?.photos || [];
+  const currentPhoto = photos.length > 0 ? photos[currentPhotoIdx] : null;
 
   useEffect(() => {
     if (interaction?.notes) {
@@ -65,17 +73,34 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
       setLocalNotes('');
     }
     setCurrentPhotoIdx(0);
+    setImageFitMode('contain');
+    setLightboxZoom(1);
     setActiveTab('kundali');
   }, [profile?.nu_id, interaction?.notes]);
 
-  // Handle escape key
+  // Handle escape & arrow keys for lightbox navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         if (lightboxImage) {
           setLightboxImage(null);
+          setLightboxZoom(1);
         } else {
           onClose();
+        }
+      } else if (lightboxImage && photos.length > 1) {
+        if (e.key === 'ArrowLeft') {
+          setCurrentPhotoIdx((prev) => {
+            const next = prev > 0 ? prev - 1 : photos.length - 1;
+            setLightboxImage(photos[next]);
+            return next;
+          });
+        } else if (e.key === 'ArrowRight') {
+          setCurrentPhotoIdx((prev) => {
+            const next = prev < photos.length - 1 ? prev + 1 : 0;
+            setLightboxImage(photos[next]);
+            return next;
+          });
         }
       }
     };
@@ -83,7 +108,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
       window.addEventListener('keydown', handleKeyDown);
     }
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, lightboxImage, onClose]);
+  }, [isOpen, lightboxImage, onClose, photos]);
 
   if (!isOpen || !profile) return null;
 
@@ -124,9 +149,6 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
   const whatsAppUrl = profile.mobile1 ? getWhatsAppLink(profile.mobile1, profile.name) : null;
   const phoneUrl = profile.mobile1 ? getTelLink(profile.mobile1) : null;
   const fatherPhoneUrl = profile.fatherMobile ? getTelLink(profile.fatherMobile) : null;
-
-  const photos = profile.photos || [];
-  const currentPhoto = photos.length > 0 ? photos[currentPhotoIdx] : null;
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 md:p-6 animate-in fade-in duration-200">
@@ -187,28 +209,68 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
           <div className="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-12 gap-6 bg-gradient-to-b from-slate-50/50 to-white">
             {/* Left Photo Carousel (5 cols) */}
             <div className="md:col-span-5 flex flex-col gap-3">
-              <div className="relative aspect-[4/3] sm:aspect-[3/4] max-h-72 sm:max-h-none w-full rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 shadow-sm group">
+              <div
+                onClick={() => currentPhoto && setLightboxImage(currentPhoto)}
+                className="relative min-h-[300px] sm:min-h-[380px] md:min-h-[440px] max-h-[500px] w-full rounded-2xl overflow-hidden bg-slate-900/5 border border-slate-200 shadow-sm group flex items-start justify-center cursor-zoom-in"
+                title="मोठा फोटो पाहण्यासाठी क्लिक करा (Click to view full size)"
+              >
                 {currentPhoto ? (
                   <img
                     src={currentPhoto}
                     alt={profile.name}
-                    className="w-full h-full object-cover"
+                    className={`w-full h-full object-top transition-all duration-300 ${
+                      imageFitMode === 'contain' ? 'object-contain' : 'object-cover'
+                    }`}
                   />
                 ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center bg-rose-50 text-rose-400">
+                  <div className="w-full h-full min-h-[300px] flex flex-col items-center justify-center bg-rose-50 text-rose-400">
                     <span className="text-5xl font-black">{profile.firstname?.[0] || 'L'}</span>
                     <span className="text-xs font-medium mt-2">No Photo</span>
                   </div>
                 )}
 
-                {/* Lightbox Trigger */}
+                {/* Fit / Cover Mode Toggle */}
+                {currentPhoto && (
+                  <div
+                    className="absolute top-3 left-3 z-10 flex items-center bg-black/60 backdrop-blur-md rounded-lg p-0.5 text-[11px] font-bold text-white shadow"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setImageFitMode('contain')}
+                      className={`px-2 py-0.5 rounded-md transition-colors ${
+                        imageFitMode === 'contain' ? 'bg-rose-600 text-white shadow-sm' : 'text-slate-300 hover:text-white'
+                      }`}
+                      title="पूर्ण आकार (Full Size / Uncropped)"
+                    >
+                      पूर्ण आकार
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setImageFitMode('cover')}
+                      className={`px-2 py-0.5 rounded-md transition-colors ${
+                        imageFitMode === 'cover' ? 'bg-rose-600 text-white shadow-sm' : 'text-slate-300 hover:text-white'
+                      }`}
+                      title="कव्हर / झूम (Fill / Cover)"
+                    >
+                      कव्हर
+                    </button>
+                  </div>
+                )}
+
+                {/* Lightbox Trigger Badge */}
                 {currentPhoto && (
                   <button
-                    onClick={() => setLightboxImage(currentPhoto)}
-                    className="absolute bottom-3 right-3 p-2 rounded-xl bg-black/60 text-white hover:bg-black/80 transition-colors backdrop-blur-sm"
-                    title="View Full Size"
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setLightboxImage(currentPhoto);
+                    }}
+                    className="absolute bottom-3 right-3 p-2 rounded-xl bg-black/60 text-white hover:bg-black/85 transition-colors backdrop-blur-md flex items-center gap-1.5 text-xs font-semibold shadow-md z-10"
+                    title="पूर्ण आकाराचा मोठा फोटो उघडा (View Fullscreen)"
                   >
                     <Maximize2 className="w-4 h-4" />
+                    <span className="hidden sm:inline">मोठा फोटो</span>
                   </button>
                 )}
 
@@ -216,14 +278,24 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                 {photos.length > 1 && (
                   <>
                     <button
-                      onClick={() => setCurrentPhotoIdx((prev) => (prev > 0 ? prev - 1 : photos.length - 1))}
-                      className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/50 hover:bg-black/70 text-white backdrop-blur-sm transition-colors"
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentPhotoIdx((prev) => (prev > 0 ? prev - 1 : photos.length - 1));
+                      }}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 hover:bg-black/80 text-white backdrop-blur-md transition-colors shadow-md z-10"
+                      title="मागील फोटो"
                     >
                       <ChevronLeft className="w-5 h-5" />
                     </button>
                     <button
-                      onClick={() => setCurrentPhotoIdx((prev) => (prev < photos.length - 1 ? prev + 1 : 0))}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-full bg-black/50 hover:bg-black/70 text-white backdrop-blur-sm transition-colors"
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentPhotoIdx((prev) => (prev < photos.length - 1 ? prev + 1 : 0));
+                      }}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 hover:bg-black/80 text-white backdrop-blur-md transition-colors shadow-md z-10"
+                      title="पुढील फोटो"
                     >
                       <ChevronRight className="w-5 h-5" />
                     </button>
@@ -237,6 +309,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                   {photos.map((p, idx) => (
                     <button
                       key={idx}
+                      type="button"
                       onClick={() => setCurrentPhotoIdx(idx)}
                       className={`relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 border-2 transition-all ${
                         currentPhotoIdx === idx
@@ -244,7 +317,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                           : 'border-transparent opacity-60 hover:opacity-100'
                       }`}
                     >
-                      <img src={p} alt={`Thumbnail ${idx}`} className="w-full h-full object-cover" />
+                      <img src={p} alt={`Thumbnail ${idx}`} className="w-full h-full object-cover object-top" />
                     </button>
                   ))}
                 </div>
@@ -595,7 +668,7 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
                           className="border border-slate-200 rounded-2xl overflow-hidden bg-slate-50 p-2 group hover:shadow-md transition-all"
                         >
                           <div className="relative aspect-[3/4] bg-white rounded-xl overflow-hidden mb-2">
-                            <img src={bioUrl} alt={`Biodata Document ${idx + 1}`} className="w-full h-full object-contain" />
+                            <img src={bioUrl} alt={`Biodata Document ${idx + 1}`} className="w-full h-full object-contain object-top" />
                             <button
                               onClick={() => setLightboxImage(bioUrl)}
                               className="absolute inset-0 bg-black/40 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center font-bold text-xs gap-1.5 transition-opacity"
@@ -697,23 +770,133 @@ export const ProfileModal: React.FC<ProfileModalProps> = ({
         </div>
       </div>
 
-      {/* Lightbox Modal */}
+      {/* Lightbox Modal with Full-Size Viewer */}
       {lightboxImage && (
         <div
-          onClick={() => setLightboxImage(null)}
-          className="fixed inset-0 z-60 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 cursor-zoom-out animate-in fade-in"
+          onClick={() => {
+            setLightboxImage(null);
+            setLightboxZoom(1);
+          }}
+          className="fixed inset-0 z-60 bg-black/95 backdrop-blur-md flex flex-col items-center justify-between p-3 sm:p-5 select-none animate-in fade-in"
         >
-          <button
-            onClick={() => setLightboxImage(null)}
-            className="absolute top-4 right-4 p-2 rounded-full bg-white/20 text-white hover:bg-white/40"
+          {/* Lightbox Top Control Bar */}
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-4xl flex items-center justify-between gap-3 text-white z-20 pb-2 border-b border-white/10"
           >
-            <X className="w-6 h-6" />
-          </button>
-          <img
-            src={lightboxImage}
-            alt="Enlarged"
-            className="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl"
-          />
+            <div className="flex items-center gap-2">
+              <span className="text-xs sm:text-sm font-bold bg-white/15 px-3 py-1 rounded-lg">
+                {profile.name}
+              </span>
+              {photos.length > 1 && (
+                <span className="text-xs text-slate-300 bg-white/10 px-2 py-1 rounded-lg">
+                  फोटो {currentPhotoIdx + 1} / {photos.length}
+                </span>
+              )}
+            </div>
+
+            {/* Zoom & Action Controls */}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setLightboxZoom((z) => Math.max(0.75, +(z - 0.25).toFixed(2)))}
+                className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors"
+                title="Zoom Out"
+              >
+                <ZoomOut className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setLightboxZoom(1)}
+                className="px-2 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-colors"
+                title="Reset Zoom"
+              >
+                {Math.round(lightboxZoom * 100)}%
+              </button>
+              <button
+                type="button"
+                onClick={() => setLightboxZoom((z) => Math.min(3, +(z + 0.25).toFixed(2)))}
+                className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors"
+                title="Zoom In"
+              >
+                <ZoomIn className="w-4 h-4" />
+              </button>
+              <a
+                href={lightboxImage}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white transition-colors flex items-center gap-1 text-xs font-medium"
+                title="मूळ फोटो नवीन टॅबमध्ये उघडा (Open raw image in new tab)"
+              >
+                <ExternalLink className="w-4 h-4" />
+                <span className="hidden sm:inline">मूळ फोटो</span>
+              </a>
+              <button
+                type="button"
+                onClick={() => {
+                  setLightboxImage(null);
+                  setLightboxZoom(1);
+                }}
+                className="p-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white transition-colors ml-2"
+                title="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Main Photo Center Container */}
+          <div
+            className="flex-1 w-full max-w-5xl flex items-center justify-center overflow-auto p-2 relative my-auto cursor-zoom-out"
+          >
+            <img
+              src={lightboxImage}
+              alt={profile.name}
+              style={{ transform: `scale(${lightboxZoom})`, transformOrigin: 'top center' }}
+              className="max-w-full max-h-[82vh] object-contain object-top rounded-xl shadow-2xl transition-transform duration-150"
+              onClick={(e) => {
+                e.stopPropagation();
+                setLightboxZoom((z) => (z === 1 ? 1.75 : 1));
+              }}
+            />
+
+            {/* Prev / Next photo buttons inside Lightbox */}
+            {photos.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const nextIdx = currentPhotoIdx > 0 ? currentPhotoIdx - 1 : photos.length - 1;
+                    setCurrentPhotoIdx(nextIdx);
+                    setLightboxImage(photos[nextIdx]);
+                  }}
+                  className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-black/60 hover:bg-black/90 text-white border border-white/20 backdrop-blur-md transition-colors"
+                  title="Previous Photo"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const nextIdx = currentPhotoIdx < photos.length - 1 ? currentPhotoIdx + 1 : 0;
+                    setCurrentPhotoIdx(nextIdx);
+                    setLightboxImage(photos[nextIdx]);
+                  }}
+                  className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-black/60 hover:bg-black/90 text-white border border-white/20 backdrop-blur-md transition-colors"
+                  title="Next Photo"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Lightbox Bottom Footer Caption */}
+          <div className="text-center text-xs text-slate-400 pb-1 z-20">
+            <span>फोटो झूम करण्यासाठी क्लिक करा • डावे/उजवे बाण वापरून फोटो बदला • Esc दाबून बंद करा</span>
+          </div>
         </div>
       )}
     </div>

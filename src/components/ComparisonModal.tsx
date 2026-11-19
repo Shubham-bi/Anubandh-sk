@@ -31,7 +31,7 @@ export const ComparisonModal: React.FC<ComparisonModalProps> = ({
         <div className="flex flex-col items-center text-center p-2">
           <div className="w-20 h-20 rounded-2xl overflow-hidden bg-slate-100 border border-slate-200 mb-2 shadow-sm">
             {p.photos && p.photos.length > 0 ? (
-              <img src={p.photos[0]} alt={p.name} className="w-full h-full object-cover" />
+              <img src={p.photos[0]} alt={p.name} className="w-full h-full object-cover object-top" />
             ) : (
               <div className="w-full h-full bg-rose-50 text-rose-600 font-black flex items-center justify-center text-xl">
                 {p.firstname?.[0] || 'L'}
