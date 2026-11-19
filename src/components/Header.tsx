@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Heart, Search, Filter, Layers, Download, CheckSquare, Sparkles, X, Smartphone, Plus, BarChart3, Users } from 'lucide-react';
 import { TriageStatus } from '../types/profile';
+import { InstallPwaModal } from './InstallPwaModal';
 
 interface HeaderProps {
   activeSection: 'portal' | 'booklet' | 'kanban' | 'analytics';
@@ -49,26 +50,40 @@ export const Header: React.FC<HeaderProps> = ({
   onViewModeChange
 }) => {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [isInstallable, setIsInstallable] = useState(false);
+  const [isInstallModalOpen, setIsInstallModalOpen] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(false);
 
   useEffect(() => {
+    // Check if app is already running in standalone PWA window
+    const isStandaloneMode =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as any).standalone === true;
+    setIsStandalone(isStandaloneMode);
+
     const handleBeforeInstall = (e: any) => {
       e.preventDefault();
       setDeferredPrompt(e);
-      setIsInstallable(true);
     };
     window.addEventListener('beforeinstallprompt', handleBeforeInstall);
     return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstall);
   }, []);
 
   const handleInstallClick = async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
-      setIsInstallable(false);
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      try {
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          setIsStandalone(true);
+        }
+      } catch {
+        // Fallback
+      }
+      setDeferredPrompt(null);
+    } else {
+      // If browser doesn't support beforeinstallprompt or not triggered yet (e.g. iOS Safari, Edge), show step-by-step modal guide
+      setIsInstallModalOpen(true);
     }
-    setDeferredPrompt(null);
   };
 
   const tabs: { id: 'all' | TriageStatus; label: string; count: number; color: string; icon?: string }[] = [
@@ -194,14 +209,15 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
 
             {/* PWA Install Button */}
-            {isInstallable && (
+            {!isStandalone && (
               <button
                 onClick={handleInstallClick}
-                className="flex items-center gap-1 px-2.5 py-1.5 sm:py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-sm shadow-rose-600/30 transition-all animate-pulse"
-                title="Install App to Device"
+                className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white shadow-sm shadow-rose-600/30 transition-all active:scale-95 animate-pulse"
+                title="मोबाईल किंवा संगणकावर ॲप इन्स्टॉल करा (Install PWA)"
               >
                 <Smartphone className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Install</span>
+                <span className="hidden sm:inline">ॲप इन्स्टॉल करा</span>
+                <span className="sm:hidden">इन्स्टॉल</span>
               </button>
             )}
           </div>
@@ -333,6 +349,14 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         )}
       </div>
+
+      {/* Install PWA Guide Modal */}
+      <InstallPwaModal
+        isOpen={isInstallModalOpen}
+        onClose={() => setIsInstallModalOpen(false)}
+        onNativeInstall={handleInstallClick}
+        canNativeInstall={Boolean(deferredPrompt)}
+      />
     </header>
   );
 };
