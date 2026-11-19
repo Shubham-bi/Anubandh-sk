@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Filter, Layers, Download, CheckSquare, Sparkles, X, Smartphone, Plus, BarChart3, Users } from 'lucide-react';
+import { Search, Filter, Layers, Download, CheckSquare, Sparkles, X, Plus, BarChart3, Users } from 'lucide-react';
 import { TriageStatus } from '../types/profile';
 
 interface HeaderProps {
@@ -24,8 +24,6 @@ interface HeaderProps {
   onOpenExport: () => void;
   onOpenAddCandidate: () => void;
   onOpenFamilyShare: () => void;
-  onOpenInstall: () => void;
-  isStandalone?: boolean;
   onToggleMobileFilters: () => void;
   viewMode: 'grid' | 'compact';
   onViewModeChange: (mode: 'grid' | 'compact') => void;
@@ -46,8 +44,6 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenExport,
   onOpenAddCandidate,
   onOpenFamilyShare,
-  onOpenInstall,
-  isStandalone = false,
   onToggleMobileFilters,
   viewMode,
   onViewModeChange
@@ -173,30 +169,6 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Users className="w-3.5 h-3.5 text-rose-600" />
               <span className="hidden md:inline">कौटुंबिक पत्रिका</span>
-            </button>
-
-            {/* PWA Install Button - Always Prominent */}
-            <button
-              onClick={onOpenInstall}
-              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs font-black transition-all active:scale-95 flex-shrink-0 shadow-md ${
-                isStandalone
-                  ? 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 shadow-slate-200/50'
-                  : 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-700 hover:to-teal-700 text-white shadow-emerald-600/30'
-              }`}
-              title={
-                isStandalone
-                  ? 'Anubandh ॲप आधीच इन्स्टॉल केले आहे (PWA Active)'
-                  : 'मोबाईल किंवा संगणकावर ॲप इन्स्टॉल करा (Install Anubandh App)'
-              }
-            >
-              <Smartphone
-                className={`w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0 ${
-                  isStandalone ? 'text-emerald-600' : 'text-emerald-100 animate-pulse'
-                }`}
-              />
-              <span className="font-extrabold whitespace-nowrap">
-                {isStandalone ? 'ॲप इन्स्टॉल्ड ✓' : 'ॲप इन्स्टॉल करा'}
-              </span>
             </button>
           </div>
         </div>

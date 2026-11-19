@@ -553,8 +553,6 @@ export const App: React.FC = () => {
           setFamilyShareCandidate(null);
           setIsFamilyShareOpen(true);
         }}
-        onOpenInstall={handleInstallClick}
-        isStandalone={isStandalone}
         onToggleMobileFilters={() => setIsMobileFiltersOpen(true)}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
