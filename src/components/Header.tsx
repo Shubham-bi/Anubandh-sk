@@ -47,7 +47,7 @@ interface HeaderProps {
   onParentLogout?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({
+export const HeaderComponent: React.FC<HeaderProps> = ({
   activeSection,
   onSectionChange,
   portalCount,
@@ -403,3 +403,5 @@ export const Header: React.FC<HeaderProps> = ({
     </header>
   );
 };
+
+export const Header = React.memo(HeaderComponent);

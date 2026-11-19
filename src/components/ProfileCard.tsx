@@ -32,7 +32,7 @@ interface ProfileCardProps {
   onShareFamily?: (profile: Profile) => void;
 }
 
-export const ProfileCard: React.FC<ProfileCardProps> = ({
+export const ProfileCardComponent: React.FC<ProfileCardProps> = ({
   profile,
   interaction,
   isCompared,
@@ -542,3 +542,5 @@ export const ProfileCard: React.FC<ProfileCardProps> = ({
     </div>
   );
 };
+
+export const ProfileCard = React.memo(ProfileCardComponent);

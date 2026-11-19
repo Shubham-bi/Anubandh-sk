@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Filter, RotateCcw, X, ChevronDown, ChevronUp, Camera, ArrowDownUp } from 'lucide-react';
 import { FilterState } from '../types/profile';
 import metadata from '../data/filter_metadata.json';
@@ -12,7 +12,7 @@ interface FilterSidebarProps {
   totalCount: number;
 }
 
-export const FilterSidebar: React.FC<FilterSidebarProps> = ({
+export const FilterSidebarComponent: React.FC<FilterSidebarProps> = ({
   filters,
   onFilterChange,
   isOpen,
@@ -70,17 +70,23 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
     filters.maritalStatus !== 'all' ||
     filters.hasPhotosOnly;
 
-  const filteredGotras = metadata.gotras.filter((g) =>
-    g.toLowerCase().includes(gotraSearch.toLowerCase())
-  );
+  const filteredGotras = useMemo(() => {
+    if (!gotraSearch.trim()) return metadata.gotras;
+    const q = gotraSearch.toLowerCase();
+    return metadata.gotras.filter((g) => g.toLowerCase().includes(q));
+  }, [gotraSearch]);
 
-  const filteredDistricts = metadata.districts.filter((d) =>
-    d.toLowerCase().includes(districtSearch.toLowerCase())
-  );
+  const filteredDistricts = useMemo(() => {
+    if (!districtSearch.trim()) return metadata.districts;
+    const q = districtSearch.toLowerCase();
+    return metadata.districts.filter((d) => d.toLowerCase().includes(q));
+  }, [districtSearch]);
 
-  const filteredCities = metadata.cities.filter((c) =>
-    c.toLowerCase().includes(citySearch.toLowerCase())
-  );
+  const filteredCities = useMemo(() => {
+    if (!citySearch.trim()) return metadata.cities;
+    const q = citySearch.toLowerCase();
+    return metadata.cities.filter((c) => c.toLowerCase().includes(q));
+  }, [citySearch]);
 
   const toggleGotra = (gotra: string) => {
     if (gotraMode === 'include') {
@@ -491,3 +497,5 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
     </>
   );
 };
+
+export const FilterSidebar = React.memo(FilterSidebarComponent);

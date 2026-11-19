@@ -27,7 +27,7 @@ interface BookletCardProps {
   onShareFamily?: (candidate: BookletCandidate) => void;
 }
 
-export const BookletCard: React.FC<BookletCardProps> = ({
+export const BookletCardComponent: React.FC<BookletCardProps> = ({
   candidate,
   interaction,
   onSelect,
@@ -380,3 +380,5 @@ export const BookletCard: React.FC<BookletCardProps> = ({
     </div>
   );
 };
+
+export const BookletCard = React.memo(BookletCardComponent);

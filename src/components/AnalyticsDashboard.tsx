@@ -25,7 +25,7 @@ interface AnalyticsDashboardProps {
   onNavigateToSection: (section: 'portal' | 'booklet' | 'kanban') => void;
 }
 
-export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
+export const AnalyticsDashboardComponent: React.FC<AnalyticsDashboardProps> = ({
   portalProfiles,
   portalInteractions,
   bookletCandidates,
@@ -670,3 +670,5 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({
     </div>
   );
 };
+
+export const AnalyticsDashboard = React.memo(AnalyticsDashboardComponent);

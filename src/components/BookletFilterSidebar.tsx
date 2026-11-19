@@ -24,7 +24,7 @@ interface BookletFilterSidebarProps {
   totalCount: number;
 }
 
-export const BookletFilterSidebar: React.FC<BookletFilterSidebarProps> = ({
+export const BookletFilterSidebarComponent: React.FC<BookletFilterSidebarProps> = ({
   filters,
   onFilterChange,
   candidates,
@@ -64,13 +64,17 @@ export const BookletFilterSidebar: React.FC<BookletFilterSidebarProps> = ({
     return Array.from(s).sort();
   }, [candidates]);
 
-  const filteredGotras = allGotras.filter((g) =>
-    g.toLowerCase().includes(gotraSearch.toLowerCase())
-  );
+  const filteredGotras = useMemo(() => {
+    if (!gotraSearch.trim()) return allGotras;
+    const q = gotraSearch.toLowerCase();
+    return allGotras.filter((g) => g.toLowerCase().includes(q));
+  }, [allGotras, gotraSearch]);
 
-  const filteredMulgaons = allMulgaons.filter((m) =>
-    m.toLowerCase().includes(mulgaonSearch.toLowerCase())
-  );
+  const filteredMulgaons = useMemo(() => {
+    if (!mulgaonSearch.trim()) return allMulgaons;
+    const q = mulgaonSearch.toLowerCase();
+    return allMulgaons.filter((m) => m.toLowerCase().includes(q));
+  }, [allMulgaons, mulgaonSearch]);
 
   const handleReset = () => {
     onFilterChange({
@@ -351,3 +355,5 @@ export const BookletFilterSidebar: React.FC<BookletFilterSidebarProps> = ({
     </>
   );
 };
+
+export const BookletFilterSidebar = React.memo(BookletFilterSidebarComponent);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useTransition } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import {
   db,
@@ -50,6 +50,9 @@ const ITEMS_PER_PAGE = 24;
 export const App: React.FC = () => {
   const [isDbReady, setIsDbReady] = useState(false);
   const [dbError, setDbError] = useState<string | null>(null);
+
+  // Transition hook for non-blocking responsive tab navigation
+  const [, startTransition] = useTransition();
 
   // Security & Authentication States
   const [isParentAuth, setIsParentAuth] = useState<boolean>(() => isParentSessionValid());
@@ -115,21 +118,26 @@ export const App: React.FC = () => {
           ? 'मॅचमेकिंग पाईपलाईन (Kanban) पाहण्यासाठी ॲडमिन पासवर्ड आवश्यक आहे.'
           : 'ॲनालिटिक्स डॅशबोर्ड पाहण्यासाठी ॲडमिन पासवर्ड आवश्यक आहे.',
         () => {
-          setActiveSection(sec);
-          setCurrentPage(1);
+          startTransition(() => {
+            setActiveSection(sec);
+            setCurrentPage(1);
+          });
         }
       );
       return;
     }
 
-    setActiveSection(sec);
-    setCurrentPage(1);
+    startTransition(() => {
+      setActiveSection(sec);
+      setCurrentPage(1);
+    });
+
     if (typeof window !== 'undefined') {
       if (sec === 'groom_profile') {
         if (!window.location.pathname.includes('/profile')) {
           window.history.pushState(null, '', '/profile');
         }
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: 'instant' });
       } else {
         if (window.location.pathname.includes('/profile')) {
           window.history.pushState(null, '', '/');
@@ -339,10 +347,10 @@ export const App: React.FC = () => {
     };
   }, [bookletCandidates.length, rawBookletInteractions]);
 
-  // Reset pagination when filters or section switch
+  // Reset pagination when search filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [portalFilters, bookletFilters, activeSection]);
+  }, [portalFilters, bookletFilters]);
 
   // Filter Portal Profiles
   const filteredPortalProfiles = useMemo(() => {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Phone,
   Printer,
@@ -25,7 +25,7 @@ interface GroomProfilePageProps {
   isParentAuthenticated?: boolean;
 }
 
-export const GroomProfilePage: React.FC<GroomProfilePageProps> = ({
+export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
   onBackToPortal,
   isParentAuthenticated = false,
 }) => {
@@ -45,15 +45,7 @@ export const GroomProfilePage: React.FC<GroomProfilePageProps> = ({
     }, 3200);
   };
 
-  // Pre-generate canvas in background on page load
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      getGeneratedBiodataImage().catch((err) => {
-        console.warn('Canvas pre-generation in background:', err);
-      });
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
+  // Canvas is generated purely on-demand when user clicks Download, Preview or Share
 
   const handleCopyLink = async () => {
     try {
@@ -518,3 +510,5 @@ export const GroomProfilePage: React.FC<GroomProfilePageProps> = ({
     </div>
   );
 };
+
+export const GroomProfilePage = React.memo(GroomProfilePageComponent);

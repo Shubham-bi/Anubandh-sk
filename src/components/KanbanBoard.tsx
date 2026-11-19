@@ -52,7 +52,7 @@ interface UnifiedItem {
   rawBooklet?: BookletCandidate;
 }
 
-export const KanbanBoard: React.FC<KanbanBoardProps> = ({
+export const KanbanBoardComponent: React.FC<KanbanBoardProps> = ({
   portalProfiles,
   portalInteractions,
   bookletCandidates,
@@ -64,6 +64,26 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
 }) => {
   const [sourceFilter, setSourceFilter] = useState<'all' | 'portal' | 'booklet'>('all');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Progressive rendering limit per column (prevents 30,000+ DOM nodes freezing the UI)
+  const DEFAULT_COLUMN_LIMIT = 25;
+  const [columnLimits, setColumnLimits] = useState<Record<string, number>>({});
+
+  const getLimitForStage = (stageId: string) => columnLimits[stageId] || DEFAULT_COLUMN_LIMIT;
+
+  const handleShowMore = (stageId: string) => {
+    setColumnLimits((prev) => ({
+      ...prev,
+      [stageId]: (prev[stageId] || DEFAULT_COLUMN_LIMIT) + 30,
+    }));
+  };
+
+  const handleShowAll = (stageId: string, total: number) => {
+    setColumnLimits((prev) => ({
+      ...prev,
+      [stageId]: total,
+    }));
+  };
 
   // Call log dialog state
   const [activeLogItem, setActiveLogItem] = useState<UnifiedItem | null>(null);
@@ -273,6 +293,9 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
       <div className="flex items-start gap-4 overflow-x-auto pb-6 pt-1 thin-scrollbar">
         {PIPELINE_STAGES.map((stageDef) => {
           const items = itemsByStage[stageDef.id] || [];
+          const limit = getLimitForStage(stageDef.id);
+          const visibleItems = items.slice(0, limit);
+          const hasMore = items.length > limit;
 
           return (
             <div
@@ -299,8 +322,9 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
 
               {/* Cards Stream */}
               <div className="p-2.5 overflow-y-auto space-y-3 flex-1">
-                {items.length > 0 ? (
-                  items.map((item) => {
+                {visibleItems.length > 0 ? (
+                  <>
+                    {visibleItems.map((item) => {
                     const waLink = item.primaryPhone
                       ? getProposalWhatsAppUrl(item.primaryPhone.slice(-10), {
                           candidateName: item.name,
@@ -439,7 +463,27 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                         </div>
                       </div>
                     );
-                  })
+                  })}
+
+                  {hasMore && (
+                    <div className="pt-2 pb-1 text-center space-y-1.5">
+                      <button
+                        type="button"
+                        onClick={() => handleShowMore(stageDef.id)}
+                        className="w-full py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors shadow-xs"
+                      >
+                        + आणखी ३० दाखवा ({visibleItems.length} / {items.length})
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleShowAll(stageDef.id, items.length)}
+                        className="text-[10px] text-slate-400 hover:text-slate-600 underline font-medium"
+                      >
+                        सर्व दाखवा ({items.length})
+                      </button>
+                    </div>
+                  )}
+                </>
                 ) : (
                   <div className="text-center py-10 text-slate-400 text-xs italic">
                     या टप्प्यात कोणीही नाही
@@ -526,3 +570,5 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
     </div>
   );
 };
+
+export const KanbanBoard = React.memo(KanbanBoardComponent);
