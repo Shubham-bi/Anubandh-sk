@@ -177,8 +177,8 @@ export const BookletFilterSidebar: React.FC<BookletFilterSidebarProps> = ({
                 onChange={(e) => onFilterChange({ ...filters, sortBy: e.target.value as any })}
                 className="w-full text-xs py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 font-bold text-slate-800"
               >
-                <option value="sr_asc">📖 अ.क्र. १ ते १८१ (पुस्तिका चढता क्रम / Ascending)</option>
-                <option value="sr_desc">📖 अ.क्र. १८१ ते १ (पुस्तिका उतरता क्रम / Descending)</option>
+                <option value="sr_asc">📖 अ.क्र. ० ते १८१ (पुस्तिका चढता क्रम / Ascending)</option>
+                <option value="sr_desc">📖 अ.क्र. १८१ ते ० (पुस्तिका उतरता क्रम / Descending)</option>
                 <option value="age_asc">🎂 वय: कमी ते जास्त (Youngest First)</option>
                 <option value="age_desc">🎂 वय: जास्त ते कमी (Oldest First)</option>
                 <option value="name_asc">👤 नाव: अ ते ज्ञ (Name: A to Z)</option>

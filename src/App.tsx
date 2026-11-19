@@ -328,16 +328,11 @@ export const App: React.FC = () => {
           case 'sr_asc': {
             const numA = getSrNum(a);
             const numB = getSrNum(b);
-            // Place 0 / test candidate at the end of the ascending list
-            if (numA === 0) return 1;
-            if (numB === 0) return -1;
             return numA - numB;
           }
           case 'sr_desc': {
             const numA = getSrNum(a);
             const numB = getSrNum(b);
-            if (numA === 0) return 1;
-            if (numB === 0) return -1;
             return numB - numA;
           }
           case 'age_asc':
