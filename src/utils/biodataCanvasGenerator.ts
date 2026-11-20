@@ -98,8 +98,8 @@ let cachedImagePromise: Promise<GeneratedBiodataImage> | null = null;
  * Exactly matching src/data/shubham_biodata_redesigned.html
  */
 export async function renderBiodataCanvas(): Promise<HTMLCanvasElement> {
-  const width = 724;
-  const height = 1040;
+  const width = 740;
+  const height = 1050;
   const scale = 2; // 2x retina crispness
 
   const canvas = document.createElement('canvas');
@@ -115,53 +115,56 @@ export async function renderBiodataCanvas(): Promise<HTMLCanvasElement> {
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, width, height);
 
-  // 2. Borders matching reference sheet (border: 2px solid #222222; outline: 1px solid #444444; outline-offset: -5px)
+  // 2. Borders with outer margin space around the card
+  const outerPad = 18; // Margin outside border
+  const innerPad = outerPad + 6; // 24px
+
   // Outer Border
   ctx.strokeStyle = '#222222';
   ctx.lineWidth = 2;
-  ctx.strokeRect(6, 6, width - 12, height - 12);
+  ctx.strokeRect(outerPad, outerPad, width - (outerPad * 2), height - (outerPad * 2));
 
-  // Inner Border with 5px offset
+  // Inner Border with 6px offset
   ctx.strokeStyle = '#444444';
   ctx.lineWidth = 1;
-  ctx.strokeRect(11, 11, width - 22, height - 22);
+  ctx.strokeRect(innerPad, innerPad, width - (innerPad * 2), height - (innerPad * 2));
 
-  // 3. Four Corner Ornamental Flourishes
-  drawCornerFlourish(ctx, 11, 11, 0.8, 0.8);
-  drawCornerFlourish(ctx, width - 11, 11, -0.8, 0.8);
-  drawCornerFlourish(ctx, 11, height - 11, 0.8, -0.8);
-  drawCornerFlourish(ctx, width - 11, height - 11, -0.8, -0.8);
+  // 3. Four Corner Ornamental Flourishes anchored at inner border
+  drawCornerFlourish(ctx, innerPad, innerPad, 0.8, 0.8);
+  drawCornerFlourish(ctx, width - innerPad, innerPad, -0.8, 0.8);
+  drawCornerFlourish(ctx, innerPad, height - innerPad, 0.8, -0.8);
+  drawCornerFlourish(ctx, width - innerPad, height - innerPad, -0.8, -0.8);
 
-  // 4. Header: Shri Ganesh Icon
-  let currentY = 36;
+  // 4. Header: Shri Ganesh Icon with generous top margin
+  let currentY = 66;
   try {
     const ganeshImg = await loadImage(GANESH_IMG_DATA);
-    const ganeshW = 66;
-    const ganeshH = 66;
+    const ganeshW = 68;
+    const ganeshH = 68;
     ctx.drawImage(ganeshImg, (width - ganeshW) / 2, currentY, ganeshW, ganeshH);
-    currentY += ganeshH + 8;
+    currentY += ganeshH + 14;
   } catch {
-    currentY += 40;
+    currentY += 72;
   }
 
   // Invocation Text
   ctx.textAlign = 'center';
   ctx.fillStyle = '#1e293b';
-  ctx.font = 'bold 18px "Noto Sans Devanagari", "Nirmala UI", "Mangal", sans-serif';
+  ctx.font = 'bold 18.5px "Noto Sans Devanagari", "Nirmala UI", "Mangal", sans-serif';
   ctx.fillText(SHUBHAM_BIODATA.invocation, width / 2, currentY);
-  currentY += 24;
+  currentY += 34;
 
-  const labelX = 145;
-  const colonX = 285;
-  const valueX = 305;
-  const rowHeight = 24.5;
+  const labelX = 148;
+  const colonX = 292;
+  const valueX = 312;
+  const rowHeight = 29.5;
 
   // 5. Section 1: Personal Information (वैयक्तिक माहिती)
   ctx.textAlign = 'center';
-  ctx.font = 'bold 18px "Noto Sans Devanagari", "Nirmala UI", "Mangal", sans-serif';
+  ctx.font = 'bold 18.5px "Noto Sans Devanagari", "Nirmala UI", "Mangal", sans-serif';
   ctx.fillStyle = '#1e293b';
   ctx.fillText(SHUBHAM_BIODATA.personalTitle, width / 2, currentY);
-  currentY += 18;
+  currentY += 25;
 
   for (const field of SHUBHAM_BIODATA.personal) {
     // Label
@@ -178,7 +181,7 @@ export async function renderBiodataCanvas(): Promise<HTMLCanvasElement> {
     ctx.fillText(field.value, valueX, currentY);
 
     if (field.subvalue) {
-      currentY += 18;
+      currentY += 19;
       ctx.font = '400 14px "Noto Sans Devanagari", "Nirmala UI", "Mangal", sans-serif';
       ctx.fillStyle = '#1e293b';
       ctx.fillText(field.subvalue, valueX, currentY);
@@ -187,14 +190,14 @@ export async function renderBiodataCanvas(): Promise<HTMLCanvasElement> {
     currentY += rowHeight;
   }
 
-  currentY += 8;
+  currentY += 10;
 
   // 6. Section 2: Family Information (कौटुंबिक माहिती)
   ctx.textAlign = 'center';
-  ctx.font = 'bold 18px "Noto Sans Devanagari", "Nirmala UI", "Mangal", sans-serif';
+  ctx.font = 'bold 18.5px "Noto Sans Devanagari", "Nirmala UI", "Mangal", sans-serif';
   ctx.fillStyle = '#1e293b';
   ctx.fillText(SHUBHAM_BIODATA.familyTitle, width / 2, currentY);
-  currentY += 18;
+  currentY += 25;
 
   for (const field of SHUBHAM_BIODATA.family) {
     ctx.textAlign = 'left';
@@ -210,16 +213,17 @@ export async function renderBiodataCanvas(): Promise<HTMLCanvasElement> {
     currentY += rowHeight;
   }
 
-  currentY += 8;
+  currentY += 10;
 
   // 7. Section 3: Contact Details (संपर्क)
   ctx.textAlign = 'center';
-  ctx.font = 'bold 18px "Noto Sans Devanagari", "Nirmala UI", "Mangal", sans-serif';
+  ctx.font = 'bold 18.5px "Noto Sans Devanagari", "Nirmala UI", "Mangal", sans-serif';
   ctx.fillStyle = '#1e293b';
   ctx.fillText(SHUBHAM_BIODATA.contactTitle, width / 2, currentY);
-  currentY += 18;
+  currentY += 24;
 
-  for (const contact of SHUBHAM_BIODATA.contacts) {
+  for (let i = 0; i < SHUBHAM_BIODATA.contacts.length; i++) {
+    const contact = SHUBHAM_BIODATA.contacts[i];
     ctx.textAlign = 'center';
     ctx.font = '500 14.5px "Noto Sans Devanagari", "Nirmala UI", "Mangal", sans-serif';
     ctx.fillStyle = '#1e293b';
@@ -228,7 +232,10 @@ export async function renderBiodataCanvas(): Promise<HTMLCanvasElement> {
 
     ctx.font = '500 14px "Noto Sans Devanagari", "Nirmala UI", "Mangal", sans-serif';
     ctx.fillText(contact.phone, width / 2, currentY);
-    currentY += 21;
+
+    if (i < SHUBHAM_BIODATA.contacts.length - 1) {
+      currentY += 21;
+    }
   }
 
   return canvas;
@@ -248,7 +255,7 @@ export async function getGeneratedBiodataImage(forceRefresh = false): Promise<Ge
     const blob = await new Promise<Blob>((resolve, reject) => {
       canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('Canvas toBlob failed'))), 'image/png');
     });
-    const file = new File([blob], 'shubham_biodata_redesigned.png', { type: 'image/png' });
+    const file = new File([blob], 'Shubham-Kharche.png', { type: 'image/png' });
     return { canvas, dataUrl, blob, file };
   })();
 
@@ -259,10 +266,10 @@ export async function getGeneratedBiodataImage(forceRefresh = false): Promise<Ge
  * Triggers instant download of the biodata canvas card as PNG
  */
 export async function downloadBiodataCanvasImage(): Promise<void> {
-  const { dataUrl } = await getGeneratedBiodataImage();
+  const { dataUrl } = await getGeneratedBiodataImage(true);
   const a = document.createElement('a');
   a.href = dataUrl;
-  a.download = 'shubham_biodata_redesigned.png';
+  a.download = 'Shubham-Kharche.png';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);

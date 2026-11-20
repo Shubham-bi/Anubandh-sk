@@ -142,11 +142,11 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
 
         {/* Authentic Marathi Patrika Sheet */}
         <main
-          className="relative w-full max-w-[724px] min-h-[1024px] mx-auto bg-white border-2 border-[#222222] shadow-[0_10px_32px_rgba(45,35,25,0.12)] p-6 sm:p-9 pt-8 overflow-hidden print:border-none print:shadow-none print:p-4 print:min-h-0"
-          style={{ outline: '1px solid #444444', outlineOffset: '-5px' }}
+          className="relative w-full max-w-[740px] min-h-[1050px] mx-auto bg-white border-2 border-[#222222] shadow-[0_10px_32px_rgba(45,35,25,0.12)] p-6 sm:p-9 pt-10 sm:pt-14 pb-12 sm:pb-16 overflow-hidden print:border-none print:shadow-none print:p-4 print:min-h-0"
+          style={{ outline: '1px solid #444444', outlineOffset: '-6px' }}
         >
           {/* Corner Flourish: Top Left */}
-          <svg className="absolute w-20 h-20 top-1.5 left-1.5 pointer-events-none" viewBox="0 0 110 110" aria-hidden="true">
+          <svg className="absolute w-20 h-20 top-2 left-2 pointer-events-none" viewBox="0 0 110 110" aria-hidden="true">
             <path d="M 8 100 C 8 75 12 55 22 40 C 32 25 45 16 65 12 C 80 9 95 8 104 8" fill="none" stroke="#333333" strokeWidth="1.6" strokeLinecap="round"/>
             <path d="M 12 85 C 12 65 18 48 30 35 C 42 22 58 14 85 12" fill="none" stroke="#555555" strokeWidth="1" strokeLinecap="round"/>
             <circle cx="28" cy="28" r="3.2" fill="#222222"/>
@@ -158,7 +158,7 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
           </svg>
 
           {/* Corner Flourish: Top Right */}
-          <svg className="absolute w-20 h-20 top-1.5 right-1.5 pointer-events-none scale-x-[-1]" viewBox="0 0 110 110" aria-hidden="true">
+          <svg className="absolute w-20 h-20 top-2 right-2 pointer-events-none scale-x-[-1]" viewBox="0 0 110 110" aria-hidden="true">
             <path d="M 8 100 C 8 75 12 55 22 40 C 32 25 45 16 65 12 C 80 9 95 8 104 8" fill="none" stroke="#333333" strokeWidth="1.6" strokeLinecap="round"/>
             <path d="M 12 85 C 12 65 18 48 30 35 C 42 22 58 14 85 12" fill="none" stroke="#555555" strokeWidth="1" strokeLinecap="round"/>
             <circle cx="28" cy="28" r="3.2" fill="#222222"/>
@@ -170,7 +170,7 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
           </svg>
 
           {/* Corner Flourish: Bottom Left */}
-          <svg className="absolute w-20 h-20 bottom-1.5 left-1.5 pointer-events-none scale-y-[-1]" viewBox="0 0 110 110" aria-hidden="true">
+          <svg className="absolute w-20 h-20 bottom-2 left-2 pointer-events-none scale-y-[-1]" viewBox="0 0 110 110" aria-hidden="true">
             <path d="M 8 100 C 8 75 12 55 22 40 C 32 25 45 16 65 12 C 80 9 95 8 104 8" fill="none" stroke="#333333" strokeWidth="1.6" strokeLinecap="round"/>
             <path d="M 12 85 C 12 65 18 48 30 35 C 42 22 58 14 85 12" fill="none" stroke="#555555" strokeWidth="1" strokeLinecap="round"/>
             <circle cx="28" cy="28" r="3.2" fill="#222222"/>
@@ -182,7 +182,7 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
           </svg>
 
           {/* Corner Flourish: Bottom Right */}
-          <svg className="absolute w-20 h-20 bottom-1.5 right-1.5 pointer-events-none scale-[-1]" viewBox="0 0 110 110" aria-hidden="true">
+          <svg className="absolute w-20 h-20 bottom-2 right-2 pointer-events-none scale-[-1]" viewBox="0 0 110 110" aria-hidden="true">
             <path d="M 8 100 C 8 75 12 55 22 40 C 32 25 45 16 65 12 C 80 9 95 8 104 8" fill="none" stroke="#333333" strokeWidth="1.6" strokeLinecap="round"/>
             <path d="M 12 85 C 12 65 18 48 30 35 C 42 22 58 14 85 12" fill="none" stroke="#555555" strokeWidth="1" strokeLinecap="round"/>
             <circle cx="28" cy="28" r="3.2" fill="#222222"/>
@@ -194,24 +194,24 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
           </svg>
 
           {/* Header with Shri Ganesh */}
-          <div className="text-center mb-4 relative z-10">
+          <div className="text-center mb-6 sm:mb-7 relative z-10">
             <img
               src={GANESH_IMG_DATA}
               alt="श्री गणेश"
-              className="w-16 h-16 mx-auto mb-1.5 object-contain"
+              className="w-16 h-16 sm:w-[68px] sm:h-[68px] mx-auto mb-2 object-contain"
             />
-            <p className="text-[#1e293b] font-bold text-lg tracking-wide m-0">
+            <p className="text-[#1e293b] font-bold text-lg sm:text-[19px] tracking-wide m-0">
               {SHUBHAM_BIODATA.invocation}
             </p>
           </div>
 
           {/* Section 1: वैयक्तिक माहिती */}
-          <section className="mb-4">
-            <h2 className="text-center text-[#1e293b] font-bold text-lg mb-2.5 tracking-wide">
+          <section className="mb-6 sm:mb-7">
+            <h2 className="text-center text-[#1e293b] font-bold text-lg sm:text-[19px] mb-3.5 tracking-wide">
               {SHUBHAM_BIODATA.personalTitle}
             </h2>
-            <div className="max-w-[480px] mx-auto">
-              <div className="grid grid-cols-[135px_20px_1fr] text-[15px] leading-[1.5] text-[#1e293b] font-medium gap-y-1.5">
+            <div className="max-w-[490px] mx-auto">
+              <div className="grid grid-cols-[135px_20px_1fr] sm:grid-cols-[145px_24px_1fr] text-[15px] sm:text-[15.5px] leading-[1.6] text-[#1e293b] font-medium gap-y-2 sm:gap-y-2.5">
                 {SHUBHAM_BIODATA.personal.map((item, idx) => (
                   <React.Fragment key={idx}>
                     <div className="whitespace-nowrap">{item.label}</div>
@@ -231,12 +231,12 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
           </section>
 
           {/* Section 2: कौटुंबिक माहिती */}
-          <section className="mb-4">
-            <h2 className="text-center text-[#1e293b] font-bold text-lg mb-2.5 tracking-wide">
+          <section className="mb-6 sm:mb-7">
+            <h2 className="text-center text-[#1e293b] font-bold text-lg sm:text-[19px] mb-3.5 tracking-wide">
               {SHUBHAM_BIODATA.familyTitle}
             </h2>
-            <div className="max-w-[480px] mx-auto">
-              <div className="grid grid-cols-[135px_20px_1fr] text-[15px] leading-[1.5] text-[#1e293b] font-medium gap-y-1.5">
+            <div className="max-w-[490px] mx-auto">
+              <div className="grid grid-cols-[135px_20px_1fr] sm:grid-cols-[145px_24px_1fr] text-[15px] sm:text-[15.5px] leading-[1.6] text-[#1e293b] font-medium gap-y-2 sm:gap-y-2.5">
                 {SHUBHAM_BIODATA.family.map((item, idx) => (
                   <React.Fragment key={idx}>
                     <div className="whitespace-nowrap">{item.label}</div>
@@ -250,19 +250,19 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
 
           {/* Section 3: संपर्क */}
           <section className="mb-2">
-            <h2 className="text-center text-[#1e293b] font-bold text-lg mb-2.5 tracking-wide">
+            <h2 className="text-center text-[#1e293b] font-bold text-lg sm:text-[19px] mb-3.5 tracking-wide">
               {SHUBHAM_BIODATA.contactTitle}
             </h2>
-            <div className="max-w-[480px] mx-auto flex flex-col gap-2.5 text-center">
+            <div className="max-w-[490px] mx-auto flex flex-col gap-3 text-center">
               {SHUBHAM_BIODATA.contacts.map((contact, idx) => (
-                <div key={idx} className="text-[14.5px] leading-[1.45] text-[#1e293b]">
+                <div key={idx} className="text-[14.5px] sm:text-[15px] leading-[1.5] text-[#1e293b]">
                   <div className="font-medium">
                     {contact.name}, {contact.place}
                   </div>
                   <div className="font-medium tracking-wide">
                     <a
                       href={`tel:${contact.phoneClean}`}
-                      className="inline-flex items-center justify-center gap-1 hover:text-[#b94c2e] hover:underline transition-colors"
+                      className="inline-flex items-center justify-center gap-1 hover:text-[#b94c2e] hover:underline transition-colors mt-0.5"
                       title={`${contact.name} यांना कॉल करा`}
                     >
                       <Phone className="w-3.5 h-3.5 text-slate-500" />
