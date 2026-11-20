@@ -141,3 +141,38 @@ export function subscribeGroomPhoto(callback: (photo: string | null) => void): (
     unsubscribeFirebase();
   };
 }
+
+/**
+ * Downloads the groom photo directly as Shubham-Kharche-Photo.jpg
+ */
+export function downloadGroomPhotoImage(photoDataUrl: string, filename = 'Shubham-Kharche-Photo.jpg'): void {
+  const a = document.createElement('a');
+  a.href = photoDataUrl;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+/**
+ * Shares the groom photo using Web Share API if supported
+ */
+export async function shareGroomPhotoImage(photoDataUrl: string): Promise<boolean> {
+  try {
+    const res = await fetch(photoDataUrl);
+    const blob = await res.blob();
+    const file = new File([blob], 'Shubham-Kharche-Photo.jpg', { type: blob.type || 'image/jpeg' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({
+        files: [file],
+        title: 'चि. शुभम अनिल खर्चे - वर फोटो',
+        text: 'चि. शुभम अनिल खर्चे यांचा फोटो'
+      });
+      return true;
+    }
+  } catch (e: any) {
+    if (e?.name === 'AbortError') return false;
+    console.warn('Share photo error:', e);
+  }
+  return false;
+}
