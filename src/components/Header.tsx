@@ -307,22 +307,13 @@ export const HeaderComponent: React.FC<HeaderProps> = ({
           </div>
 
           <button
-            onClick={() => {
-              if (!isAdminAuthenticated && onAdminLoginRequest) {
-                onAdminLoginRequest('नवीन उमेदवार जोडण्यासाठी ॲडमिन पासवर्ड आवश्यक आहे.');
-              } else {
-                onOpenAddCandidate();
-              }
-            }}
-            className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-600/20 transition-all whitespace-nowrap ml-auto"
+            onClick={onOpenAddCandidate}
+            className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-600/20 transition-all whitespace-nowrap ml-auto cursor-pointer"
             title="नवीन उमेदवार जोडा (Add New Candidate)"
           >
             <Plus className="w-4 h-4" />
             <span className="hidden sm:inline">नवीन उमेदवार</span>
             <span className="sm:hidden">जोडा</span>
-            {!isAdminAuthenticated && (
-              <Lock className="w-3 h-3 text-emerald-200" />
-            )}
           </button>
         </div>
 

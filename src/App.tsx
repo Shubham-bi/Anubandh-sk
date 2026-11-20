@@ -898,9 +898,7 @@ export const App: React.FC = () => {
         onOpenComparison={() => navigateTo({ type: 'comparison' })}
         onOpenExport={() => setActiveSheet({ type: 'export' })}
         onOpenAddCandidate={() => {
-          triggerAdminPrompt('नवीन उमेदवार जोडण्यासाठी ॲडमिन पासवर्ड आवश्यक आहे.', () => {
-            navigateTo({ type: 'candidate_form' });
-          });
+          navigateTo({ type: 'candidate_form' });
         }}
         onOpenFamilyShare={() => {
           navigateTo({ type: 'family_share' });
