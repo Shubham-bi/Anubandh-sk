@@ -711,6 +711,8 @@ export const App: React.FC = () => {
         <GroomProfilePage
           onBackToPortal={isParentAuth ? () => handleSectionChange('portal') : undefined}
           isParentAuthenticated={isParentAuth}
+          isAdminAuthenticated={isAdminAuth}
+          onAdminLoginRequest={(reason) => triggerAdminPrompt(reason || 'ॲडमिन पासवर्ड आवश्यक आहे.', () => {})}
         />
         {/* Floating PWA Install Banner */}
         <InstallFloatingBanner

@@ -93,6 +93,19 @@ export interface GeneratedBiodataImage {
 
 let cachedImagePromise: Promise<GeneratedBiodataImage> | null = null;
 
+export function clearBiodataCanvasCache() {
+  cachedImagePromise = null;
+}
+
+export function getStoredGroomPhoto(): string | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    return localStorage.getItem('anubandh_groom_photo_v1');
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Dynamically renders the complete high-resolution biodata card on an HTML5 Canvas
  * Exactly matching src/data/shubham_biodata_redesigned.html
@@ -153,6 +166,61 @@ export async function renderBiodataCanvas(): Promise<HTMLCanvasElement> {
   ctx.font = 'bold 18.5px "Noto Sans Devanagari", "Nirmala UI", "Mangal", sans-serif';
   ctx.fillText(SHUBHAM_BIODATA.invocation, width / 2, currentY);
   currentY += 34;
+
+  // 4.5. Optional Groom Portrait Photo (Upper Right of Personal Section)
+  const groomPhotoSrc = getStoredGroomPhoto();
+  if (groomPhotoSrc) {
+    try {
+      const groomImg = await loadImage(groomPhotoSrc);
+      const photoW = 132;
+      const photoH = 168;
+      const photoX = width - innerPad - 22 - photoW;
+      const photoY = 150;
+
+      // Draw photo container background & clip
+      ctx.save();
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(photoX, photoY, photoW, photoH);
+
+      ctx.beginPath();
+      if (typeof ctx.roundRect === 'function') {
+        ctx.roundRect(photoX, photoY, photoW, photoH, 3);
+      } else {
+        ctx.rect(photoX, photoY, photoW, photoH);
+      }
+      ctx.clip();
+
+      // Aspect fill the image
+      const imgRatio = groomImg.width / groomImg.height;
+      const frameRatio = photoW / photoH;
+      let drawW = photoW;
+      let drawH = photoH;
+      let drawX = photoX;
+      let drawY = photoY;
+
+      if (imgRatio > frameRatio) {
+        drawW = photoH * imgRatio;
+        drawX = photoX - (drawW - photoW) / 2;
+      } else {
+        drawH = photoW / imgRatio;
+        drawY = photoY - (drawH - photoH) / 2;
+      }
+      ctx.drawImage(groomImg, drawX, drawY, drawW, drawH);
+      ctx.restore();
+
+      // Outer border around photo
+      ctx.strokeStyle = '#222222';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(photoX, photoY, photoW, photoH);
+
+      // Inner subtle border matching Marathi Patrika styling
+      ctx.strokeStyle = '#666666';
+      ctx.lineWidth = 0.8;
+      ctx.strokeRect(photoX + 2.5, photoY + 2.5, photoW - 5, photoH - 5);
+    } catch (e) {
+      console.warn('Could not draw groom photo on canvas:', e);
+    }
+  }
 
   const labelX = 148;
   const colonX = 292;

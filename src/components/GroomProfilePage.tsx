@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Phone,
   Share2,
   ArrowLeft,
-  Download
+  Download,
+  Camera
 } from 'lucide-react';
 import { getBiodataUrl, buildGenericShareMessage } from '../utils/messages';
 import { SHUBHAM_BIODATA, GANESH_IMG_DATA } from '../constants/shubhamBiodataData';
@@ -11,17 +12,38 @@ import {
   getGeneratedBiodataImage,
   downloadBiodataCanvasImage
 } from '../utils/biodataCanvasGenerator';
+import {
+  subscribeGroomPhoto,
+  saveGroomPhoto,
+  removeGroomPhoto
+} from '../services/groomProfileService';
+import { GroomPhotoUploadModal } from './GroomPhotoUploadModal';
 
 interface GroomProfilePageProps {
   onBackToPortal?: () => void;
   isParentAuthenticated?: boolean;
+  isAdminAuthenticated?: boolean;
+  onAdminLoginRequest?: (reason?: string) => void;
 }
 
 export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
   onBackToPortal,
   isParentAuthenticated = false,
+  isAdminAuthenticated = false,
+  onAdminLoginRequest
 }) => {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [groomPhoto, setGroomPhoto] = useState<string | null>(null);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+
+  // Subscribe to real-time groom photo updates (local cache + Firebase cloud sync)
+  useEffect(() => {
+    const unsubscribe = subscribeGroomPhoto((photo) => {
+      setGroomPhoto(photo);
+    });
+    return () => unsubscribe();
+  }, []);
 
   // Runtime dynamic URL computation
   const dynamicProfileUrl = getBiodataUrl();
@@ -39,6 +61,34 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
       showToast('✅ बायोडाटा लिंक कॉपी झाली!');
     } catch {
       showToast('⚠️ लिंक कॉपी करता आली नाही');
+    }
+  };
+
+  const handleSavePhoto = async (photoDataUrl: string) => {
+    try {
+      await saveGroomPhoto(photoDataUrl);
+      showToast('✅ वर फोटो सेव्ह झाला व क्लाउडवर सिंक झाला!');
+    } catch {
+      showToast('⚠️ फोटो सेव्ह करताना त्रुटी आली.');
+    }
+  };
+
+  const handleRemovePhoto = async () => {
+    try {
+      await removeGroomPhoto();
+      showToast('✅ वर फोटो काढून टाकला!');
+    } catch {
+      showToast('⚠️ फोटो काढताना त्रुटी आली.');
+    }
+  };
+
+  const handleOpenPhotoManager = () => {
+    if (isAdminAuthenticated) {
+      setIsUploadModalOpen(true);
+    } else if (onAdminLoginRequest) {
+      onAdminLoginRequest('वर फोटो अपलोड करण्यासाठी ॲडमिन पासवर्ड आवश्यक आहे.');
+    } else {
+      setIsUploadModalOpen(true);
     }
   };
 
@@ -116,8 +166,30 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
             </div>
           )}
 
-          {/* Action Buttons (Share and Download Icons Only) */}
+          {/* Action Buttons */}
           <div className="flex items-center gap-2">
+            {/* Admin Photo Management Button */}
+            {isAdminAuthenticated ? (
+              <button
+                type="button"
+                onClick={handleOpenPhotoManager}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+                title="वर फोटो व्यवस्थापन (Admin)"
+              >
+                <Camera className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">{groomPhoto ? 'फोटो बदला' : 'फोटो जोडा'}</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleOpenPhotoManager}
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-700 flex items-center justify-center border border-slate-200 transition-all active:scale-90 shadow-xs cursor-pointer"
+                title="वर फोटो जोडा (ॲडमिन पासवर्ड)"
+              >
+                <Camera className="w-4 h-4 sm:w-5 sm:h-5" />
+              </button>
+            )}
+
             <button
               type="button"
               onClick={handleShareNative}
@@ -205,6 +277,61 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
             </p>
           </div>
 
+          {/* Groom Portrait Photo (Traditional Patrika Upper-Right Frame) */}
+          {groomPhoto ? (
+            <div className="relative group sm:absolute sm:top-[142px] sm:right-10 w-28 h-36 sm:w-[134px] sm:h-[170px] mx-auto sm:mx-0 mb-5 sm:mb-0 z-20">
+              <div
+                onClick={() => setIsLightboxOpen(true)}
+                className="w-full h-full bg-white p-1 border-2 border-[#222222] shadow-md hover:shadow-lg transition-all cursor-pointer relative overflow-hidden"
+                style={{ outline: '1px solid #666666', outlineOffset: '-3px' }}
+                title="मोठा फोटो पाहण्यासाठी क्लिक करा"
+              >
+                <img
+                  src={groomPhoto}
+                  alt="चि. शुभम अनिल खर्चे"
+                  className="w-full h-full object-cover object-top"
+                />
+                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-[10px] font-semibold">
+                  🔍 मोठा करा
+                </div>
+              </div>
+
+              {/* Quick Admin Edit Button */}
+              {isAdminAuthenticated && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsUploadModalOpen(true);
+                  }}
+                  className="no-print absolute -bottom-2 -right-2 px-2 py-0.5 rounded-full bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-bold shadow-md flex items-center gap-1 cursor-pointer transition-transform active:scale-90"
+                  title="फोटो बदला"
+                >
+                  <Camera className="w-3 h-3" />
+                  <span>बदला</span>
+                </button>
+              )}
+            </div>
+          ) : (
+            isAdminAuthenticated && (
+              <div
+                onClick={handleOpenPhotoManager}
+                className="no-print sm:absolute sm:top-[142px] sm:right-10 w-28 h-36 sm:w-[134px] sm:h-[170px] mx-auto sm:mx-0 mb-5 sm:mb-0 z-20 border-2 border-dashed border-rose-300 hover:border-rose-500 bg-rose-50/50 hover:bg-rose-50 transition-all rounded-lg flex flex-col items-center justify-center gap-1.5 p-2 text-center cursor-pointer group shadow-xs"
+                title="वर फोटो जोडा (ॲडमिन)"
+              >
+                <div className="w-8 h-8 rounded-full bg-rose-100 group-hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-colors">
+                  <Camera className="w-4 h-4" />
+                </div>
+                <span className="text-[11px] font-bold text-slate-800 leading-tight">
+                  + वर फोटो जोडा
+                </span>
+                <span className="text-[9px] text-rose-600 font-medium">
+                  (ॲडमिन)
+                </span>
+              </div>
+            )
+          )}
+
           {/* Section 1: वैयक्तिक माहिती */}
           <section className="mb-6 sm:mb-7">
             <h2 className="text-center text-[#1e293b] font-bold text-lg sm:text-[19px] mb-3.5 tracking-wide">
@@ -275,6 +402,49 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
           </section>
         </main>
       </div>
+
+      {/* Lightbox / Full-screen Photo Zoom Modal */}
+      {isLightboxOpen && groomPhoto && (
+        <div
+          onClick={() => setIsLightboxOpen(false)}
+          className="fixed inset-0 z-[100001] bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative max-w-sm sm:max-w-md w-full bg-white rounded-3xl p-3 shadow-2xl overflow-hidden"
+          >
+            <div className="relative rounded-2xl overflow-hidden border border-slate-200 bg-slate-900">
+              <img
+                src={groomPhoto}
+                alt="चि. शुभम अनिल खर्चे"
+                className="w-full max-h-[75vh] object-contain mx-auto"
+              />
+            </div>
+            <div className="mt-3 flex items-center justify-between px-2">
+              <div>
+                <span className="text-xs font-bold text-slate-800 block">चि. शुभम अनिल खर्चे</span>
+                <span className="text-[11px] text-slate-500">विवाह परिचय पत्रिका फोटो</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsLightboxOpen(false)}
+                className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all cursor-pointer"
+              >
+                बंद करा
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Admin Groom Photo Upload / Management Bottom Sheet */}
+      <GroomPhotoUploadModal
+        isOpen={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+        currentPhoto={groomPhoto}
+        onSavePhoto={handleSavePhoto}
+        onRemovePhoto={handleRemovePhoto}
+      />
     </div>
   );
 };
