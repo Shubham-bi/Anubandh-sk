@@ -385,7 +385,7 @@ export const AnalyticsDashboardComponent: React.FC<AnalyticsDashboardProps> = ({
         {/* Passed */}
         <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between text-slate-400 mb-2">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">वगळले (Pass)</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">वगळले (Not Interested)</span>
             <XCircle className="w-4 h-4 text-slate-400" />
           </div>
           <div className="text-2xl font-black text-slate-600">{stats.passed}</div>
@@ -485,7 +485,7 @@ export const AnalyticsDashboardComponent: React.FC<AnalyticsDashboardProps> = ({
           </div>
 
           <div className="p-3 rounded-2xl bg-slate-100 border border-slate-200 text-xs">
-            <span className="text-slate-500 block font-semibold text-[10px]">६. वगळले (Pass)</span>
+            <span className="text-slate-500 block font-semibold text-[10px]">६. वगळले (Not Interested)</span>
             <span className="text-lg font-black text-slate-700">{stats.passed}</span>
             <span className="text-[10px] text-slate-500 block">
               {Math.round((stats.passed / (stats.total || 1)) * 100)}%

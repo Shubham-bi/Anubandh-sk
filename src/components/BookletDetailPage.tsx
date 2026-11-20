@@ -496,7 +496,7 @@ export const BookletDetailPage: React.FC<BookletDetailPageProps> = ({
                 }`}
               >
                 <XCircle className="w-3.5 h-3.5" />
-                <span>Pass</span>
+                <span>Not Interested</span>
               </button>
             </div>
           </div>

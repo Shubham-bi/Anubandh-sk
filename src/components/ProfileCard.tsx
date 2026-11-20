@@ -488,7 +488,7 @@ export const ProfileCardComponent: React.FC<ProfileCardProps> = ({
             title="Mark as Not Interested"
           >
             <XCircle className="w-3.5 h-3.5 mb-0.5" />
-            <span className="text-[10px]">Pass</span>
+            <span className="text-[9px] leading-tight text-center">Not Interested</span>
           </button>
         </div>
       </div>

@@ -448,7 +448,7 @@ export const ProfileDetailPage: React.FC<ProfileDetailPageProps> = ({
                     }`}
                   >
                     <XCircle className="w-3.5 h-3.5" />
-                    <span>Not Int.</span>
+                    <span>Not Interested</span>
                   </button>
                 </div>
               </div>

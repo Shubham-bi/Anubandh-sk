@@ -114,7 +114,7 @@ export const BookletCardComponent: React.FC<BookletCardProps> = ({
             )}
             {status === 'not_interested' && (
               <span className="bg-rose-50 text-rose-700 border border-rose-300 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                <XCircle className="w-3 h-3 text-rose-600" /> Pass
+                <XCircle className="w-3 h-3 text-rose-600" /> Not Interested
               </span>
             )}
 
@@ -373,7 +373,7 @@ export const BookletCardComponent: React.FC<BookletCardProps> = ({
             }`}
           >
             <XCircle className="w-3.5 h-3.5 mb-0.5" />
-            <span className="text-[10px]">Pass</span>
+            <span className="text-[9px] leading-tight text-center">Not Interested</span>
           </button>
         </div>
       </div>
