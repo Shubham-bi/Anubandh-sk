@@ -6,7 +6,8 @@ import {
   Download,
   Camera,
   FileText,
-  Eye
+  Eye,
+  Trash2
 } from 'lucide-react';
 import { getBiodataUrl, buildGenericShareMessage } from '../utils/messages';
 import { SHUBHAM_BIODATA, GANESH_IMG_DATA } from '../constants/shubhamBiodataData';
@@ -256,7 +257,7 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
                   title="वर फोटो व्यवस्थापन"
                 >
                   <Camera className="w-4 h-4" />
-                  <span className="hidden sm:inline">{groomPhoto ? 'फोटो बदला' : 'फोटो जोडा'}</span>
+                  <span className="hidden sm:inline">{groomPhoto ? 'फोटो / लिंक बदला' : 'फोटो / लिंक जोडा'}</span>
                 </button>
               </>
             )}
@@ -508,14 +509,26 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
                     </button>
 
                     {isAdminAuthenticated && (
-                      <button
-                        type="button"
-                        onClick={handleOpenPhotoManager}
-                        className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all active:scale-95 flex items-center gap-2 border border-slate-200 cursor-pointer"
-                      >
-                        <Camera className="w-4 h-4" />
-                        <span>📸 फोटो बदला</span>
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={handleOpenPhotoManager}
+                          className="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all active:scale-95 flex items-center gap-1.5 border border-slate-200 cursor-pointer"
+                        >
+                          <Camera className="w-4 h-4" />
+                          <span>📸 फोटो / लिंक बदला</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={handleRemovePhoto}
+                          className="px-3.5 py-2.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold transition-all active:scale-95 flex items-center gap-1.5 border border-red-200 cursor-pointer"
+                          title="फोटो किंवा लिंक काढून टाका"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          <span>काढून टाका</span>
+                        </button>
+                      </div>
                     )}
                   </div>
 
@@ -533,7 +546,7 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
                       अद्याप वर फोटो अपलोड केलेला नाही
                     </h3>
                     <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">
-                      ॲडमिन पॅनेलमधून शुभम यांचा उच्च दर्जाचा फोटो अपलोड करा.
+                      Google Drive शेअरिंग लिंक किंवा गॅलरीतून शुभम यांचा फोटो जोडा.
                     </p>
                   </div>
                   <div>
@@ -543,7 +556,7 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
                       className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all shadow-md shadow-rose-600/30 flex items-center gap-2 mx-auto cursor-pointer"
                     >
                       <Camera className="w-4 h-4" />
-                      <span>{isAdminAuthenticated ? '📸 फोटो अपलोड करा' : '🔐 ॲडमिन लॉगिन व फोटो अपलोड'}</span>
+                      <span>{isAdminAuthenticated ? '📸 फोटो किंवा Google Drive लिंक जोडा' : '🔐 ॲडमिन लॉगिन व फोटो जोडा'}</span>
                     </button>
                   </div>
                 </div>

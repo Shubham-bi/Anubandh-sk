@@ -1,6 +1,7 @@
 import { ref, set, onValue } from 'firebase/database';
 import { rtdb } from './firebase';
 import { clearBiodataCanvasCache } from '../utils/biodataCanvasGenerator';
+import { DEFAULT_GROOM_PHOTO_CDN } from '../utils/googleDriveHelper';
 
 const STORAGE_KEY = 'anubandh_groom_photo_v1';
 const RTDB_PATH = 'anubandh/groom_profile';
@@ -11,41 +12,49 @@ export interface GroomProfileCloudData {
 }
 
 /**
- * Synchronously retrieves the cached groom photo for 0ms initial render
+ * Synchronously retrieves the cached groom photo for 0ms initial render.
+ * Returns default Google Drive photo link on fresh installs, or null if explicitly removed.
  */
 export function getCachedGroomPhoto(): string | null {
-  if (typeof window === 'undefined') return null;
+  if (typeof window === 'undefined') return DEFAULT_GROOM_PHOTO_CDN;
   try {
-    return localStorage.getItem(STORAGE_KEY);
+    const val = localStorage.getItem(STORAGE_KEY);
+    if (val === '__REMOVED__') {
+      return null;
+    }
+    if (val && val.trim().length > 0) {
+      return val;
+    }
+    return DEFAULT_GROOM_PHOTO_CDN;
   } catch {
-    return null;
+    return DEFAULT_GROOM_PHOTO_CDN;
   }
 }
 
 /**
- * Saves a new groom photo locally and syncs to Firebase Realtime Database
+ * Saves a new groom photo (base64 WebP or Google Drive CDN URL) locally and syncs to Firebase
  */
-export async function saveGroomPhoto(photoDataUrl: string): Promise<void> {
+export async function saveGroomPhoto(photoUrl: string): Promise<void> {
   const updatedAt = Date.now();
 
   // 1. Instant local persistence
   if (typeof window !== 'undefined') {
     try {
-      localStorage.setItem(STORAGE_KEY, photoDataUrl);
-      window.dispatchEvent(new CustomEvent('anubandh-groom-photo-changed', { detail: photoDataUrl }));
+      localStorage.setItem(STORAGE_KEY, photoUrl);
+      window.dispatchEvent(new CustomEvent('anubandh-groom-photo-changed', { detail: photoUrl }));
     } catch (e) {
       console.warn('LocalStorage save error:', e);
     }
   }
 
-  // Clear cached canvas so new download includes this photo
+  // Clear cached canvas if any
   clearBiodataCanvasCache();
 
   // 2. Cloud sync to Firebase RTDB
   try {
     const groomRef = ref(rtdb, RTDB_PATH);
     await set(groomRef, {
-      photo: photoDataUrl,
+      photo: photoUrl,
       updatedAt
     });
   } catch (err) {
@@ -59,7 +68,7 @@ export async function saveGroomPhoto(photoDataUrl: string): Promise<void> {
 export async function removeGroomPhoto(): Promise<void> {
   if (typeof window !== 'undefined') {
     try {
-      localStorage.removeItem(STORAGE_KEY);
+      localStorage.setItem(STORAGE_KEY, '__REMOVED__');
       window.dispatchEvent(new CustomEvent('anubandh-groom-photo-changed', { detail: null }));
     } catch (e) {
       console.warn('LocalStorage removal error:', e);
@@ -71,7 +80,7 @@ export async function removeGroomPhoto(): Promise<void> {
   try {
     const groomRef = ref(rtdb, RTDB_PATH);
     await set(groomRef, {
-      photo: null,
+      photo: '__REMOVED__',
       updatedAt: Date.now()
     });
   } catch (err) {
@@ -100,32 +109,30 @@ export function subscribeGroomPhoto(callback: (photo: string | null) => void): (
   const unsubscribeFirebase = onValue(groomRef, (snapshot) => {
     const val = snapshot.val() as GroomProfileCloudData | null;
     if (val !== undefined && val !== null) {
-      const remotePhoto = val.photo || null;
-      const localPhoto = getCachedGroomPhoto();
-
-      if (remotePhoto !== localPhoto) {
-        if (remotePhoto) {
-          try {
-            localStorage.setItem(STORAGE_KEY, remotePhoto);
-          } catch (e) {
-            console.warn('Could not cache remote photo:', e);
-          }
-        } else {
-          try {
-            localStorage.removeItem(STORAGE_KEY);
-          } catch (e) {
-            console.warn('Could not clear local photo cache:', e);
-          }
+      const remotePhoto = val.photo;
+      if (remotePhoto === '__REMOVED__' || remotePhoto === null || remotePhoto === '') {
+        try {
+          localStorage.setItem(STORAGE_KEY, '__REMOVED__');
+        } catch {
+          // ignore
+        }
+        clearBiodataCanvasCache();
+        callback(null);
+      } else {
+        try {
+          localStorage.setItem(STORAGE_KEY, remotePhoto);
+        } catch {
+          // ignore
         }
         clearBiodataCanvasCache();
         callback(remotePhoto);
       }
     } else {
-      // If cloud is empty but we have local photo, seed local to cloud
-      const localPhoto = getCachedGroomPhoto();
-      if (localPhoto) {
+      // If cloud is empty and local was not explicitly removed, initialize cloud with default photo
+      const local = getCachedGroomPhoto();
+      if (local && local !== '__REMOVED__') {
         set(groomRef, {
-          photo: localPhoto,
+          photo: local,
           updatedAt: Date.now()
         }).catch(() => {});
       }
@@ -144,11 +151,44 @@ export function subscribeGroomPhoto(callback: (photo: string | null) => void): (
 
 /**
  * Downloads the groom photo directly as Shubham-Kharche-Photo.jpg
+ * Handles both base64 data URLs and remote Google Drive CDN URLs
  */
-export function downloadGroomPhotoImage(photoDataUrl: string, filename = 'Shubham-Kharche-Photo.jpg'): void {
+export async function downloadGroomPhotoImage(photoUrl: string, filename = 'Shubham-Kharche-Photo.jpg'): Promise<void> {
+  if (photoUrl.startsWith('data:')) {
+    const a = document.createElement('a');
+    a.href = photoUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    return;
+  }
+
+  // Remote URL: attempt fetch to blob for true browser download dialog
+  try {
+    const response = await fetch(photoUrl);
+    if (response.ok) {
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+      return;
+    }
+  } catch (e) {
+    console.warn('Direct fetch download failed (falling back to direct anchor):', e);
+  }
+
+  // Fallback anchor
   const a = document.createElement('a');
-  a.href = photoDataUrl;
+  a.href = photoUrl;
   a.download = filename;
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
