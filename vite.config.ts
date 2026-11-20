@@ -7,11 +7,20 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      manifestFilename: 'manifest.json',
       devOptions: {
         enabled: true,
-        type: 'module',
       },
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg', 'icon.svg', 'pwa-192x192.png', 'pwa-512x512.png', 'pwa-maskable-512.png', 'pwa-maskable-192.png'],
+      includeAssets: [
+        'favicon.ico',
+        'apple-touch-icon.png',
+        'mask-icon.svg',
+        'icon.svg',
+        'pwa-192x192.png',
+        'pwa-512x512.png',
+        'pwa-maskable-512.png',
+        'pwa-maskable-192.png'
+      ],
       manifest: {
         id: '/',
         name: 'अनुबंध',
@@ -22,8 +31,7 @@ export default defineConfig({
         theme_color: '#881337',
         background_color: '#881337',
         display: 'standalone',
-        display_override: ['standalone', 'window-controls-overlay'],
-        orientation: 'portrait-primary',
+        orientation: 'portrait',
         categories: ['lifestyle', 'social'],
         icons: [
           {
@@ -49,12 +57,6 @@ export default defineConfig({
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable',
-          },
-          {
-            src: '/icon.svg',
-            sizes: 'any',
-            type: 'image/svg+xml',
-            purpose: 'any',
           },
         ],
       },
