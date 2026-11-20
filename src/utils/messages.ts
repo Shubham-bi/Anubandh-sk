@@ -28,7 +28,7 @@ export const BIODATA_URL = typeof window !== 'undefined' && window.location?.ori
 export const DEFAULT_GROOM = {
   name: 'शुभम अनिल खर्चे',
   edu: 'B.E. Mechanical',
-  job: 'Sr. QA Engineer',
+  job: 'Sr. QA Engineer IT',
   company: 'Shaurya Technosoft Pvt. Ltd., Pune',
   salary: '7.8 LPA',
   dob: '25/08/1996',
@@ -136,13 +136,11 @@ export function buildCandidateProposalMessage(params: CandidateProposalParams = 
     `• शिक्षण: ${groomEdu}`,
     `• नोकरी: ${groomJob}, ${groomCompany}`,
     `• वार्षिक पॅकेज: ${groomSalary}`,
-    `• जन्मतारीख: ${groomDob}`
+    `• जन्मतारीख: ${groomDob}`,
+    `• उंची: ${groomHeight}`
   ];
-  if (params.includeGotra !== false) {
+  if (params.includeGotra) {
     groomLines.push(`• गोत्र: ${groomGotra}`);
-  }
-  if (params.includeHeight !== false && groomHeight) {
-    groomLines.push(`• उंची: ${groomHeight}`);
   }
 
   const footerNote = 'धन्यवाद! 🙏';
@@ -221,7 +219,6 @@ export function buildGenericShareMessage(params: GenericShareParams = {}): strin
 • नोकरी: ${groomJob}, ${groomCompany}
 • वार्षिक पॅकेज: ${groomSalary}
 • जन्मतारीख: ${groomDob}
-• गोत्र: ${groomGotra}
 • उंची: ${groomHeight}
 
 मुलाचा (${groomName}) बायोडाटा सोबत जोडलेला आहे. अधिक माहिती खालील लिंकवर पाहता येईल:
