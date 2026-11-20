@@ -15,7 +15,6 @@ import {
   User,
   FileText,
   Edit,
-  Share2,
   Copy,
   Check,
   X
@@ -47,8 +46,7 @@ export const BookletDetailPage: React.FC<BookletDetailPageProps> = ({
   onNotesChange,
   onAddTag,
   onRemoveTag,
-  onEdit,
-  onShareFamily
+  onEdit
 }) => {
   const [localNotes, setLocalNotes] = useState('');
   const [newTagInput, setNewTagInput] = useState('');
@@ -136,18 +134,6 @@ export const BookletDetailPage: React.FC<BookletDetailPageProps> = ({
 
           {/* Quick Actions */}
           <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-            {onShareFamily && (
-              <button
-                onClick={() => onShareFamily(candidate)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition-colors shadow-2xs"
-                title="कौटुंबिक चर्चा पत्रिका / PDF तयार करा"
-              >
-                <Share2 className="w-3.5 h-3.5 text-rose-600" />
-                <span className="hidden sm:inline">कौटुंबिक पत्रिका</span>
-                <span className="sm:hidden">शेअर</span>
-              </button>
-            )}
-
             {onEdit && (
               <button
                 onClick={() => onEdit(candidate)}
@@ -228,29 +214,32 @@ export const BookletDetailPage: React.FC<BookletDetailPageProps> = ({
               </div>
             </div>
 
-            {/* Education & Occupation */}
-            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2">
-              <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                <GraduationCap className="w-4 h-4 text-slate-400" />
-                शिक्षण व नोकरी / व्यवसाय
-              </h4>
-              <p className="text-slate-800 font-medium text-sm whitespace-pre-line leading-relaxed">
-                {candidate.edu}
-              </p>
-            </div>
-
-            {/* Family Details */}
-            {candidate.fam && (
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2">
-                <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                  <Users className="w-4 h-4 text-slate-400" />
-                  कौटुंबिक माहिती (भाऊ / बहिण)
+            {/* Education & Family Info Grid (Adjusted for compact balance) */}
+            <div className={`grid grid-cols-1 ${candidate.fam ? 'md:grid-cols-2' : ''} gap-3`}>
+              {/* Education & Occupation */}
+              <div className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/60 space-y-1.5">
+                <h4 className="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                  <GraduationCap className="w-4 h-4 text-slate-500" />
+                  शिक्षण व नोकरी / व्यवसाय
                 </h4>
                 <p className="text-slate-800 font-medium text-sm whitespace-pre-line leading-relaxed">
-                  {candidate.fam}
+                  {candidate.edu || 'माहिती उपलब्ध नाही'}
                 </p>
               </div>
-            )}
+
+              {/* Family Details */}
+              {candidate.fam && (
+                <div className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/60 space-y-1.5">
+                  <h4 className="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                    <Users className="w-4 h-4 text-slate-500" />
+                    कौटुंबिक माहिती (भाऊ / बहिण)
+                  </h4>
+                  <p className="text-slate-800 font-medium text-sm whitespace-pre-line leading-relaxed">
+                    {candidate.fam}
+                  </p>
+                </div>
+              )}
+            </div>
 
             {/* Expectations */}
             {candidate.exp && (
@@ -335,36 +324,37 @@ export const BookletDetailPage: React.FC<BookletDetailPageProps> = ({
                         )}
                       </div>
 
-                      {/* WhatsApp, Copy & Call Buttons for this person */}
+                      {/* WhatsApp, Copy & Call Buttons (Adjusted equal 3-column layout) */}
                       {person.phoneClean && (
-                        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100">
+                        <div className="grid grid-cols-3 gap-2 pt-2 border-t border-slate-100">
                           {waLink && (
                             <a
                               href={waLink}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex-1 min-w-[130px] flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-colors shadow-xs"
+                              className="flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold transition-all shadow-xs"
+                              title="WhatsApp वर मेसेज पाठवा"
                             >
-                              <MessageCircle className="w-4 h-4" />
-                              <span>WhatsApp प्रस्ताव पाठवा</span>
+                              <MessageCircle className="w-3.5 h-3.5 flex-shrink-0" />
+                              <span className="truncate">WhatsApp</span>
                             </a>
                           )}
 
                           <button
                             type="button"
                             onClick={handleCopyProposal}
-                            className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 text-xs font-bold transition-colors border border-amber-300/80 shadow-xs"
+                            className="flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl bg-amber-50 hover:bg-amber-100 active:scale-95 text-amber-900 text-xs font-bold transition-all border border-amber-200 shadow-xs cursor-pointer"
                             title="पालकांसाठी प्रस्ताव मेसेज कॉपी करा"
                           >
                             {copiedContactIdx === idx ? (
                               <>
-                                <Check className="w-4 h-4 text-emerald-700" />
-                                <span className="text-emerald-800">कॉपी झाले!</span>
+                                <Check className="w-3.5 h-3.5 text-emerald-700 flex-shrink-0" />
+                                <span className="text-emerald-800 truncate">कॉपी झाले!</span>
                               </>
                             ) : (
                               <>
-                                <Copy className="w-4 h-4 text-amber-700" />
-                                <span>मेसेज कॉपी</span>
+                                <Copy className="w-3.5 h-3.5 text-amber-700 flex-shrink-0" />
+                                <span className="truncate">मेसेज कॉपी</span>
                               </>
                             )}
                           </button>
@@ -372,10 +362,11 @@ export const BookletDetailPage: React.FC<BookletDetailPageProps> = ({
                           {callLink && (
                             <a
                               href={callLink}
-                              className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-colors shadow-xs"
+                              className="flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs font-bold transition-all shadow-xs"
+                              title="थेट कॉल करा"
                             >
-                              <Phone className="w-4 h-4" />
-                              <span>कॉल</span>
+                              <Phone className="w-3.5 h-3.5 flex-shrink-0" />
+                              <span className="truncate">कॉल</span>
                             </a>
                           )}
                         </div>

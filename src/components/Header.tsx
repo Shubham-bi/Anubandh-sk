@@ -8,8 +8,6 @@ import {
   Sparkles,
   X,
   Plus,
-  BarChart3,
-  Users,
   Lock,
   ShieldCheck,
   LogOut
@@ -61,7 +59,6 @@ export const HeaderComponent: React.FC<HeaderProps> = ({
   onOpenComparison,
   onOpenExport,
   onOpenAddCandidate,
-  onOpenFamilyShare,
   onToggleMobileFilters,
   viewMode,
   onViewModeChange,
@@ -184,23 +181,21 @@ export const HeaderComponent: React.FC<HeaderProps> = ({
               <span className="hidden sm:inline">Export</span>
             </button>
 
-            {/* Family Dossier & PDF Button */}
-            <button
-              onClick={onOpenFamilyShare}
-              className="flex items-center gap-1 px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-rose-50 to-amber-50 hover:from-rose-100 hover:to-amber-100 text-rose-800 border border-rose-200 transition-all shadow-xs"
-              title="कौटुंबिक चर्चा पत्रिका तयार करा (A4 PDF / WhatsApp Share)"
-            >
-              <Users className="w-3.5 h-3.5 text-rose-600" />
-              <span className="hidden md:inline">कौटुंबिक पत्रिका</span>
-            </button>
-
-            {/* Admin status / Login Trigger */}
+            {/* Admin Section Access Option (Small & Accessible on both Mobile & Web) */}
             {isAdminAuthenticated ? (
-              <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-900 text-xs font-bold shadow-xs">
-                <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" />
-                <span className="hidden md:inline">ॲडमिन</span>
+              <div className="flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-900 text-xs font-bold shadow-xs">
+                <button
+                  type="button"
+                  onClick={() => onSectionChange('kanban')}
+                  className="flex items-center gap-1 hover:text-indigo-700 transition-colors"
+                  title="ॲडमिन पॅनेल (पाईपलाईन) वर जा"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>ॲडमिन</span>
+                </button>
                 {onAdminLogout && (
                   <button
+                    type="button"
                     onClick={onAdminLogout}
                     className="p-1 rounded-md hover:bg-indigo-100 text-indigo-700 hover:text-rose-600 transition-colors ml-0.5"
                     title="ॲडमिन मोडमधून बाहेर पडा (Logout Admin)"
@@ -212,12 +207,13 @@ export const HeaderComponent: React.FC<HeaderProps> = ({
             ) : (
               onAdminLoginRequest && (
                 <button
+                  type="button"
                   onClick={() => onAdminLoginRequest('ॲडमिन पॅनेलमध्ये प्रवेश करण्यासाठी पासवर्ड टाका.')}
-                  className="flex items-center gap-1 px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 transition-colors"
+                  className="flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 transition-colors"
                   title="ॲडमिन लॉगिन (Admin Login)"
                 >
                   <Lock className="w-3.5 h-3.5 text-slate-500" />
-                  <span className="hidden md:inline">ॲडमिन</span>
+                  <span>ॲडमिन</span>
                 </button>
               )
             )}
@@ -298,42 +294,43 @@ export const HeaderComponent: React.FC<HeaderProps> = ({
               </span>
             </button>
 
+            {/* 3rd Tab: पाईपलाईन (Clean name & icon) */}
             <button
               onClick={() => {
                 if (!isAdminAuthenticated && onAdminLoginRequest) {
-                  onAdminLoginRequest('मॅचमेकिंग पाईपलाईन (Kanban) पाहण्यासाठी ॲडमिन पासवर्ड आवश्यक आहे.');
+                  onAdminLoginRequest('मॅचमेकिंग पाईपलाईन पाहण्यासाठी ॲडमिन पासवर्ड आवश्यक आहे.');
                 } else {
                   onSectionChange('kanban');
                 }
               }}
-              className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+              className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                 activeSection === 'kanban'
                   ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/30'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
-              <span>📋 पाईपलाईन (Kanban)</span>
+              <span>पाईपलाईन</span>
               {!isAdminAuthenticated && (
                 <Lock className="w-3 h-3 text-slate-400" />
               )}
             </button>
 
+            {/* 4th Tab: ॲनालिटिक्स (Clean name & icon) */}
             <button
               onClick={() => {
                 if (!isAdminAuthenticated && onAdminLoginRequest) {
-                  onAdminLoginRequest('ॲनालिटिक्स डॅशबोर्ड (Analytics) पाहण्यासाठी ॲडमिन पासवर्ड आवश्यक आहे.');
+                  onAdminLoginRequest('ॲनालिटिक्स डॅशबोर्ड पाहण्यासाठी ॲडमिन पासवर्ड आवश्यक आहे.');
                 } else {
                   onSectionChange('analytics');
                 }
               }}
-              className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+              className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
                 activeSection === 'analytics'
                   ? 'bg-purple-600 text-white shadow-sm shadow-purple-600/30'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
-              <BarChart3 className="w-3.5 h-3.5" />
-              <span>📊 ॲनालिटिक्स</span>
+              <span>ॲनालिटिक्स</span>
               {!isAdminAuthenticated && (
                 <Lock className="w-3 h-3 text-slate-400" />
               )}
