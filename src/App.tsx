@@ -23,6 +23,8 @@ import {
 import { Profile, ProfileInteraction, FilterState, TriageStatus } from './types/profile';
 import { BookletCandidate, marathiToAscii } from './types/candidate';
 import { PipelineStage } from './types/pipeline';
+import cleanProfilesData from './data/profiles_clean.json';
+import candidatesData from './data/candidates.json';
 import { initCloudSync, subscribeSyncStatus } from './services/cloudSync';
 import { Header } from './components/Header';
 import { FilterSidebar } from './components/FilterSidebar';
@@ -329,31 +331,60 @@ export const App: React.FC = () => {
   const [toast, setToast] = useState<ToastMessage | null>(null);
   const [syncStatus, setSyncStatus] = useState<'connected' | 'connecting' | 'offline' | 'error'>('connecting');
 
-  // Initialize DB & Cloud Sync
+  // Initialize DB & Cloud Sync with watchdog timeout
   useEffect(() => {
+    let isMounted = true;
     const unsub = subscribeSyncStatus((status) => {
-      setSyncStatus(status);
+      if (isMounted) setSyncStatus(status);
     });
+
+    // 1200ms Safety Watchdog: Guarantees splash screen NEVER hangs indefinitely on Android reopen
+    const watchdogTimer = setTimeout(() => {
+      if (isMounted) {
+        setIsDbReady(true);
+      }
+    }, 1200);
 
     initDatabase()
       .then(() => {
-        setIsDbReady(true);
-        initCloudSync();
+        if (isMounted) {
+          setIsDbReady(true);
+          initCloudSync();
+        }
       })
       .catch((err) => {
-        console.error('Failed to init IndexedDB:', err);
-        setDbError(err.message);
+        console.warn('Failed to init IndexedDB (continuing with bundled dataset):', err);
+        if (isMounted) {
+          setDbError(err.message);
+          setIsDbReady(true);
+        }
+      })
+      .finally(() => {
+        clearTimeout(watchdogTimer);
       });
 
-    return () => unsub();
+    return () => {
+      isMounted = false;
+      clearTimeout(watchdogTimer);
+      unsub();
+    };
   }, []);
 
   // Live Queries from Dexie
-  const profiles = useLiveQuery(() => db.profiles.toArray(), [], [] as Profile[]);
+  const dbProfiles = useLiveQuery(() => db.profiles.toArray(), [], [] as Profile[]);
   const rawInteractions = useLiveQuery(() => db.interactions.toArray(), [], [] as ProfileInteraction[]);
-  const bookletCandidates = useLiveQuery(() => db.booklet_candidates.toArray(), [], [] as BookletCandidate[]);
+  const dbBookletCandidates = useLiveQuery(() => db.booklet_candidates.toArray(), [], [] as BookletCandidate[]);
   const rawBookletInteractions = useLiveQuery(() => db.booklet_interactions.toArray(), [], [] as ProfileInteraction[]);
   const comparisonItems = useLiveQuery(() => db.comparison.toArray(), [], [] as { nu_id: string; addedAt: number }[]);
+
+  // Instant in-memory fallback to guarantee all 1,224 profiles and 84 booklet candidates load with 0ms delay
+  const profiles = useMemo(() => {
+    return dbProfiles && dbProfiles.length > 0 ? dbProfiles : (cleanProfilesData as Profile[]);
+  }, [dbProfiles]);
+
+  const bookletCandidates = useMemo(() => {
+    return dbBookletCandidates && dbBookletCandidates.length > 0 ? dbBookletCandidates : (candidatesData as BookletCandidate[]);
+  }, [dbBookletCandidates]);
 
   // Maps for fast O(1) lookups
   const portalInteractionsMap = useMemo(() => {
@@ -687,6 +718,15 @@ export const App: React.FC = () => {
           <p className="text-xs text-rose-100/70 mt-3 font-semibold">
             स्थानिक डेटाबेस लोड होत आहे...
           </p>
+
+          {/* Fail-safe instant proceed button */}
+          <button
+            type="button"
+            onClick={() => setIsDbReady(true)}
+            className="mt-4 px-4 py-2 rounded-xl bg-white/15 hover:bg-white/25 active:scale-95 text-xs text-amber-100 font-bold border border-white/20 transition-all cursor-pointer shadow-sm flex items-center gap-1.5"
+          >
+            <span>👉 थेट ॲप सुरू करा</span>
+          </button>
 
           {dbError && (
             <div className="text-xs text-rose-200 bg-rose-950/80 border border-rose-500/40 p-3 rounded-2xl mt-4 max-w-xs">

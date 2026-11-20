@@ -34,29 +34,80 @@ export class LSMDatabase extends Dexie {
 
 export const db = new LSMDatabase();
 
+// Handle cross-tab and PWA lifecycle version upgrades
+db.on('versionchange', () => {
+  console.warn('Dexie versionchange event triggered. Closing DB to avoid locking other instances.');
+  db.close();
+});
+
+db.on('blocked', () => {
+  console.warn('Dexie open blocked by another tab or connection.');
+});
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeunload', () => {
+    try {
+      db.close();
+    } catch (e) {
+      console.warn('Error closing DB on beforeunload:', e);
+    }
+  });
+}
+
 export async function initDatabase(): Promise<{ profilesCount: number; bookletCount: number }> {
-  // Purge any removed / blacklisted test profiles from existing IndexedDB
-  await db.profiles.delete('15600');
-  await db.interactions.delete('15600');
-  await db.comparison.delete('15600');
+  const initPromise = (async () => {
+    try {
+      if (!db.isOpen()) {
+        await db.open();
+      }
 
-  let pCount = await db.profiles.count();
-  if (pCount === 0) {
-    console.log('Seeding Dexie IndexedDB with portal profiles...');
-    const profiles = cleanProfilesData as Profile[];
-    await db.profiles.bulkAdd(profiles);
-    pCount = profiles.length;
-  }
+      // Purge any removed / blacklisted test profiles from existing IndexedDB
+      try {
+        await db.profiles.delete('15600');
+        await db.interactions.delete('15600');
+        await db.comparison.delete('15600');
+      } catch (e) {
+        console.warn('Cleanup error ignored:', e);
+      }
 
-  let bCount = await db.booklet_candidates.count();
-  if (bCount === 0) {
-    console.log('Seeding Dexie IndexedDB with booklet candidates...');
-    const bookletCandidates = candidatesData as BookletCandidate[];
-    await db.booklet_candidates.bulkAdd(bookletCandidates);
-    bCount = bookletCandidates.length;
-  }
+      let pCount = await db.profiles.count();
+      if (pCount === 0) {
+        console.log('Seeding Dexie IndexedDB with portal profiles...');
+        const profiles = cleanProfilesData as Profile[];
+        await db.profiles.bulkAdd(profiles);
+        pCount = profiles.length;
+      }
 
-  return { profilesCount: pCount, bookletCount: bCount };
+      let bCount = await db.booklet_candidates.count();
+      if (bCount === 0) {
+        console.log('Seeding Dexie IndexedDB with booklet candidates...');
+        const bookletCandidates = candidatesData as BookletCandidate[];
+        await db.booklet_candidates.bulkAdd(bookletCandidates);
+        bCount = bookletCandidates.length;
+      }
+
+      return { profilesCount: pCount, bookletCount: bCount };
+    } catch (err) {
+      console.warn('IndexedDB initialization error (falling back to bundled data):', err);
+      return {
+        profilesCount: (cleanProfilesData as Profile[]).length,
+        bookletCount: (candidatesData as BookletCandidate[]).length
+      };
+    }
+  })();
+
+  // 1500ms safety timeout: prevents hanging indefinitely on mobile if IndexedDB connection is locked
+  const timeoutPromise = new Promise<{ profilesCount: number; bookletCount: number }>((resolve) => {
+    setTimeout(() => {
+      console.warn('initDatabase timed out after 1500ms - auto-bypassing to in-memory bundled data');
+      resolve({
+        profilesCount: (cleanProfilesData as Profile[]).length,
+        bookletCount: (candidatesData as BookletCandidate[]).length
+      });
+    }, 1500);
+  });
+
+  return Promise.race([initPromise, timeoutPromise]);
 }
 
 // Portal interactions
