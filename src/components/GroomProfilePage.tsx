@@ -7,7 +7,11 @@ import {
   Camera,
   FileText,
   Eye,
-  Trash2
+  Trash2,
+  ChevronLeft,
+  ChevronRight,
+  Star,
+  Plus
 } from 'lucide-react';
 import { getBiodataUrl, buildGenericShareMessage } from '../utils/messages';
 import { SHUBHAM_BIODATA, GANESH_IMG_DATA } from '../constants/shubhamBiodataData';
@@ -16,9 +20,11 @@ import {
   downloadBiodataCanvasImage
 } from '../utils/biodataCanvasGenerator';
 import {
-  subscribeGroomPhoto,
-  saveGroomPhoto,
-  removeGroomPhoto,
+  subscribeGroomPhotos,
+  addGroomPhoto,
+  removeGroomPhotoAtIndex,
+  setPrimaryGroomPhoto,
+  clearAllGroomPhotos,
   downloadGroomPhotoImage,
   shareGroomPhotoImage
 } from '../services/groomProfileService';
@@ -39,17 +45,34 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
 }) => {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'biodata' | 'photo'>('biodata');
-  const [groomPhoto, setGroomPhoto] = useState<string | null>(null);
+  const [groomPhotos, setGroomPhotos] = useState<string[]>([]);
+  const [activePhotoIndex, setActivePhotoIndex] = useState(0);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
-  // Subscribe to real-time groom photo updates (local cache + Firebase cloud sync)
+  // Subscribe to real-time groom photos list (local cache + Firebase cloud sync)
   useEffect(() => {
-    const unsubscribe = subscribeGroomPhoto((photo) => {
-      setGroomPhoto(photo);
+    const unsubscribe = subscribeGroomPhotos((photos) => {
+      setGroomPhotos(photos);
+      setActivePhotoIndex((prev) => {
+        if (photos.length === 0) return 0;
+        return prev >= photos.length ? photos.length - 1 : prev;
+      });
     });
     return () => unsubscribe();
   }, []);
+
+  const activePhoto = groomPhotos[activePhotoIndex] || groomPhotos[0] || null;
+
+  const handlePrevPhoto = () => {
+    if (groomPhotos.length <= 1) return;
+    setActivePhotoIndex((prev) => (prev > 0 ? prev - 1 : groomPhotos.length - 1));
+  };
+
+  const handleNextPhoto = () => {
+    if (groomPhotos.length <= 1) return;
+    setActivePhotoIndex((prev) => (prev < groomPhotos.length - 1 ? prev + 1 : 0));
+  };
 
   // Runtime dynamic URL computation
   const dynamicProfileUrl = getBiodataUrl();
@@ -118,16 +141,22 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
     await handleCopyLink();
   };
 
-  // 2. Separate Photo Handlers (Strictly Shubham-Kharche-Photo.jpg)
+  // 2. Separate Photo Handlers (Shubham-Kharche-Photo.jpg)
   const handleDownloadPhoto = () => {
-    if (!groomPhoto) return;
-    downloadGroomPhotoImage(groomPhoto);
-    showToast('✅ वर फोटो (Shubham-Kharche-Photo.jpg) डाऊनलोड झाला!');
+    if (!activePhoto) return;
+    const filename = groomPhotos.length > 1
+      ? `Shubham-Kharche-Photo-${activePhotoIndex + 1}.jpg`
+      : 'Shubham-Kharche-Photo.jpg';
+    downloadGroomPhotoImage(activePhoto, filename);
+    showToast(`✅ वर फोटो (${filename}) डाऊनलोड झाला!`);
   };
 
   const handleSharePhoto = async () => {
-    if (!groomPhoto) return;
-    const success = await shareGroomPhotoImage(groomPhoto);
+    if (!activePhoto) return;
+    const title = groomPhotos.length > 1
+      ? `चि. शुभम अनिल खर्चे - वर फोटो (${activePhotoIndex + 1}/${groomPhotos.length})`
+      : 'चि. शुभम अनिल खर्चे - वर फोटो';
+    const success = await shareGroomPhotoImage(activePhoto, title);
     if (success) {
       showToast('✅ वर फोटो शेअर झाला!');
     } else {
@@ -135,20 +164,40 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
     }
   };
 
-  // 3. Photo Management Handlers
-  const handleSavePhoto = async (photoDataUrl: string) => {
+  // 3. Multi-Photo Management Handlers
+  const handleAddPhoto = async (photoUrl: string) => {
     try {
-      await saveGroomPhoto(photoDataUrl);
-      showToast('✅ वर फोटो सेव्ह झाला व क्लाउडवर सिंक झाला!');
+      await addGroomPhoto(photoUrl);
+      showToast('✅ नवीन फोटो गॅलरीत जोडला!');
     } catch {
-      showToast('⚠️ फोटो सेव्ह करताना त्रुटी आली.');
+      showToast('⚠️ फोटो जोडताना त्रुटी आली.');
     }
   };
 
-  const handleRemovePhoto = async () => {
+  const handleRemovePhotoAtIndex = async (index: number) => {
     try {
-      await removeGroomPhoto();
-      showToast('✅ वर फोटो काढून टाकला!');
+      await removeGroomPhotoAtIndex(index);
+      showToast('✅ फोटो काढून टाकला!');
+    } catch {
+      showToast('⚠️ फोटो काढताना त्रुटी आली.');
+    }
+  };
+
+  const handleSetPrimaryPhoto = async (index: number) => {
+    try {
+      await setPrimaryGroomPhoto(index);
+      setActivePhotoIndex(0);
+      showToast('⭐ हा फोटो मुख्य फोटो म्हणून सेट केला!');
+    } catch {
+      showToast('⚠️ मुख्य फोटो सेट करताना त्रुटी आली.');
+    }
+  };
+
+  const handleClearAllPhotos = async () => {
+    try {
+      await clearAllGroomPhotos();
+      setActivePhotoIndex(0);
+      showToast('✅ सर्व फोटो काढून टाकले!');
     } catch {
       showToast('⚠️ फोटो काढताना त्रुटी आली.');
     }
@@ -158,7 +207,7 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
     if (isAdminAuthenticated) {
       setIsUploadModalOpen(true);
     } else if (onAdminLoginRequest) {
-      onAdminLoginRequest('वर फोटो अपलोड करण्यासाठी ॲडमिन पासवर्ड आवश्यक आहे.');
+      onAdminLoginRequest('वर फोटो व्यवस्थापनासाठी ॲडमिन पासवर्ड आवश्यक आहे.');
     } else {
       setIsUploadModalOpen(true);
     }
@@ -217,7 +266,7 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
               </>
             ) : (
               <>
-                {groomPhoto && (
+                {activePhoto && (
                   <>
                     <button
                       type="button"
@@ -241,7 +290,7 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
                       type="button"
                       onClick={handleDownloadPhoto}
                       className="px-3 h-9 sm:h-10 rounded-xl bg-rose-50 hover:bg-rose-100 text-[#881337] flex items-center gap-1.5 border border-rose-200 transition-all active:scale-90 shadow-xs cursor-pointer text-xs font-bold"
-                      title="फोटो डाऊनलोड करा (Shubham-Kharche-Photo.jpg)"
+                      title="फोटो डाऊनलोड करा"
                     >
                       <Download className="w-4 h-4" />
                       <span className="hidden sm:inline">फोटो डाऊनलोड</span>
@@ -249,15 +298,15 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
                   </>
                 )}
 
-                {/* Admin Upload / Change Button */}
+                {/* Admin Add/Manage Photos Button */}
                 <button
                   type="button"
                   onClick={handleOpenPhotoManager}
                   className="px-3 h-9 sm:h-10 rounded-xl bg-rose-600 hover:bg-rose-700 text-white flex items-center gap-1.5 shadow-sm transition-all active:scale-90 cursor-pointer text-xs font-bold"
-                  title="वर फोटो व्यवस्थापन"
+                  title="वर फोटो गॅलरी व्यवस्थापन"
                 >
-                  <Camera className="w-4 h-4" />
-                  <span className="hidden sm:inline">{groomPhoto ? 'फोटो / लिंक बदला' : 'फोटो / लिंक जोडा'}</span>
+                  <Plus className="w-4 h-4" />
+                  <span className="hidden sm:inline">{groomPhotos.length > 0 ? 'फोटो जोडा / व्यवस्थापन' : 'फोटो जोडा'}</span>
                 </button>
               </>
             )}
@@ -289,8 +338,10 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
             }`}
           >
             <Camera className="w-4 h-4 flex-shrink-0" />
-            <span className="truncate">🤵 वर फोटो (Shubham-Kharche-Photo.jpg)</span>
-            {groomPhoto && <span className="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0" />}
+            <span className="truncate">
+              🤵 वर फोटो {groomPhotos.length > 0 ? `(${groomPhotos.length})` : ''}
+            </span>
+            {groomPhotos.length > 0 && <span className="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0" />}
           </button>
         </div>
 
@@ -439,52 +490,114 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/95 hover:bg-white text-rose-800 text-xs font-bold border border-rose-200/80 shadow-xs hover:shadow-md transition-all cursor-pointer active:scale-95"
               >
                 <Camera className="w-4 h-4 text-rose-600" />
-                <span>📸 चि. शुभम खर्चे यांचा फोटो पाहण्यासाठी येथे क्लिक करा 👉</span>
+                <span>📸 चि. शुभम खर्चे यांचे फोटो पाहण्यासाठी येथे क्लिक करा 👉</span>
               </button>
             </div>
           </div>
         )}
 
-        {/* Tab 2 Content: Separate Groom Photo Card */}
+        {/* Tab 2 Content: Dedicated Groom Photos Gallery */}
         {activeTab === 'photo' && (
           <div className="space-y-4 animate-fade-in">
-            <div className="bg-white rounded-3xl border border-[#d8c9bd] shadow-md p-6 sm:p-8 text-center max-w-[560px] mx-auto">
-              <div className="mb-5">
+            <div className="bg-white border-2 border-[#222222] shadow-[0_10px_32px_rgba(45,35,25,0.12)] rounded-3xl p-4 sm:p-7 text-center space-y-4 relative">
+              <div className="border-b border-slate-100 pb-3">
                 <span className="text-[11px] font-bold tracking-[0.25em] text-rose-800 uppercase block mb-1">
                   ॥ श्री गणेशाय नमः ॥
                 </span>
                 <h2 className="text-xl sm:text-2xl font-black text-slate-900 font-serif">
                   चि. शुभम अनिल खर्चे
                 </h2>
-                <p className="text-xs text-slate-500 mt-1">
-                  विवाह परिचय वर फोटो • स्वतंत्र फोटो दृश्य
+                <p className="text-xs text-rose-700 font-semibold tracking-wide mt-0.5">
+                  विवाह परिचय वर फोटो गॅलरी {groomPhotos.length > 0 && `• ${groomPhotos.length} फोटो`}
                 </p>
               </div>
 
-              {groomPhoto ? (
-                <div className="space-y-5">
-                  {/* Photo Container */}
-                  <div
-                    onClick={() => setIsLightboxOpen(true)}
-                    className="relative group max-w-[340px] mx-auto rounded-2xl overflow-hidden border-2 border-slate-800 shadow-2xl bg-slate-950 cursor-pointer"
-                  >
-                    <img
-                      src={groomPhoto}
-                      alt="चि. शुभम अनिल खर्चे"
-                      className="w-full h-auto max-h-[480px] object-cover object-top mx-auto"
-                    />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1.5 text-white font-bold text-xs">
-                      <Eye className="w-6 h-6" />
-                      <span>पूर्ण स्क्रीनमध्ये मोठा फोटो पहा</span>
+              {groomPhotos.length > 0 ? (
+                <div className="space-y-4">
+                  {/* Main Photo Container with Prev/Next Navigation */}
+                  <div className="relative group max-w-[360px] mx-auto rounded-2xl overflow-hidden border-2 border-slate-800 shadow-2xl bg-slate-950">
+                    <div
+                      onClick={() => setIsLightboxOpen(true)}
+                      className="cursor-pointer relative aspect-[3/4] flex items-center justify-center bg-black"
+                    >
+                      <img
+                        src={activePhoto || groomPhotos[0]}
+                        alt={`चि. शुभम अनिल खर्चे - फोटो ${activePhotoIndex + 1}`}
+                        className="w-full h-full object-cover object-top"
+                      />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1.5 text-white font-bold text-xs pointer-events-none">
+                        <Eye className="w-6 h-6" />
+                        <span>पूर्ण स्क्रीनमध्ये मोठा फोटो पहा</span>
+                      </div>
                     </div>
+
+                    {/* Photo Counter Badge */}
+                    <div className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md text-white text-[11px] font-bold flex items-center gap-1">
+                      <span>{activePhotoIndex + 1} / {groomPhotos.length}</span>
+                      {activePhotoIndex === 0 && (
+                        <span className="text-amber-300 flex items-center gap-0.5 ml-1">
+                          <Star className="w-3 h-3 fill-current" />
+                          <span>मुख्य</span>
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Floating Prev / Next Buttons */}
+                    {groomPhotos.length > 1 && (
+                      <>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handlePrevPhoto();
+                          }}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center transition-all cursor-pointer shadow-md"
+                          title="मागील फोटो"
+                        >
+                          <ChevronLeft className="w-5 h-5" />
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleNextPhoto();
+                          }}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/60 hover:bg-black/80 text-white flex items-center justify-center transition-all cursor-pointer shadow-md"
+                          title="पुढील फोटो"
+                        >
+                          <ChevronRight className="w-5 h-5" />
+                        </button>
+                      </>
+                    )}
                   </div>
 
-                  {/* Dedicated Action Buttons for Photo */}
-                  <div className="flex flex-wrap items-center justify-center gap-2.5 pt-2">
+                  {/* Horizontal Thumbnail Strip for Multiple Photos */}
+                  {groomPhotos.length > 1 && (
+                    <div className="flex items-center justify-center gap-2 max-w-sm mx-auto overflow-x-auto py-1 px-2">
+                      {groomPhotos.map((url, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => setActivePhotoIndex(i)}
+                          className={`w-12 h-16 rounded-lg overflow-hidden border-2 transition-all flex-shrink-0 cursor-pointer ${
+                            i === activePhotoIndex
+                              ? 'border-rose-600 scale-105 shadow-md shadow-rose-600/30 ring-2 ring-rose-400/50'
+                              : 'border-slate-300 opacity-60 hover:opacity-100'
+                          }`}
+                        >
+                          <img src={url} alt={`Thumbnail ${i + 1}`} className="w-full h-full object-cover object-top" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Action Buttons for Active Photo */}
+                  <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
                     <button
                       type="button"
                       onClick={() => setIsLightboxOpen(true)}
-                      className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all active:scale-95 flex items-center gap-2 shadow-sm cursor-pointer"
+                      className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all active:scale-95 flex items-center gap-1.5 shadow-sm cursor-pointer"
                     >
                       <Eye className="w-4 h-4" />
                       <span>👁️ मोठा फोटो पहा</span>
@@ -493,7 +606,7 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
                     <button
                       type="button"
                       onClick={handleDownloadPhoto}
-                      className="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all active:scale-95 flex items-center gap-2 shadow-md shadow-rose-600/25 cursor-pointer"
+                      className="px-3.5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all active:scale-95 flex items-center gap-1.5 shadow-md shadow-rose-600/25 cursor-pointer"
                     >
                       <Download className="w-4 h-4" />
                       <span>⬇️ फोटो डाऊनलोड</span>
@@ -502,51 +615,65 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
                     <button
                       type="button"
                       onClick={handleSharePhoto}
-                      className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all active:scale-95 flex items-center gap-2 shadow-md shadow-emerald-600/25 cursor-pointer"
+                      className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all active:scale-95 flex items-center gap-1.5 shadow-md shadow-emerald-600/25 cursor-pointer"
                     >
                       <Share2 className="w-4 h-4" />
                       <span>📤 फोटो शेअर</span>
                     </button>
 
                     {isAdminAuthenticated && (
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5">
                         <button
                           type="button"
                           onClick={handleOpenPhotoManager}
-                          className="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all active:scale-95 flex items-center gap-1.5 border border-slate-200 cursor-pointer"
+                          className="px-3 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-800 text-xs font-bold transition-all active:scale-95 flex items-center gap-1.5 border border-rose-200 cursor-pointer"
+                          title="आणखी फोटो जोडा किंवा व्यवस्थापन करा"
                         >
-                          <Camera className="w-4 h-4" />
-                          <span>📸 फोटो / लिंक बदला</span>
+                          <Plus className="w-4 h-4 text-rose-600" />
+                          <span>फोटो जोडा / व्यवस्थापन</span>
                         </button>
+
+                        {activePhotoIndex > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => handleSetPrimaryPhoto(activePhotoIndex)}
+                            className="px-2.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-bold transition-all active:scale-95 flex items-center gap-1 border border-amber-200 cursor-pointer"
+                            title="हा फोटो मुख्य फोटो बनवा"
+                          >
+                            <Star className="w-3.5 h-3.5" />
+                            <span>मुख्य करा</span>
+                          </button>
+                        )}
 
                         <button
                           type="button"
-                          onClick={handleRemovePhoto}
-                          className="px-3.5 py-2.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold transition-all active:scale-95 flex items-center gap-1.5 border border-red-200 cursor-pointer"
-                          title="फोटो किंवा लिंक काढून टाका"
+                          onClick={() => handleRemovePhotoAtIndex(activePhotoIndex)}
+                          className="px-2.5 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold transition-all active:scale-95 flex items-center gap-1 border border-red-200 cursor-pointer"
+                          title="हा फोटो काढून टाका"
                         >
-                          <Trash2 className="w-4 h-4" />
-                          <span>काढून टाका</span>
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>काढा</span>
                         </button>
                       </div>
                     )}
                   </div>
 
                   <p className="text-[11px] text-slate-400">
-                    डाऊनलोड नाव: <code>Shubham-Kharche-Photo.jpg</code>
+                    डाऊनलोड नाव: <code>{groomPhotos.length > 1 ? `Shubham-Kharche-Photo-${activePhotoIndex + 1}.jpg` : 'Shubham-Kharche-Photo.jpg'}</code>
                   </p>
                 </div>
               ) : (
+                /* Empty State */
                 <div className="py-12 px-4 space-y-4 border-2 border-dashed border-rose-200 rounded-2xl bg-rose-50/40">
                   <div className="w-16 h-16 rounded-full bg-rose-100 text-rose-600 mx-auto flex items-center justify-center">
                     <Camera className="w-8 h-8" />
                   </div>
                   <div>
                     <h3 className="text-sm font-bold text-slate-800">
-                      अद्याप वर फोटो अपलोड केलेला नाही
+                      अद्याप वर फोटो जोडलेला नाही
                     </h3>
                     <p className="text-xs text-slate-500 mt-1 max-w-xs mx-auto">
-                      Google Drive शेअरिंग लिंक किंवा गॅलरीतून शुभम यांचा फोटो जोडा.
+                      Google Drive शेअरिंग लिंक किंवा गॅलरीतून शुभम यांचे एकापेक्षा जास्त फोटो जोडा.
                     </p>
                   </div>
                   <div>
@@ -555,8 +682,8 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
                       onClick={handleOpenPhotoManager}
                       className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold transition-all shadow-md shadow-rose-600/30 flex items-center gap-2 mx-auto cursor-pointer"
                     >
-                      <Camera className="w-4 h-4" />
-                      <span>{isAdminAuthenticated ? '📸 फोटो किंवा Google Drive लिंक जोडा' : '🔐 ॲडमिन लॉगिन व फोटो जोडा'}</span>
+                      <Plus className="w-4 h-4" />
+                      <span>{isAdminAuthenticated ? '📸 फोटो जोडा (Multiple Photos)' : '🔐 ॲडमिन लॉगिन व फोटो जोडा'}</span>
                     </button>
                   </div>
                 </div>
@@ -578,27 +705,58 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
         )}
       </div>
 
-      {/* Lightbox / Full-screen Photo Zoom Modal */}
-      {isLightboxOpen && groomPhoto && (
+      {/* Lightbox / Full-screen Photo Zoom Modal with Slider */}
+      {isLightboxOpen && activePhoto && (
         <div
           onClick={() => setIsLightboxOpen(false)}
-          className="fixed inset-0 z-[100001] bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in"
+          className="fixed inset-0 z-[100001] bg-black/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-fade-in"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative max-w-sm sm:max-w-md w-full bg-white rounded-3xl p-3 shadow-2xl overflow-hidden"
+            className="relative max-w-md w-full bg-white rounded-3xl p-3 shadow-2xl overflow-hidden"
           >
-            <div className="relative rounded-2xl overflow-hidden border border-slate-200 bg-slate-900">
+            <div className="relative rounded-2xl overflow-hidden border border-slate-200 bg-slate-950 aspect-[3/4] flex items-center justify-center">
               <img
-                src={groomPhoto}
-                alt="चि. शुभम अनिल खर्चे"
-                className="w-full max-h-[75vh] object-contain mx-auto"
+                src={activePhoto}
+                alt={`चि. शुभम अनिल खर्चे - ${activePhotoIndex + 1}`}
+                className="w-full h-full object-contain mx-auto"
               />
+
+              {/* Lightbox Prev / Next Controls */}
+              {groomPhotos.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={handlePrevPhoto}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center transition-all cursor-pointer shadow-lg"
+                    title="मागील फोटो"
+                  >
+                    <ChevronLeft className="w-6 h-6" />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleNextPhoto}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/60 hover:bg-black/90 text-white flex items-center justify-center transition-all cursor-pointer shadow-lg"
+                    title="पुढील फोटो"
+                  >
+                    <ChevronRight className="w-6 h-6" />
+                  </button>
+                </>
+              )}
+
+              {/* Photo Indicator */}
+              <div className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-full bg-black/60 text-white text-[11px] font-bold">
+                फोटो {activePhotoIndex + 1} / {groomPhotos.length}
+              </div>
             </div>
+
             <div className="mt-3 flex items-center justify-between px-2">
               <div>
                 <span className="text-xs font-bold text-slate-800 block">चि. शुभम अनिल खर्चे</span>
-                <span className="text-[11px] text-slate-500">वर फोटो • Shubham-Kharche-Photo.jpg</span>
+                <span className="text-[11px] text-slate-500">
+                  वर फोटो • {groomPhotos.length > 1 ? `फोटो ${activePhotoIndex + 1} / ${groomPhotos.length}` : 'Shubham-Kharche-Photo.jpg'}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <button
@@ -626,9 +784,11 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
       <GroomPhotoUploadModal
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}
-        currentPhoto={groomPhoto}
-        onSavePhoto={handleSavePhoto}
-        onRemovePhoto={handleRemovePhoto}
+        currentPhotos={groomPhotos}
+        onAddPhoto={handleAddPhoto}
+        onRemovePhotoAtIndex={handleRemovePhotoAtIndex}
+        onSetPrimaryPhoto={handleSetPrimaryPhoto}
+        onClearAllPhotos={handleClearAllPhotos}
       />
     </div>
   );

@@ -10,22 +10,31 @@ import {
   Link2,
   ClipboardPaste,
   XCircle,
-  HelpCircle
+  HelpCircle,
+  Star,
+  Plus,
+  Image as ImageIcon
 } from 'lucide-react';
 import { BottomSheet } from './BottomSheet';
 import { compressImage } from '../utils/imageCompressor';
 import {
   parseImageLink,
-  isGoogleDriveUrl,
   DEFAULT_GROOM_DRIVE_SHARE_LINK
 } from '../utils/googleDriveHelper';
 
 interface GroomPhotoUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
-  currentPhoto: string | null;
-  onSavePhoto: (photoDataUrl: string) => Promise<void>;
-  onRemovePhoto: () => Promise<void>;
+  currentPhotos: string[];
+  onAddPhoto: (photoUrl: string) => Promise<void>;
+  onAddMultiplePhotos?: (photoUrls: string[]) => Promise<void>;
+  onRemovePhotoAtIndex: (index: number) => Promise<void>;
+  onSetPrimaryPhoto: (index: number) => Promise<void>;
+  onClearAllPhotos: () => Promise<void>;
+  // Backward compatibility
+  currentPhoto?: string | null;
+  onSavePhoto?: (photoDataUrl: string) => Promise<void>;
+  onRemovePhoto?: () => Promise<void>;
 }
 
 type TabType = 'drive' | 'gallery';
@@ -33,17 +42,19 @@ type TabType = 'drive' | 'gallery';
 export const GroomPhotoUploadModal: React.FC<GroomPhotoUploadModalProps> = ({
   isOpen,
   onClose,
-  currentPhoto,
+  currentPhotos,
+  onAddPhoto,
+  onAddMultiplePhotos,
+  onRemovePhotoAtIndex,
+  onSetPrimaryPhoto,
+  onClearAllPhotos,
   onSavePhoto,
   onRemovePhoto
 }) => {
-  const [activeTab, setActiveTab] = useState<TabType>(() => {
-    return isGoogleDriveUrl(currentPhoto) ? 'drive' : 'drive';
-  });
+  const [activeTab, setActiveTab] = useState<TabType>('drive');
 
-  // Gallery file upload state
-  const [galleryPreview, setGalleryPreview] = useState<string | null>(null);
-  const [fileStats, setFileStats] = useState<{ sizeKb: number; width: number; height: number } | null>(null);
+  // Multi-photo gallery upload state
+  const [galleryPreviews, setGalleryPreviews] = useState<Array<{ dataUrl: string; sizeKb: number; width: number; height: number }>>([]);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Google Drive / Web Link state
@@ -56,34 +67,27 @@ export const GroomPhotoUploadModal: React.FC<GroomPhotoUploadModalProps> = ({
   // General processing & error states
   const [isProcessing, setIsProcessing] = useState(false);
   const [generalError, setGeneralError] = useState<string | null>(null);
+  const [successNotice, setSuccessNotice] = useState<string | null>(null);
 
-  // Initialize modal state when opened
+  // Reset/Initialize state when modal opens
   useEffect(() => {
     if (isOpen) {
       setGeneralError(null);
+      setSuccessNotice(null);
       setIsProcessing(false);
-      setGalleryPreview(null);
-      setFileStats(null);
-
-      if (currentPhoto && isGoogleDriveUrl(currentPhoto)) {
-        setActiveTab('drive');
-        setLinkDirectUrl(currentPhoto);
-        setIsDriveLink(true);
-        setLinkImageStatus('success');
-      } else {
-        setActiveTab('drive');
-        setLinkInput('');
-        setLinkDirectUrl(null);
-        setLinkImageStatus('idle');
-        setLinkErrorMessage(null);
-      }
+      setGalleryPreviews([]);
+      setLinkInput('');
+      setLinkDirectUrl(null);
+      setLinkImageStatus('idle');
+      setLinkErrorMessage(null);
     }
-  }, [isOpen, currentPhoto]);
+  }, [isOpen]);
 
   // Handle URL link input changes with real-time parsing
   const handleLinkChange = (value: string) => {
     setLinkInput(value);
     setGeneralError(null);
+    setSuccessNotice(null);
 
     const trimmed = value.trim();
     if (!trimmed) {
@@ -127,101 +131,184 @@ export const GroomPhotoUploadModal: React.FC<GroomPhotoUploadModalProps> = ({
     handleLinkChange(DEFAULT_GROOM_DRIVE_SHARE_LINK);
   };
 
-  // Gallery File Picker Handler
+  // Gallery File Picker Handler supporting multiple files
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      setGeneralError('कृपया वैध इमेज फाईल (JPG, PNG, WebP) निवडा.');
-      return;
-    }
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
     setGeneralError(null);
+    setSuccessNotice(null);
     setIsProcessing(true);
 
-    try {
-      const result = await compressImage(file, {
-        maxWidth: 480,
-        maxHeight: 620,
-        quality: 0.82
-      });
+    const compressedList: Array<{ dataUrl: string; sizeKb: number; width: number; height: number }> = [];
 
-      setGalleryPreview(result.dataUrl);
-      setFileStats({
-        sizeKb: result.sizeKb,
-        width: result.width,
-        height: result.height
-      });
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (file.type.startsWith('image/')) {
+          const result = await compressImage(file, {
+            maxWidth: 480,
+            maxHeight: 620,
+            quality: 0.82
+          });
+          compressedList.push(result);
+        }
+      }
+
+      if (compressedList.length === 0) {
+        setGeneralError('कृपया वैध इमेज फाईल्स (JPG, PNG, WebP) निवडा.');
+      } else {
+        setGalleryPreviews((prev) => [...prev, ...compressedList]);
+      }
     } catch (err: any) {
       console.error('Image compression error:', err);
       setGeneralError('फोटो कॉम्प्रेस करताना त्रुटी आली. कृपया पुन्हा प्रयत्न करा.');
     } finally {
       setIsProcessing(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
-  // Save Link or File
-  const handleSave = async () => {
-    let photoToSave: string | null = null;
+  // Add Google Drive Link to Gallery
+  const handleAddDrivePhoto = async () => {
+    if (!linkDirectUrl) {
+      setGeneralError('कृपया प्रथम वैध Google Drive लिंक प्रविष्ट करा.');
+      return;
+    }
 
-    if (activeTab === 'drive') {
-      if (!linkDirectUrl) {
-        setGeneralError('कृपया वैध Google Drive लिंक प्रविष्ट करा.');
-        return;
-      }
-      photoToSave = linkDirectUrl;
-    } else {
-      if (!galleryPreview) {
-        setGeneralError('कृपया प्रथम गॅलरीतून फोटो निवडा.');
-        return;
-      }
-      photoToSave = galleryPreview;
+    if (currentPhotos.includes(linkDirectUrl)) {
+      setGeneralError('हा फोटो आधीच गॅलरीमध्ये जोडलेला आहे.');
+      return;
     }
 
     setIsProcessing(true);
     setGeneralError(null);
 
     try {
-      await onSavePhoto(photoToSave);
-      onClose();
+      if (onAddPhoto) {
+        await onAddPhoto(linkDirectUrl);
+      } else if (onSavePhoto) {
+        await onSavePhoto(linkDirectUrl);
+      }
+
+      setLinkInput('');
+      setLinkDirectUrl(null);
+      setLinkImageStatus('idle');
+      setSuccessNotice('✅ फोटो गॅलरीमध्ये यशस्वीरित्या जोडला!');
+    } catch (err: any) {
+      console.error('Add photo error:', err);
+      setGeneralError('फोटो जोडताना त्रुटी आली.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // Add Uploaded Gallery Photos
+  const handleAddGalleryPhotos = async () => {
+    if (galleryPreviews.length === 0) {
+      setGeneralError('कृपया प्रथम गॅलरीतून फोटो निवडा.');
+      return;
+    }
+
+    setIsProcessing(true);
+    setGeneralError(null);
+
+    try {
+      const urls = galleryPreviews.map((p) => p.dataUrl);
+      if (onAddMultiplePhotos) {
+        await onAddMultiplePhotos(urls);
+      } else {
+        for (const url of urls) {
+          if (onAddPhoto) {
+            await onAddPhoto(url);
+          } else if (onSavePhoto) {
+            await onSavePhoto(url);
+          }
+        }
+      }
+
+      setGalleryPreviews([]);
+      setSuccessNotice(`✅ ${urls.length} फोटो गॅलरीमध्ये जोडले!`);
     } catch (err: any) {
       console.error('Save error:', err);
       setGeneralError('फोटो सेव्ह करताना त्रुटी आली.');
+    } finally {
       setIsProcessing(false);
     }
   };
 
-  // Delete / Remove Photo
-  const handleRemove = async () => {
-    if (!window.confirm('तुम्हाला वर फोटो / लिंक काढून टाकायची आहे का?')) return;
+  // Remove individual photo at index
+  const handleRemovePhoto = async (index: number) => {
+    if (!window.confirm('हा फोटो गॅलरीतून काढून टाकायचा आहे का?')) return;
+    setIsProcessing(true);
+    setGeneralError(null);
+    setSuccessNotice(null);
+
+    try {
+      if (onRemovePhotoAtIndex) {
+        await onRemovePhotoAtIndex(index);
+      } else if (onRemovePhoto && currentPhotos.length <= 1) {
+        await onRemovePhoto();
+      }
+      setSuccessNotice('फोटो काढून टाकला.');
+    } catch (err: any) {
+      console.error('Remove error:', err);
+      setGeneralError('फोटो काढताना त्रुटी आली.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // Set primary photo
+  const handleSetPrimary = async (index: number) => {
+    if (index === 0) return;
     setIsProcessing(true);
     setGeneralError(null);
 
     try {
-      await onRemovePhoto();
-      onClose();
+      if (onSetPrimaryPhoto) {
+        await onSetPrimaryPhoto(index);
+        setSuccessNotice('⭐ हा फोटो मुख्य फोटो म्हणून सेट केला!');
+      }
     } catch (err: any) {
-      console.error('Remove error:', err);
-      setGeneralError('फोटो काढताना त्रुटी आली.');
+      console.error('Set primary error:', err);
+      setGeneralError('मुख्य फोटो सेट करताना त्रुटी आली.');
+    } finally {
       setIsProcessing(false);
     }
   };
 
-  // Active preview candidate
-  const currentPreview =
-    activeTab === 'drive'
-      ? linkDirectUrl || (isGoogleDriveUrl(currentPhoto) ? currentPhoto : null)
-      : galleryPreview || (!isGoogleDriveUrl(currentPhoto) ? currentPhoto : null);
+  // Clear all photos
+  const handleClearAll = async () => {
+    if (!window.confirm('तुम्हाला सर्व फोटो काढून टाकायचे आहेत का?')) return;
+    setIsProcessing(true);
+    setGeneralError(null);
+
+    try {
+      if (onClearAllPhotos) {
+        await onClearAllPhotos();
+      } else if (onRemovePhoto) {
+        await onRemovePhoto();
+      }
+      setSuccessNotice('सर्व फोटो काढून टाकले.');
+    } catch (err: any) {
+      console.error('Clear all error:', err);
+      setGeneralError('फोटो काढताना त्रुटी आली.');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   return (
     <BottomSheet
       isOpen={isOpen}
       onClose={onClose}
-      title="वर फोटो व्यवस्थापन (Google Drive / Upload)"
-      subtitle="बायोडाटा व प्रोफाइलसाठी शुभम यांचा फोटो लिंक जोडा किंवा अपलोड करा"
+      title="वर फोटो गॅलरी व्यवस्थापन (Multiple Photos)"
+      subtitle="बायोडाटा व प्रोफाइलसाठी एकापेक्षा जास्त फोटो Google Drive किंवा गॅलरीतून जोडा"
       icon={<Camera className="w-5 h-5 text-rose-600" />}
-      maxWidth="max-w-lg"
+      maxWidth="max-w-xl"
     >
       <div className="space-y-4">
         {generalError && (
@@ -231,38 +318,129 @@ export const GroomPhotoUploadModal: React.FC<GroomPhotoUploadModalProps> = ({
           </div>
         )}
 
-        {/* Tab Switcher: Drive Link vs Gallery Upload */}
-        <div className="grid grid-cols-2 p-1 bg-slate-100 rounded-xl text-xs font-bold gap-1 border border-slate-200">
-          <button
-            type="button"
-            onClick={() => setActiveTab('drive')}
-            className={`py-2 px-3 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer ${
-              activeTab === 'drive'
-                ? 'bg-white text-rose-800 shadow-xs border border-rose-200'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <Link2 className="w-4 h-4" />
-            <span>🔗 गुगल ड्राईव्ह लिंक</span>
-          </button>
+        {successNotice && (
+          <div className="p-2.5 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center gap-2 animate-fade-in font-medium">
+            <Check className="w-4 h-4 flex-shrink-0 text-emerald-600" />
+            <span>{successNotice}</span>
+          </div>
+        )}
 
-          <button
-            type="button"
-            onClick={() => setActiveTab('gallery')}
-            className={`py-2 px-3 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer ${
-              activeTab === 'gallery'
-                ? 'bg-white text-rose-800 shadow-xs border border-rose-200'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <Upload className="w-4 h-4" />
-            <span>📁 गॅलरीतून निवडा</span>
-          </button>
+        {/* SECTION 1: Current Photos Gallery Strip */}
+        <div className="bg-slate-50 border border-slate-200 rounded-2xl p-3 space-y-2.5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ImageIcon className="w-4 h-4 text-slate-700" />
+              <span className="text-xs font-bold text-slate-800">
+                सध्याचे फोटो ({currentPhotos.length})
+              </span>
+            </div>
+            {currentPhotos.length > 0 && (
+              <button
+                type="button"
+                onClick={handleClearAll}
+                disabled={isProcessing}
+                className="text-[11px] font-semibold text-red-600 hover:text-red-800 flex items-center gap-1 cursor-pointer"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>सर्व काढा</span>
+              </button>
+            )}
+          </div>
+
+          {currentPhotos.length > 0 ? (
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5 max-h-56 overflow-y-auto p-1">
+              {currentPhotos.map((photoUrl, idx) => (
+                <div
+                  key={idx}
+                  className="relative group rounded-xl overflow-hidden border-2 border-slate-300 bg-white shadow-xs aspect-[3/4] flex flex-col justify-between"
+                >
+                  <img
+                    src={photoUrl}
+                    alt={`फोटो ${idx + 1}`}
+                    className="w-full h-full object-cover object-top"
+                  />
+
+                  {/* Primary Badge */}
+                  {idx === 0 ? (
+                    <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded-md bg-amber-400 text-slate-900 text-[9px] font-black shadow-xs flex items-center gap-0.5">
+                      <Star className="w-2.5 h-2.5 fill-current" />
+                      <span>मुख्य</span>
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => handleSetPrimary(idx)}
+                      disabled={isProcessing}
+                      className="absolute top-1 left-1 px-1.5 py-0.5 rounded-md bg-black/60 hover:bg-amber-500 text-white text-[9px] font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 cursor-pointer"
+                      title="मुख्य फोटो बनवा"
+                    >
+                      <Star className="w-2.5 h-2.5" />
+                      <span>मुख्य करा</span>
+                    </button>
+                  )}
+
+                  {/* Delete Button */}
+                  <button
+                    type="button"
+                    onClick={() => handleRemovePhoto(idx)}
+                    disabled={isProcessing}
+                    className="absolute top-1 right-1 w-6 h-6 rounded-md bg-red-600/90 hover:bg-red-700 text-white flex items-center justify-center opacity-90 group-hover:opacity-100 transition-opacity shadow-xs cursor-pointer"
+                    title="हा फोटो काढून टाका"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </button>
+
+                  <span className="absolute bottom-1 right-1 px-1.5 py-0.2 rounded-md bg-black/50 text-white text-[9px] font-mono">
+                    #{idx + 1}
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="py-5 text-center text-slate-400 text-xs">
+              गॅलरीमध्ये अद्याप कोणताही फोटो जोडलेला नाही. खालील पर्यायांतून फोटो जोडा.
+            </div>
+          )}
+        </div>
+
+        {/* SECTION 2: Add Photo Tabs */}
+        <div>
+          <span className="text-xs font-bold text-slate-700 block mb-1.5">
+            नवीन फोटो जोडा (Add New Photo):
+          </span>
+
+          <div className="grid grid-cols-2 p-1 bg-slate-100 rounded-xl text-xs font-bold gap-1 border border-slate-200">
+            <button
+              type="button"
+              onClick={() => setActiveTab('drive')}
+              className={`py-2 px-3 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                activeTab === 'drive'
+                  ? 'bg-white text-rose-800 shadow-xs border border-rose-200'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Link2 className="w-4 h-4" />
+              <span>🔗 गुगल ड्राईव्ह लिंक</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('gallery')}
+              className={`py-2 px-3 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                activeTab === 'gallery'
+                  ? 'bg-white text-rose-800 shadow-xs border border-rose-200'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              <Upload className="w-4 h-4" />
+              <span>📁 गॅलरीतून निवडा</span>
+            </button>
+          </div>
         </div>
 
         {/* TAB 1: GOOGLE DRIVE LINK */}
         {activeTab === 'drive' && (
-          <div className="space-y-3.5 animate-fade-in">
+          <div className="space-y-3 animate-fade-in">
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
@@ -311,72 +489,67 @@ export const GroomPhotoUploadModal: React.FC<GroomPhotoUploadModalProps> = ({
             </div>
 
             {/* Live Link Verification & Preview Box */}
-            <div className="flex flex-col items-center justify-center p-3 bg-slate-50 border border-slate-200 rounded-2xl">
-              {currentPreview ? (
-                <div className="relative flex flex-col items-center">
-                  <div className="w-36 h-48 sm:w-40 sm:h-52 rounded-2xl overflow-hidden border-2 border-slate-700 shadow-lg bg-slate-200 flex items-center justify-center relative">
-                    <img
-                      src={currentPreview}
-                      alt="फोटो प्रिव्ह्यू"
-                      className="w-full h-full object-cover object-top"
-                      onLoad={() => setLinkImageStatus('success')}
-                      onError={() => {
-                        setLinkImageStatus('error');
-                        setLinkErrorMessage('गुगल ड्राईव्हवरून फोटो लोड होऊ शकला नाही. कृपया शेअरिंग सेटिंग तपासा.');
-                      }}
-                    />
-                    {linkImageStatus === 'loading' && (
-                      <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-white text-xs gap-1.5">
-                        <Loader2 className="w-6 h-6 animate-spin text-amber-300" />
-                        <span>फोटो तपासत आहे...</span>
-                      </div>
-                    )}
+            {linkDirectUrl && (
+              <div className="flex flex-col items-center justify-center p-3 bg-slate-50 border border-slate-200 rounded-2xl">
+                <div className="w-28 h-36 rounded-xl overflow-hidden border-2 border-slate-700 shadow-md bg-slate-200 relative">
+                  <img
+                    src={linkDirectUrl}
+                    alt="नवीन फोटो प्रिव्ह्यू"
+                    className="w-full h-full object-cover object-top"
+                    onLoad={() => setLinkImageStatus('success')}
+                    onError={() => {
+                      setLinkImageStatus('error');
+                      setLinkErrorMessage('गुगल ड्राईव्हवरून फोटो लोड होऊ शकला नाही. कृपया शेअरिंग सेटिंग तपासा.');
+                    }}
+                  />
+                  {linkImageStatus === 'loading' && (
+                    <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-white text-[11px] gap-1">
+                      <Loader2 className="w-5 h-5 animate-spin text-amber-300" />
+                      <span>तपासत आहे...</span>
+                    </div>
+                  )}
+                </div>
+
+                {linkImageStatus === 'success' && (
+                  <div className="mt-2 inline-flex items-center gap-1 px-3 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-[11px] text-emerald-800 font-bold">
+                    <Check className="w-3 h-3 text-emerald-600" />
+                    <span>{isDriveLink ? 'गुगल ड्राईव्ह फोटो तयार आहे!' : 'वेब इमेज तयार आहे!'}</span>
                   </div>
+                )}
 
-                  {/* Status Badge */}
-                  {linkImageStatus === 'success' && (
-                    <div className="mt-2.5 inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[11px] text-emerald-800 font-bold">
-                      <Check className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>{isDriveLink ? 'गुगल ड्राईव्ह फोटो यशस्वीरित्या लोड झाला!' : 'वेब इमेज लोड झाली!'}</span>
-                    </div>
-                  )}
+                {linkImageStatus === 'error' && (
+                  <div className="mt-2 p-2 bg-amber-50 border border-amber-200 text-amber-900 rounded-xl text-[10.5px] text-center max-w-xs space-y-1">
+                    <p className="font-bold flex items-center justify-center gap-1 text-amber-800">
+                      <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
+                      <span>फोटो लोड होऊ शकला नाही</span>
+                    </p>
+                    <p className="text-amber-700">
+                      {linkErrorMessage || 'Google Drive मधील शेअरिंग पर्याय तपासा.'}
+                    </p>
+                  </div>
+                )}
 
-                  {linkImageStatus === 'error' && (
-                    <div className="mt-2.5 p-2 bg-amber-50 border border-amber-200 text-amber-900 rounded-xl text-[11px] text-center max-w-xs space-y-1">
-                      <p className="font-bold flex items-center justify-center gap-1 text-amber-800">
-                        <AlertCircle className="w-3.5 h-3.5 text-amber-600" />
-                        <span>फोटो लोड होऊ शकला नाही</span>
-                      </p>
-                      <p className="text-[10.5px] text-amber-700">
-                        {linkErrorMessage || 'Google Drive मध्ये फाईलवर उजवे क्लिक करून Share > Anyone with the link (Viewer) असे सेट करा.'}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="py-6 text-center text-slate-400 space-y-1.5">
-                  <Link2 className="w-8 h-8 mx-auto text-slate-300" />
-                  <p className="text-xs font-semibold text-slate-600">
-                    वरील चौकटीत Google Drive लिंक पेस्ट करा
-                  </p>
-                  <p className="text-[11px] text-slate-400">
-                    उदा. https://drive.google.com/file/d/1lLsfQzKYrJWMs8.../view?usp=sharing
-                  </p>
-                </div>
-              )}
-            </div>
+                <button
+                  type="button"
+                  onClick={handleAddDrivePhoto}
+                  disabled={isProcessing || linkImageStatus === 'loading'}
+                  className="mt-3 px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-bold transition-all shadow-md shadow-rose-600/30 flex items-center gap-1.5 cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>➕ हा फोटो गॅलरीमध्ये जोडा</span>
+                </button>
+              </div>
+            )}
 
             {/* Helpful Guide */}
-            <div className="p-3 bg-amber-50/70 border border-amber-200/70 rounded-xl text-[11px] text-amber-900 space-y-1">
+            <div className="p-2.5 bg-amber-50/70 border border-amber-200/70 rounded-xl text-[10.5px] text-amber-900 space-y-0.5">
               <p className="font-bold flex items-center gap-1 text-amber-800">
-                <HelpCircle className="w-3.5 h-3.5 text-amber-700" />
-                <span>Google Drive लिंक कशी मिळवावी?</span>
+                <HelpCircle className="w-3 h-3 text-amber-700" />
+                <span>Google Drive लिंक वापरताना:</span>
               </p>
-              <ol className="list-decimal list-inside space-y-0.5 text-amber-800">
-                <li>Google Drive वर फोटो उघडून <strong>Share (शेअर)</strong> बटनावर टॅप करा.</li>
-                <li>General access मध्ये <strong>"Anyone with the link"</strong> निवडा.</li>
-                <li><strong>"Copy link"</strong> करून ती येथे पेस्ट करा.</li>
-              </ol>
+              <p className="text-amber-800">
+                Google Drive वर फोटोच्या <strong>Share</strong> पर्यायामध्ये <strong>"Anyone with the link can view"</strong> असणे आवश्यक आहे.
+              </p>
             </div>
           </div>
         )}
@@ -389,115 +562,101 @@ export const GroomPhotoUploadModal: React.FC<GroomPhotoUploadModalProps> = ({
               ref={fileInputRef}
               onChange={handleFileChange}
               accept="image/*"
+              multiple
               className="hidden"
             />
 
             <div className="flex flex-col items-center justify-center p-3 bg-slate-50 border border-slate-200 rounded-2xl">
-              {currentPreview ? (
-                <div className="relative group">
-                  <div className="w-36 h-48 sm:w-40 sm:h-52 rounded-2xl overflow-hidden border-2 border-slate-700 shadow-lg bg-slate-100 flex items-center justify-center">
-                    <img
-                      src={currentPreview}
-                      alt="वर फोटो"
-                      className="w-full h-full object-cover object-top"
-                    />
+              {galleryPreviews.length > 0 ? (
+                <div className="w-full space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-700">
+                      निवडलेले नवीन फोटो ({galleryPreviews.length}):
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setGalleryPreviews([])}
+                      className="text-[11px] text-red-600 hover:underline cursor-pointer"
+                    >
+                      साफ करा
+                    </button>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={isProcessing}
-                    className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl flex flex-col items-center justify-center text-white text-xs font-semibold gap-1 cursor-pointer"
-                  >
-                    <Camera className="w-5 h-5" />
-                    <span>फोटो बदला</span>
-                  </button>
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                    {galleryPreviews.map((p, i) => (
+                      <div key={i} className="relative rounded-xl overflow-hidden border border-slate-300 aspect-[3/4] bg-white">
+                        <img src={p.dataUrl} alt={`New ${i}`} className="w-full h-full object-cover object-top" />
+                        <span className="absolute bottom-1 right-1 px-1 rounded bg-black/60 text-white text-[9px]">
+                          {p.sizeKb}KB
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex justify-center gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isProcessing}
+                      className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>आणखी निवडा</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleAddGalleryPhotos}
+                      disabled={isProcessing}
+                      className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-bold transition-all shadow-md shadow-rose-600/30 flex items-center gap-1.5 cursor-pointer"
+                    >
+                      {isProcessing ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>जोडत आहे...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Check className="w-4 h-4" />
+                          <span>➕ हे {galleryPreviews.length} फोटो गॅलरीत जोडा</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="w-36 h-48 sm:w-40 sm:h-52 rounded-2xl border-2 border-dashed border-rose-300 hover:border-rose-500 bg-rose-50/50 hover:bg-rose-50 transition-all flex flex-col items-center justify-center gap-2 cursor-pointer p-4 text-center group"
+                  className="w-full py-8 border-2 border-dashed border-rose-300 hover:border-rose-500 bg-rose-50/50 hover:bg-rose-50 transition-all rounded-2xl flex flex-col items-center justify-center gap-2 cursor-pointer text-center group"
                 >
                   <div className="w-12 h-12 rounded-full bg-rose-100 group-hover:bg-rose-200 text-rose-700 flex items-center justify-center transition-colors">
                     <Upload className="w-6 h-6" />
                   </div>
-                  <span className="text-xs font-bold text-slate-800">फोटो निवडा</span>
-                  <span className="text-[11px] text-slate-500">गॅलरी किंवा कॉम्प्युटरमधून</span>
-                </div>
-              )}
-
-              {fileStats && (
-                <div className="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-[11px] text-emerald-800 font-medium">
-                  <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>
-                    ऑप्टिमाईज्ड: <strong>{fileStats.sizeKb} KB</strong> ({fileStats.width}×{fileStats.height}px)
+                  <span className="text-xs font-bold text-slate-800">
+                    मोबाईल / कॉम्प्युटर गॅलरीतून फोटो निवडा
                   </span>
+                  <span className="text-[11px] text-slate-500">
+                    (एकाच वेळी एकापेक्षा जास्त फोटो निवडू शकता)
+                  </span>
+                  <div className="mt-1 inline-flex items-center gap-1 text-[10px] text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                    <Sparkles className="w-3 h-3 text-emerald-600" />
+                    <span>ऑटोमॅटिक हलक्या WebP फॉरमॅटमध्ये कॉम्प्रेस होतात</span>
+                  </div>
                 </div>
               )}
-            </div>
-
-            <div className="flex justify-center">
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isProcessing}
-                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all flex items-center gap-2 cursor-pointer"
-              >
-                <Upload className="w-4 h-4" />
-                <span>{currentPreview ? 'दुसरा फोटो निवडा' : 'गॅलरी उघडा'}</span>
-              </button>
             </div>
           </div>
         )}
 
-        {/* Action Buttons: Delete vs Save vs Cancel */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-3 border-t border-slate-100">
-          <div>
-            {currentPhoto && (
-              <button
-                type="button"
-                onClick={handleRemove}
-                disabled={isProcessing}
-                className="w-full sm:w-auto px-3.5 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold transition-all flex items-center justify-center gap-1.5 border border-red-200 cursor-pointer"
-                title="फोटो किंवा लिंक काढून टाका"
-              >
-                <Trash2 className="w-4 h-4" />
-                <span>फोटो / लिंक काढून टाका</span>
-              </button>
-            )}
-          </div>
-
-          <div className="flex items-center justify-end gap-2">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={isProcessing}
-              className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 transition-all cursor-pointer"
-            >
-              रद्द करा
-            </button>
-
-            {((activeTab === 'drive' && linkDirectUrl) || (activeTab === 'gallery' && galleryPreview)) && (
-              <button
-                type="button"
-                onClick={handleSave}
-                disabled={isProcessing}
-                className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-bold transition-all shadow-md shadow-rose-600/30 flex items-center justify-center gap-2 cursor-pointer"
-              >
-                {isProcessing ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    <span>सेव्ह होत आहे...</span>
-                  </>
-                ) : (
-                  <>
-                    <Check className="w-4 h-4" />
-                    <span>{activeTab === 'drive' ? 'ही लिंक सेव्ह करा' : 'हा फोटो सेव्ह करा'}</span>
-                  </>
-                )}
-              </button>
-            )}
-          </div>
+        {/* Bottom Done / Close Button */}
+        <div className="pt-2 border-t border-slate-100 flex items-center justify-end">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 active:scale-95 text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+          >
+            पूर्ण झाले (Done)
+          </button>
         </div>
       </div>
     </BottomSheet>
