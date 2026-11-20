@@ -145,12 +145,7 @@ export function buildCandidateProposalMessage(params: CandidateProposalParams = 
     groomLines.push(`• उंची: ${groomHeight}`);
   }
 
-  let footerNote = 'धन्यवाद! 🙏';
-  if (params.includeFamilyFooter !== false) {
-    const footerText =
-      params.familyFooterText || 'खर्चे परिवार (मो. 9420539396 / 9422152231)';
-    footerNote += `\n— ${footerText}`;
-  }
+  const footerNote = 'धन्यवाद! 🙏';
 
   return `नमस्कार!
 
