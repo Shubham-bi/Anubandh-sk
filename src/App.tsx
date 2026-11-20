@@ -219,7 +219,11 @@ export const App: React.FC = () => {
   }, [currentPageView.type]);
 
   const handleSectionChange = (sec: 'portal' | 'booklet' | 'kanban' | 'analytics' | 'groom_profile') => {
-    setNavHistory([]);
+    if (sec === 'groom_profile') {
+      setNavHistory((prev) => [...prev, currentPageView]);
+    } else {
+      setNavHistory([]);
+    }
     startTransition(() => {
       setCurrentPageView({ type: sec });
       setCurrentPage(1);
@@ -749,7 +753,20 @@ export const App: React.FC = () => {
     return (
       <div className="min-h-screen bg-[#eeeae5] selection:bg-rose-500 selection:text-white">
         <GroomProfilePage
-          onBackToPortal={isParentAuth ? () => handleSectionChange('portal') : undefined}
+          onBackToPortal={
+            isParentAuth
+              ? () => {
+                  if (navHistory.length > 0) {
+                    const prev = navHistory[navHistory.length - 1];
+                    if (prev.type === 'booklet' || prev.type === 'booklet_detail') {
+                      navigateBack();
+                      return;
+                    }
+                  }
+                  handleSectionChange('booklet');
+                }
+              : undefined
+          }
           isParentAuthenticated={isParentAuth}
           isAdminAuthenticated={isAdminAuth}
           onAdminLoginRequest={(reason) => triggerAdminPrompt(reason || 'ॲडमिन पासवर्ड आवश्यक आहे.', () => {})}

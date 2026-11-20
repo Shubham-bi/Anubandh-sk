@@ -231,7 +231,7 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-all cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4 text-[#b94c2e]" />
-              <span>वधू स्थळे पहा</span>
+              <span>📖 पुस्तिका पहा</span>
             </button>
           ) : (
             <div className="flex items-center gap-2">

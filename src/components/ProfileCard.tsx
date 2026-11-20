@@ -341,13 +341,13 @@ export const ProfileCardComponent: React.FC<ProfileCardProps> = ({
         <div className="space-y-2">
           {/* Education & Occupation */}
           <div className="flex items-start gap-2 text-xs text-slate-700">
-            <GraduationCap className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
-            <span className="font-semibold truncate">{profile.education}</span>
+            <GraduationCap className="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" />
+            <span className="font-semibold break-words leading-snug">{profile.education}</span>
           </div>
 
           <div className="flex items-start gap-2 text-xs text-slate-700">
             <Briefcase className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
-            <span className="truncate">{profile.occupation}</span>
+            <span className="break-words leading-snug">{profile.occupation}</span>
           </div>
 
           {/* Income & Location */}

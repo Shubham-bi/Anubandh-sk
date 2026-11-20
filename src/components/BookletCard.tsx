@@ -140,7 +140,7 @@ export const BookletCardComponent: React.FC<BookletCardProps> = ({
             {candidate.name.replace(/कु\.?\s*/, '').trim()?.[0] || 'ल'}
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="font-extrabold text-base text-slate-900 tracking-tight leading-snug truncate">
+            <h3 className="font-extrabold text-base text-slate-900 tracking-tight leading-snug break-words">
               {candidate.name}
             </h3>
             <p className="text-xs text-slate-500 font-medium mt-0.5 flex items-center gap-2">
@@ -169,20 +169,20 @@ export const BookletCardComponent: React.FC<BookletCardProps> = ({
           )}
         </div>
 
-        {/* Education & Job excerpt */}
-        <div className="space-y-1.5 text-xs text-slate-700 bg-slate-50 p-2.5 rounded-xl border border-slate-100 mb-3">
+        {/* Education & Job excerpt - Full details displayed */}
+        <div className="space-y-2 text-xs text-slate-700 bg-slate-50 p-2.5 rounded-xl border border-slate-100 mb-3">
           <div className="flex items-start gap-2">
-            <GraduationCap className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
-            <p className="line-clamp-2 leading-relaxed whitespace-pre-line font-medium">
+            <GraduationCap className="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" />
+            <div className="leading-relaxed whitespace-pre-line font-medium text-slate-800 break-words flex-1">
               {candidate.edu}
-            </p>
+            </div>
           </div>
           {candidate.fam && (
-            <div className="flex items-start gap-2 pt-1 border-t border-slate-200/60 text-slate-600">
+            <div className="flex items-start gap-2 pt-1.5 border-t border-slate-200/60 text-slate-600">
               <Users className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
-              <p className="line-clamp-1 truncate font-medium">
+              <div className="font-medium text-[11.5px] leading-relaxed break-words flex-1">
                 {candidate.fam.replace(/\n/g, ' • ')}
-              </p>
+              </div>
             </div>
           )}
         </div>
@@ -223,13 +223,13 @@ export const BookletCardComponent: React.FC<BookletCardProps> = ({
                           {idx + 1}
                         </span>
                         <User className="w-3.5 h-3.5 text-amber-700 flex-shrink-0" />
-                        <span className="truncate">{contact.name}</span>
+                        <span className="break-words">{contact.name}</span>
                       </div>
 
                       {contact.address && (
                         <div className="flex items-start gap-1 text-[11px] text-slate-500 mt-0.5 ml-5">
                           <MapPin className="w-3 h-3 text-slate-400 flex-shrink-0 mt-0.5" />
-                          <span className="line-clamp-1">{contact.address}</span>
+                          <span className="break-words leading-tight">{contact.address}</span>
                         </div>
                       )}
                     </div>
