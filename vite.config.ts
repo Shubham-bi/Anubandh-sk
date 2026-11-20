@@ -22,6 +22,7 @@ export default defineConfig({
         theme_color: '#881337',
         background_color: '#881337',
         display: 'standalone',
+        display_override: ['standalone', 'window-controls-overlay'],
         orientation: 'portrait-primary',
         categories: ['lifestyle', 'social'],
         icons: [
@@ -51,7 +52,7 @@ export default defineConfig({
           },
           {
             src: '/icon.svg',
-            sizes: '512x512',
+            sizes: 'any',
             type: 'image/svg+xml',
             purpose: 'any',
           },
