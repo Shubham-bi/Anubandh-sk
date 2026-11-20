@@ -9,8 +9,7 @@ import {
   X,
   Plus,
   Lock,
-  ShieldCheck,
-  LogOut
+  ShieldCheck
 } from 'lucide-react';
 import { TriageStatus } from '../types/profile';
 
@@ -65,7 +64,6 @@ export const HeaderComponent: React.FC<HeaderProps> = ({
   isAdminAuthenticated = false,
   onAdminLoginRequest,
   onAdminLogout,
-  onParentLogout,
 }) => {
   const tabs: { id: 'all' | TriageStatus; label: string; count: number; color: string; icon?: string }[] = [
     { id: 'all', label: 'All Profiles', count: stats.total, color: 'bg-slate-100 text-slate-700 hover:bg-slate-200' },
@@ -181,52 +179,29 @@ export const HeaderComponent: React.FC<HeaderProps> = ({
               <span className="hidden sm:inline">Export</span>
             </button>
 
-            {/* Admin Section Access Option (Small & Accessible on both Mobile & Web) */}
+            {/* Single Lock Icon for Admin Access */}
             {isAdminAuthenticated ? (
-              <div className="flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-900 text-xs font-bold shadow-xs">
-                <button
-                  type="button"
-                  onClick={() => onSectionChange('kanban')}
-                  className="flex items-center gap-1 hover:text-indigo-700 transition-colors"
-                  title="ॲडमिन पॅनेल (पाईपलाईन) वर जा"
-                >
-                  <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" />
-                  <span>ॲडमिन</span>
-                </button>
-                {onAdminLogout && (
-                  <button
-                    type="button"
-                    onClick={onAdminLogout}
-                    className="p-1 rounded-md hover:bg-indigo-100 text-indigo-700 hover:text-rose-600 transition-colors ml-0.5"
-                    title="ॲडमिन मोडमधून बाहेर पडा (Logout Admin)"
-                  >
-                    <LogOut className="w-3 h-3" />
-                  </button>
-                )}
-              </div>
+              <button
+                type="button"
+                onClick={onAdminLogout}
+                className="p-1.5 sm:p-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition-colors cursor-pointer"
+                title="ॲडमिन मोड सक्रिय आहे (लॉगआउट करण्यासाठी क्लिक करा)"
+                aria-label="Admin Logout"
+              >
+                <ShieldCheck className="w-4 h-4 text-indigo-600" />
+              </button>
             ) : (
               onAdminLoginRequest && (
                 <button
                   type="button"
-                  onClick={() => onAdminLoginRequest('ॲडमिन पॅनेलमध्ये प्रवेश करण्यासाठी पासवर्ड टाका.')}
-                  className="flex items-center gap-1 px-2 sm:px-2.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 transition-colors"
-                  title="ॲडमिन लॉगिन (Admin Login)"
+                  onClick={() => onAdminLoginRequest('ॲडमिन पासवर्ड टाका.')}
+                  className="p-1.5 sm:p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 border border-transparent transition-colors cursor-pointer"
+                  title="ॲडमिन लॉगिन"
+                  aria-label="Admin Login"
                 >
-                  <Lock className="w-3.5 h-3.5 text-slate-500" />
-                  <span>ॲडमिन</span>
+                  <Lock className="w-4 h-4 text-slate-500" />
                 </button>
               )
-            )}
-
-            {/* Parent PIN Lock / Re-lock Button */}
-            {onParentLogout && (
-              <button
-                onClick={onParentLogout}
-                className="p-1.5 sm:p-2 rounded-xl bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 border border-transparent hover:border-rose-200 transition-colors"
-                title="ॲप लॉक करा (Lock App with PIN)"
-              >
-                <Lock className="w-3.5 h-3.5" />
-              </button>
             )}
           </div>
         </div>

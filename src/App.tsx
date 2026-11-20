@@ -42,7 +42,7 @@ import { InstallFloatingBanner } from './components/InstallFloatingBanner';
 import { Toast, ToastMessage } from './components/Toast';
 import { PinLockScreen } from './components/PinLockScreen';
 import { AdminLoginModal } from './components/AdminLoginModal';
-import { isParentSessionValid, isAdminSessionValid, logoutParent, logoutAdmin } from './utils/auth';
+import { isParentSessionValid, isAdminSessionValid, logoutAdmin } from './utils/auth';
 import { ChevronLeft, ChevronRight, Inbox } from 'lucide-react';
 
 const ITEMS_PER_PAGE = 24;
@@ -189,17 +189,6 @@ export const App: React.FC = () => {
     setToast({
       id: String(Date.now()),
       message: 'ॲडमिन मोडमधून बाहेर पडलात.',
-    });
-  };
-
-  const handleParentLogout = () => {
-    logoutParent();
-    logoutAdmin();
-    setIsParentAuth(false);
-    setIsAdminAuth(false);
-    setToast({
-      id: String(Date.now()),
-      message: 'अनुबंध ॲप सुरक्षितपणे लॉक केले आहे.',
     });
   };
 
@@ -924,7 +913,6 @@ export const App: React.FC = () => {
           triggerAdminPrompt(reason || 'ॲडमिन पासवर्ड आवश्यक आहे.', () => {});
         }}
         onAdminLogout={handleAdminLogout}
-        onParentLogout={handleParentLogout}
       />
 
       {/* Main Body */}
