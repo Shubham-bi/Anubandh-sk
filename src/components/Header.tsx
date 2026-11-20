@@ -269,7 +269,20 @@ export const HeaderComponent: React.FC<HeaderProps> = ({
               </span>
             </button>
 
-            {/* 3rd Tab: पाईपलाईन (Admin access not required) */}
+            {/* 3rd Tab: वर परिचय (शुभम खर्चे) */}
+            <button
+              onClick={() => onSectionChange('groom_profile')}
+              className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+                activeSection === 'groom_profile'
+                  ? 'bg-rose-700 text-white shadow-sm shadow-rose-700/30 ring-2 ring-rose-300'
+                  : 'bg-rose-50 text-rose-800 hover:bg-rose-100 border border-rose-200/80 font-black'
+              }`}
+              title="चि. शुभम अनिल खर्चे यांचा विवाह बायोडाटा पहा"
+            >
+              <span>🤵 वर परिचय (शुभम खर्चे)</span>
+            </button>
+
+            {/* 4th Tab: पाईपलाईन (Admin access not required) */}
             <button
               onClick={() => onSectionChange('kanban')}
               className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
@@ -281,7 +294,7 @@ export const HeaderComponent: React.FC<HeaderProps> = ({
               <span>पाईपलाईन</span>
             </button>
 
-            {/* 4th Tab: ॲनालिटिक्स (Admin access not required) */}
+            {/* 5th Tab: ॲनालिटिक्स (Admin access not required) */}
             <button
               onClick={() => onSectionChange('analytics')}
               className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
@@ -291,18 +304,6 @@ export const HeaderComponent: React.FC<HeaderProps> = ({
               }`}
             >
               <span>ॲनालिटिक्स</span>
-            </button>
-
-            <button
-              onClick={() => onSectionChange('groom_profile')}
-              className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
-                activeSection === 'groom_profile'
-                  ? 'bg-rose-700 text-white shadow-sm shadow-rose-700/30 ring-2 ring-rose-300'
-                  : 'bg-rose-50 text-rose-800 hover:bg-rose-100 border border-rose-200/80 font-black'
-              }`}
-              title="चि. शुभम अनिल खर्चे यांचा विवाह बायोडाटा पहा"
-            >
-              <span>🤵 वर परिचय (शुभम खर्चे)</span>
             </button>
           </div>
 
