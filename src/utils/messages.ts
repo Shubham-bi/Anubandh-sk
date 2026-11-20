@@ -33,7 +33,7 @@ export const DEFAULT_GROOM = {
   salary: '7.8 LPA',
   dob: '25/08/1996',
   gotra: 'वशिष्ठ',
-  height: '5\' 6" (5.6 inch)',
+  height: '5\' 6"',
   mobile1: '9420539396',
   mobile2: '9422152231'
 };

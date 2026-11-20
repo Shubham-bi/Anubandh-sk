@@ -190,9 +190,6 @@ export const App: React.FC = () => {
       id: String(Date.now()),
       message: 'ॲडमिन मोडमधून बाहेर पडलात.',
     });
-    if (currentPageView.type === 'kanban' || currentPageView.type === 'analytics') {
-      handleSectionChange('portal');
-    }
   };
 
   const handleParentLogout = () => {
@@ -230,22 +227,6 @@ export const App: React.FC = () => {
   }, [currentPageView.type]);
 
   const handleSectionChange = (sec: 'portal' | 'booklet' | 'kanban' | 'analytics' | 'groom_profile') => {
-    if ((sec === 'kanban' || sec === 'analytics') && !isAdminAuth) {
-      triggerAdminPrompt(
-        sec === 'kanban'
-          ? 'मॅचमेकिंग पाईपलाईन (Kanban) पाहण्यासाठी ॲडमिन पासवर्ड आवश्यक आहे.'
-          : 'ॲनालिटिक्स डॅशबोर्ड पाहण्यासाठी ॲडमिन पासवर्ड आवश्यक आहे.',
-        () => {
-          setNavHistory([]);
-          startTransition(() => {
-            setCurrentPageView({ type: sec });
-            setCurrentPage(1);
-          });
-        }
-      );
-      return;
-    }
-
     setNavHistory([]);
     startTransition(() => {
       setCurrentPageView({ type: sec });

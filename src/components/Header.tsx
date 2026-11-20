@@ -294,46 +294,28 @@ export const HeaderComponent: React.FC<HeaderProps> = ({
               </span>
             </button>
 
-            {/* 3rd Tab: पाईपलाईन (Clean name & icon) */}
+            {/* 3rd Tab: पाईपलाईन (Admin access not required) */}
             <button
-              onClick={() => {
-                if (!isAdminAuthenticated && onAdminLoginRequest) {
-                  onAdminLoginRequest('मॅचमेकिंग पाईपलाईन पाहण्यासाठी ॲडमिन पासवर्ड आवश्यक आहे.');
-                } else {
-                  onSectionChange('kanban');
-                }
-              }}
-              className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+              onClick={() => onSectionChange('kanban')}
+              className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
                 activeSection === 'kanban'
                   ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/30'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
               <span>पाईपलाईन</span>
-              {!isAdminAuthenticated && (
-                <Lock className="w-3 h-3 text-slate-400" />
-              )}
             </button>
 
-            {/* 4th Tab: ॲनालिटिक्स (Clean name & icon) */}
+            {/* 4th Tab: ॲनालिटिक्स (Admin access not required) */}
             <button
-              onClick={() => {
-                if (!isAdminAuthenticated && onAdminLoginRequest) {
-                  onAdminLoginRequest('ॲनालिटिक्स डॅशबोर्ड पाहण्यासाठी ॲडमिन पासवर्ड आवश्यक आहे.');
-                } else {
-                  onSectionChange('analytics');
-                }
-              }}
-              className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+              onClick={() => onSectionChange('analytics')}
+              className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
                 activeSection === 'analytics'
                   ? 'bg-purple-600 text-white shadow-sm shadow-purple-600/30'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
               <span>ॲनालिटिक्स</span>
-              {!isAdminAuthenticated && (
-                <Lock className="w-3 h-3 text-slate-400" />
-              )}
             </button>
 
             <button
