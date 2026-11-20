@@ -234,42 +234,42 @@ export const BookletCardComponent: React.FC<BookletCardProps> = ({
                       )}
                     </div>
 
-                    {/* Phone & Direct Action Buttons */}
+                    {/* Phone & Direct Action Buttons (Icon Only to Prevent Overflow) */}
                     {contact.phoneClean && (
                       <div className="flex items-center justify-between gap-1.5 pt-1.5 border-t border-slate-100">
                         <a
                           href={callLink || '#'}
                           onClick={(e) => e.stopPropagation()}
-                          className="font-mono text-xs font-bold text-slate-800 hover:text-blue-600 flex items-center gap-1 tracking-wide"
+                          className="font-mono text-xs font-bold text-slate-800 hover:text-blue-600 flex items-center gap-1 tracking-wide truncate"
                           title="कॉल करा"
                         >
-                          <Phone className="w-3 h-3 text-slate-400" />
+                          <Phone className="w-3 h-3 text-slate-400 flex-shrink-0" />
                           <span>{contact.phoneClean}</span>
                         </a>
 
-                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                        <div className="flex items-center gap-1 flex-shrink-0">
                           {waLink && (
                             <a
                               href={waLink}
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={(e) => e.stopPropagation()}
-                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold shadow-xs transition-colors"
+                              className="w-7 h-7 rounded-lg bg-emerald-600 hover:bg-emerald-700 active:scale-90 text-white flex items-center justify-center shadow-xs transition-all"
                               title="WhatsApp वर मेसेज करा"
+                              aria-label="WhatsApp"
                             >
-                              <MessageCircle className="w-3 h-3" />
-                              <span>WhatsApp</span>
+                              <MessageCircle className="w-3.5 h-3.5" />
                             </a>
                           )}
                           {callLink && (
                             <a
                               href={callLink}
                               onClick={(e) => e.stopPropagation()}
-                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-[11px] font-bold shadow-xs transition-colors"
+                              className="w-7 h-7 rounded-lg bg-blue-600 hover:bg-blue-700 active:scale-90 text-white flex items-center justify-center shadow-xs transition-all"
                               title="थेट कॉल करा"
+                              aria-label="Call"
                             >
-                              <Phone className="w-3 h-3" />
-                              <span>Call</span>
+                              <Phone className="w-3.5 h-3.5" />
                             </a>
                           )}
                         </div>

@@ -260,6 +260,26 @@ export const HeaderComponent: React.FC<HeaderProps> = ({
         {/* Section Switcher Tabs */}
         <div className="flex items-center gap-2 pt-2 pb-1.5 overflow-x-auto thin-scrollbar border-t border-slate-100">
           <div className="flex items-center gap-2 flex-shrink-0">
+            {/* 1st Tab: पुस्तिका */}
+            <button
+              onClick={() => onSectionChange('booklet')}
+              className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+                activeSection === 'booklet'
+                  ? 'bg-amber-600 text-white shadow-sm shadow-amber-600/30'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              <span>📖 पुस्तिका</span>
+              <span
+                className={`px-1.5 py-0.2 rounded-full text-[10px] ${
+                  activeSection === 'booklet' ? 'bg-white/25 text-white' : 'bg-black/10 text-slate-700'
+                }`}
+              >
+                {bookletCount}
+              </span>
+            </button>
+
+            {/* 2nd Tab: पोर्टल प्रोफाईल्स */}
             <button
               onClick={() => onSectionChange('portal')}
               className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
@@ -275,24 +295,6 @@ export const HeaderComponent: React.FC<HeaderProps> = ({
                 }`}
               >
                 {portalCount}
-              </span>
-            </button>
-
-            <button
-              onClick={() => onSectionChange('booklet')}
-              className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
-                activeSection === 'booklet'
-                  ? 'bg-amber-600 text-white shadow-sm shadow-amber-600/30'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
-            >
-              <span>📖 मेळावा / पुस्तिका</span>
-              <span
-                className={`px-1.5 py-0.2 rounded-full text-[10px] ${
-                  activeSection === 'booklet' ? 'bg-white/25 text-white' : 'bg-black/10 text-slate-700'
-                }`}
-              >
-                {bookletCount}
               </span>
             </button>
 

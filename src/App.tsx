@@ -85,7 +85,7 @@ export const App: React.FC = () => {
         return { type: 'groom_profile' };
       }
     }
-    return { type: 'portal' };
+    return { type: 'booklet' };
   });
 
   const [navHistory, setNavHistory] = useState<PageView[]>([]);
@@ -144,7 +144,7 @@ export const App: React.FC = () => {
       window.scrollTo({ top: 0, behavior: 'instant' });
     } else {
       startTransition(() => {
-        setCurrentPageView({ type: 'portal' });
+        setCurrentPageView({ type: 'booklet' });
       });
     }
   };
@@ -163,7 +163,7 @@ export const App: React.FC = () => {
         setNavHistory((h) => h.slice(0, -1));
         setCurrentPageView(prev);
       } else {
-        setCurrentPageView({ type: 'portal' });
+        setCurrentPageView({ type: 'booklet' });
       }
     };
     window.addEventListener('popstate', handlePopState);
