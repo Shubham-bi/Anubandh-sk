@@ -4,6 +4,12 @@ import { BookletCandidate } from '../types/candidate';
 import { PipelineStage, CallLogEntry } from '../types/pipeline';
 import cleanProfilesData from '../data/profiles_clean.json';
 import candidatesData from '../data/candidates.json';
+import {
+  pushPortalInteractionToCloud,
+  pushBookletInteractionToCloud,
+  pushBookletCandidateToCloud,
+  deleteBookletCandidateFromCloud
+} from '../services/cloudSync';
 
 export class LSMDatabase extends Dexie {
   profiles!: Table<Profile, string>;
@@ -65,6 +71,7 @@ export async function updateProfileStatus(nu_id: string, status: TriageStatus): 
     updatedAt: Date.now()
   };
   await db.interactions.put(updated);
+  pushPortalInteractionToCloud(updated);
 }
 
 export async function updateProfileNotes(nu_id: string, notes: string): Promise<void> {
@@ -78,6 +85,7 @@ export async function updateProfileNotes(nu_id: string, notes: string): Promise<
     updatedAt: Date.now()
   };
   await db.interactions.put(updated);
+  pushPortalInteractionToCloud(updated);
 }
 
 export async function updateProfileRating(nu_id: string, rating: number): Promise<void> {
@@ -91,6 +99,7 @@ export async function updateProfileRating(nu_id: string, rating: number): Promis
     updatedAt: Date.now()
   };
   await db.interactions.put(updated);
+  pushPortalInteractionToCloud(updated);
 }
 
 export async function addProfileTag(nu_id: string, tag: string): Promise<void> {
@@ -99,25 +108,29 @@ export async function addProfileTag(nu_id: string, tag: string): Promise<void> {
   const existing = await db.interactions.get(nu_id);
   const currentTags = existing?.tags || [];
   if (!currentTags.includes(cleanTag)) {
-    await db.interactions.put({
+    const updated: ProfileInteraction = {
       nu_id,
       status: existing?.status || 'default',
       notes: existing?.notes || '',
       tags: [...currentTags, cleanTag],
       rating: existing?.rating || 0,
       updatedAt: Date.now()
-    });
+    };
+    await db.interactions.put(updated);
+    pushPortalInteractionToCloud(updated);
   }
 }
 
 export async function removeProfileTag(nu_id: string, tag: string): Promise<void> {
   const existing = await db.interactions.get(nu_id);
   if (!existing) return;
-  await db.interactions.put({
+  const updated: ProfileInteraction = {
     ...existing,
     tags: (existing.tags || []).filter(t => t !== tag),
     updatedAt: Date.now()
-  });
+  };
+  await db.interactions.put(updated);
+  pushPortalInteractionToCloud(updated);
 }
 
 // Booklet candidate interactions
@@ -132,6 +145,7 @@ export async function updateBookletStatus(id: string, status: TriageStatus): Pro
     updatedAt: Date.now()
   };
   await db.booklet_interactions.put(updated);
+  pushBookletInteractionToCloud(updated);
 }
 
 export async function updateBookletNotes(id: string, notes: string): Promise<void> {
@@ -145,6 +159,7 @@ export async function updateBookletNotes(id: string, notes: string): Promise<voi
     updatedAt: Date.now()
   };
   await db.booklet_interactions.put(updated);
+  pushBookletInteractionToCloud(updated);
 }
 
 export async function updateBookletRating(id: string, rating: number): Promise<void> {
@@ -158,6 +173,7 @@ export async function updateBookletRating(id: string, rating: number): Promise<v
     updatedAt: Date.now()
   };
   await db.booklet_interactions.put(updated);
+  pushBookletInteractionToCloud(updated);
 }
 
 export async function addBookletTag(id: string, tag: string): Promise<void> {
@@ -166,25 +182,29 @@ export async function addBookletTag(id: string, tag: string): Promise<void> {
   const existing = await db.booklet_interactions.get(id);
   const currentTags = existing?.tags || [];
   if (!currentTags.includes(cleanTag)) {
-    await db.booklet_interactions.put({
+    const updated: ProfileInteraction = {
       nu_id: id,
       status: existing?.status || 'default',
       notes: existing?.notes || '',
       tags: [...currentTags, cleanTag],
       rating: existing?.rating || 0,
       updatedAt: Date.now()
-    });
+    };
+    await db.booklet_interactions.put(updated);
+    pushBookletInteractionToCloud(updated);
   }
 }
 
 export async function removeBookletTag(id: string, tag: string): Promise<void> {
   const existing = await db.booklet_interactions.get(id);
   if (!existing) return;
-  await db.booklet_interactions.put({
+  const updated: ProfileInteraction = {
     ...existing,
     tags: (existing.tags || []).filter(t => t !== tag),
     updatedAt: Date.now()
-  });
+  };
+  await db.booklet_interactions.put(updated);
+  pushBookletInteractionToCloud(updated);
 }
 
 // Comparison
@@ -210,15 +230,18 @@ export async function clearComparison(): Promise<void> {
 // Candidate CRUD
 export async function addBookletCandidate(candidate: BookletCandidate): Promise<void> {
   await db.booklet_candidates.put(candidate);
+  pushBookletCandidateToCloud(candidate);
 }
 
 export async function updateBookletCandidate(candidate: BookletCandidate): Promise<void> {
   await db.booklet_candidates.put(candidate);
+  pushBookletCandidateToCloud(candidate);
 }
 
 export async function deleteBookletCandidate(id: string): Promise<void> {
   await db.booklet_candidates.delete(id);
   await db.booklet_interactions.delete(id);
+  deleteBookletCandidateFromCloud(id);
 }
 
 export async function updatePortalProfile(profile: Profile): Promise<void> {
@@ -257,6 +280,11 @@ export async function updatePipelineStage(
     updatedAt: Date.now()
   };
   await table.put(updated);
+  if (isBooklet) {
+    pushBookletInteractionToCloud(updated);
+  } else {
+    pushPortalInteractionToCloud(updated);
+  }
 }
 
 export async function addCallLog(
@@ -278,7 +306,7 @@ export async function addCallLog(
     contactPerson
   };
 
-  await table.put({
+  const updated: ProfileInteraction = {
     nu_id: id,
     status: existing?.status || 'default',
     stage: stage,
@@ -287,5 +315,12 @@ export async function addCallLog(
     rating: existing?.rating || 0,
     logs: [newLog, ...currentLogs],
     updatedAt: Date.now()
-  });
+  };
+
+  await table.put(updated);
+  if (isBooklet) {
+    pushBookletInteractionToCloud(updated);
+  } else {
+    pushPortalInteractionToCloud(updated);
+  }
 }

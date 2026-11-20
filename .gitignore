@@ -36,3 +36,5 @@ coverage
 *.lcov
 .nyc_output
 .eslintcache
+
+.env

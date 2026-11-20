@@ -23,6 +23,7 @@ import {
 import { Profile, ProfileInteraction, FilterState, TriageStatus } from './types/profile';
 import { BookletCandidate, marathiToAscii } from './types/candidate';
 import { PipelineStage } from './types/pipeline';
+import { initCloudSync, subscribeSyncStatus } from './services/cloudSync';
 import { Header } from './components/Header';
 import { FilterSidebar } from './components/FilterSidebar';
 import { ProfileCard } from './components/ProfileCard';
@@ -326,15 +327,25 @@ export const App: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'compact'>('grid');
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [toast, setToast] = useState<ToastMessage | null>(null);
+  const [syncStatus, setSyncStatus] = useState<'connected' | 'connecting' | 'offline' | 'error'>('connecting');
 
-  // Initialize DB
+  // Initialize DB & Cloud Sync
   useEffect(() => {
+    const unsub = subscribeSyncStatus((status) => {
+      setSyncStatus(status);
+    });
+
     initDatabase()
-      .then(() => setIsDbReady(true))
+      .then(() => {
+        setIsDbReady(true);
+        initCloudSync();
+      })
       .catch((err) => {
         console.error('Failed to init IndexedDB:', err);
         setDbError(err.message);
       });
+
+    return () => unsub();
   }, []);
 
   // Live Queries from Dexie
@@ -911,6 +922,7 @@ export const App: React.FC = () => {
           triggerAdminPrompt(reason || 'ॲडमिन पासवर्ड आवश्यक आहे.', () => {});
         }}
         onAdminLogout={handleAdminLogout}
+        syncStatus={syncStatus}
       />
 
       {/* Main Body */}

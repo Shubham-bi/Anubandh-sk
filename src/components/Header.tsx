@@ -9,7 +9,9 @@ import {
   X,
   Plus,
   Lock,
-  ShieldCheck
+  ShieldCheck,
+  Cloud,
+  CloudOff
 } from 'lucide-react';
 import { TriageStatus } from '../types/profile';
 
@@ -42,6 +44,7 @@ interface HeaderProps {
   onAdminLoginRequest?: (reason?: string) => void;
   onAdminLogout?: () => void;
   onParentLogout?: () => void;
+  syncStatus?: 'connected' | 'connecting' | 'offline' | 'error';
 }
 
 export const HeaderComponent: React.FC<HeaderProps> = ({
@@ -64,6 +67,7 @@ export const HeaderComponent: React.FC<HeaderProps> = ({
   isAdminAuthenticated = false,
   onAdminLoginRequest,
   onAdminLogout,
+  syncStatus = 'connecting',
 }) => {
   const tabs: { id: 'all' | TriageStatus; label: string; count: number; color: string; icon?: string }[] = [
     { id: 'all', label: 'All Profiles', count: stats.total, color: 'bg-slate-100 text-slate-700 hover:bg-slate-200' },
@@ -168,6 +172,35 @@ export const HeaderComponent: React.FC<HeaderProps> = ({
                 {comparisonCount}
               </span>
             </button>
+
+            {/* Cloud Sync Status */}
+            {syncStatus === 'connected' && (
+              <div
+                className="flex items-center gap-1 px-2 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80 cursor-default"
+                title="क्लाउड रिअल-टाईम सिंक सक्रिय आहे (Firebase Realtime Database Connected)"
+              >
+                <Cloud className="w-3.5 h-3.5 text-emerald-600" />
+                <span className="hidden md:inline">सिंक्ड</span>
+              </div>
+            )}
+            {syncStatus === 'connecting' && (
+              <div
+                className="flex items-center gap-1 px-2 py-1.5 rounded-xl text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200/80 cursor-default"
+                title="क्लाउडशी जोडणी होत आहे..."
+              >
+                <Cloud className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
+                <span className="hidden md:inline">जोडत आहे</span>
+              </div>
+            )}
+            {syncStatus === 'offline' && (
+              <div
+                className="flex items-center gap-1 px-2 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 text-slate-500 border border-slate-200 cursor-default"
+                title="ऑफलाईन मोड (इंटरनेट उपलब्ध झाल्यावर आपोआप सिंक होईल)"
+              >
+                <CloudOff className="w-3.5 h-3.5 text-slate-400" />
+                <span className="hidden md:inline">ऑफलाईन</span>
+              </div>
+            )}
 
             {/* Export Button */}
             <button
