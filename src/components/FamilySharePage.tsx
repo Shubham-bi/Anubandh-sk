@@ -401,13 +401,13 @@ export const FamilySharePage: React.FC<FamilySharePageProps> = ({
               >
                 {/* Traditional Auspicious Header */}
                 <div className="text-center pb-3 border-b-2 border-rose-600/30">
-                  <p className="text-xs font-serif font-black text-rose-800 tracking-wider">
+                  <p className="text-sm font-serif font-black text-rose-800 tracking-wider">
                     ॥ श्री गणेशाय नमः ॥
                   </p>
                   <h3 className="text-xl sm:text-2xl font-black text-slate-900 mt-1 font-serif">
                     लेवा शुभ मंगल - कौटुंबिक चर्चा पत्रिका
                   </h3>
-                  <p className="text-[11px] text-slate-500 font-medium">
+                  <p className="text-xs sm:text-sm text-slate-500 font-medium">
                     {item.isBooklet ? 'मेळावा नोंदणी पुस्तिका' : 'ऑनलाइन पोर्टल नोंदणी'}
                     {item.srNo ? ` • अनु. क्र. ${item.srNo}` : ''}
                   </p>
@@ -428,13 +428,13 @@ export const FamilySharePage: React.FC<FamilySharePageProps> = ({
                       </div>
                     )}
                     <div>
-                      <h4 className="text-lg sm:text-xl font-black text-slate-900 tracking-tight">
+                      <h4 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
                         {item.name}
                       </h4>
-                      <p className="text-xs text-rose-800 font-bold mt-0.5">
+                      <p className="text-sm sm:text-base text-rose-800 font-bold mt-0.5">
                         वय: {item.age} वर्षे • उंची: {item.height} {item.blood ? `• रक्तगट: ${item.blood}` : ''}
                       </p>
-                      <p className="text-xs text-slate-700 font-semibold mt-0.5">
+                      <p className="text-sm sm:text-base text-slate-700 font-semibold mt-0.5">
                         गोत्र: <span className="text-rose-700 font-bold">{item.gotra}</span>
                         {item.mamkul ? ` • मामकूळ: ${item.mamkul}` : ''}
                       </p>
@@ -442,27 +442,27 @@ export const FamilySharePage: React.FC<FamilySharePageProps> = ({
                   </div>
 
                   <div className="text-left sm:text-right flex-shrink-0 bg-white/80 sm:bg-transparent p-2.5 sm:p-0 rounded-xl border border-rose-100 sm:border-0 w-full sm:w-auto">
-                    <span className="text-[11px] font-bold text-slate-400 block">मुळगाव / शहर</span>
-                    <span className="text-sm font-black text-slate-800 flex items-center gap-1 sm:justify-end">
-                      <MapPin className="w-3.5 h-3.5 text-rose-600" />
+                    <span className="text-xs sm:text-sm font-bold text-slate-500 block">मुळगाव / शहर</span>
+                    <span className="text-sm sm:text-base font-black text-slate-800 flex items-center gap-1 sm:justify-end">
+                      <MapPin className="w-4 h-4 text-rose-600 flex-shrink-0" />
                       {item.mulgaon || item.city}
                     </span>
                   </div>
                 </div>
 
                 {/* Key Details 2-Column Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-sm sm:text-base">
                   {/* Education & Occupation */}
                   <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1.5">
-                    <span className="font-bold text-slate-700 flex items-center gap-1 text-[11px] uppercase tracking-wider">
-                      <GraduationCap className="w-3.5 h-3.5 text-rose-600" />
+                    <span className="font-bold text-slate-700 flex items-center gap-1 text-xs sm:text-sm uppercase tracking-wider">
+                      <GraduationCap className="w-4 h-4 text-rose-600 flex-shrink-0" />
                       शिक्षण व व्यवसाय
                     </span>
-                    <p className="font-bold text-slate-900 text-xs sm:text-sm whitespace-pre-line leading-snug">
+                    <p className="font-bold text-slate-900 text-sm sm:text-base whitespace-pre-line leading-snug">
                       {item.education}
                     </p>
                     {item.occupation && (
-                      <p className="text-slate-600 font-medium pt-1 border-t border-slate-200">
+                      <p className="text-slate-700 font-medium pt-1 border-t border-slate-200">
                         {item.occupation} {item.income ? `• ${item.income}` : ''}
                       </p>
                     )}
@@ -470,11 +470,11 @@ export const FamilySharePage: React.FC<FamilySharePageProps> = ({
 
                   {/* Birth Details */}
                   <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1.5">
-                    <span className="font-bold text-slate-700 flex items-center gap-1 text-[11px] uppercase tracking-wider">
-                      <Calendar className="w-3.5 h-3.5 text-rose-600" />
+                    <span className="font-bold text-slate-700 flex items-center gap-1 text-xs sm:text-sm uppercase tracking-wider">
+                      <Calendar className="w-4 h-4 text-rose-600 flex-shrink-0" />
                       जन्म तपशील
                     </span>
-                    <div className="space-y-0.5 text-slate-800">
+                    <div className="space-y-0.5 text-slate-800 text-sm sm:text-base">
                       <p className="font-semibold">तारीख: {item.birthDate || 'माहिती उपलब्ध नाही'}</p>
                       <p className="font-semibold">वेळ: {item.birthTime || 'माहिती उपलब्ध नाही'}</p>
                       {item.birthPlace && <p className="text-slate-600">ठिकाण: {item.birthPlace}</p>}
@@ -484,9 +484,9 @@ export const FamilySharePage: React.FC<FamilySharePageProps> = ({
 
                 {/* Family Details */}
                 {item.family && (
-                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1.5 text-xs">
-                    <span className="font-bold text-slate-700 flex items-center gap-1 text-[11px] uppercase tracking-wider">
-                      <Users className="w-3.5 h-3.5 text-rose-600" />
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1.5 text-sm sm:text-base">
+                    <span className="font-bold text-slate-700 flex items-center gap-1 text-xs sm:text-sm uppercase tracking-wider">
+                      <Users className="w-4 h-4 text-rose-600 flex-shrink-0" />
                       कौटुंबिक माहिती
                     </span>
                     <p className="text-slate-800 font-medium whitespace-pre-line leading-relaxed">
@@ -497,18 +497,18 @@ export const FamilySharePage: React.FC<FamilySharePageProps> = ({
 
                 {/* Contact Information (if enabled) */}
                 {includeContacts && item.contacts.length > 0 && (
-                  <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/90 space-y-2 text-xs">
-                    <span className="font-bold text-amber-950 flex items-center gap-1 text-[11px] uppercase tracking-wider">
-                      <Phone className="w-3.5 h-3.5 text-amber-700" />
+                  <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/90 space-y-2 text-sm sm:text-base">
+                    <span className="font-bold text-amber-950 flex items-center gap-1 text-xs sm:text-sm uppercase tracking-wider">
+                      <Phone className="w-4 h-4 text-amber-700 flex-shrink-0" />
                       पालक व संपर्क पत्ते
                     </span>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {item.contacts.map((c, cIdx) => (
                         <div key={cIdx} className="p-2.5 rounded-xl bg-white border border-amber-200/80 space-y-1">
-                          <p className="font-bold text-slate-900">{c.name}</p>
-                          {c.address && <p className="text-slate-600 text-[11px]">{c.address}</p>}
+                          <p className="font-bold text-slate-900 text-sm sm:text-base">{c.name}</p>
+                          {c.address && <p className="text-slate-600 text-xs sm:text-sm">{c.address}</p>}
                           {c.phone && (
-                            <p className="text-rose-700 font-mono font-bold text-xs flex items-center gap-1">
+                            <p className="text-rose-700 font-mono font-bold text-sm sm:text-base flex items-center gap-1">
                               📞 {c.phone}
                             </p>
                           )}

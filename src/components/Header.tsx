@@ -91,9 +91,9 @@ export const HeaderComponent: React.FC<HeaderProps> = ({
             />
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 min-w-0">
-                <span className="font-extrabold text-sm sm:text-lg text-slate-900 tracking-tight truncate">अनुबंध</span>
+                <span className="font-black text-base sm:text-xl text-slate-900 tracking-tight truncate">अनुबंध</span>
               </div>
-              <p className="text-[11px] text-slate-500 hidden sm:block font-medium truncate">
+              <p className="text-xs sm:text-sm text-slate-500 hidden sm:block font-medium truncate">
                 दोन मनांचे आणि दोन घराण्यांचे रेशीमबंध • <span className="text-slate-600 font-semibold">Created by Shubham Kharche</span>
               </p>
             </div>
@@ -159,16 +159,16 @@ export const HeaderComponent: React.FC<HeaderProps> = ({
             <button
               onClick={onOpenComparison}
               disabled={comparisonCount === 0}
-              className={`flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs font-semibold transition-all ${
+              className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
                 comparisonCount > 0
                   ? 'bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200'
                   : 'bg-slate-100 text-slate-400 opacity-60 cursor-not-allowed'
               }`}
               title="Compare Selected Profiles"
             >
-              <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+              <Sparkles className="w-4 h-4 text-purple-600" />
               <span className="hidden md:inline">Compare</span>
-              <span className="bg-purple-600 text-white rounded-full px-1.5 py-0.2 text-[10px] font-bold">
+              <span className="bg-purple-600 text-white rounded-full px-2 py-0.5 text-xs font-bold">
                 {comparisonCount}
               </span>
             </button>
@@ -267,16 +267,16 @@ export const HeaderComponent: React.FC<HeaderProps> = ({
             {/* 1st Tab: पुस्तिका */}
             <button
               onClick={() => onSectionChange('booklet')}
-              className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+              className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${
                 activeSection === 'booklet'
                   ? 'bg-amber-600 text-white shadow-sm shadow-amber-600/30'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
               <span>📖 पुस्तिका</span>
               <span
-                className={`px-1.5 py-0.2 rounded-full text-[10px] ${
-                  activeSection === 'booklet' ? 'bg-white/25 text-white' : 'bg-black/10 text-slate-700'
+                className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                  activeSection === 'booklet' ? 'bg-white/25 text-white' : 'bg-black/10 text-slate-800'
                 }`}
               >
                 {bookletCount}
@@ -286,16 +286,16 @@ export const HeaderComponent: React.FC<HeaderProps> = ({
             {/* 2nd Tab: पोर्टल प्रोफाईल्स */}
             <button
               onClick={() => onSectionChange('portal')}
-              className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+              className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${
                 activeSection === 'portal'
                   ? 'bg-rose-600 text-white shadow-sm shadow-rose-600/30'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
               <span>🌐 पोर्टल प्रोफाईल्स</span>
               <span
-                className={`px-1.5 py-0.2 rounded-full text-[10px] ${
-                  activeSection === 'portal' ? 'bg-white/25 text-white' : 'bg-black/10 text-slate-700'
+                className={`px-2 py-0.5 rounded-full text-xs font-bold ${
+                  activeSection === 'portal' ? 'bg-white/25 text-white' : 'bg-black/10 text-slate-800'
                 }`}
               >
                 {portalCount}
@@ -305,7 +305,7 @@ export const HeaderComponent: React.FC<HeaderProps> = ({
             {/* 3rd Tab: वर परिचय (शुभम खर्चे) */}
             <button
               onClick={() => onSectionChange('groom_profile')}
-              className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap ${
+              className={`flex-shrink-0 flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all whitespace-nowrap ${
                 activeSection === 'groom_profile'
                   ? 'bg-rose-700 text-white shadow-sm shadow-rose-700/30 ring-2 ring-rose-300'
                   : 'bg-rose-50 text-rose-800 hover:bg-rose-100 border border-rose-200/80 font-black'

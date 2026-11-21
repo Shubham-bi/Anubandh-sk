@@ -86,11 +86,11 @@ export const BookletCardComponent: React.FC<BookletCardProps> = ({
       <div>
         {/* Top Badges & Serial */}
         <div className="flex items-center justify-between gap-2 mb-3">
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs font-bold px-2 py-0.5 rounded-lg bg-rose-50 text-rose-700 border border-rose-200">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-extrabold px-2.5 py-0.5 rounded-lg bg-rose-50 text-rose-800 border border-rose-200">
               {candidate.sr || candidate.id}
             </span>
-            <span className="text-[11px] font-semibold text-slate-500">
+            <span className="text-xs sm:text-sm font-bold text-slate-600">
               {candidate.mulgaon}
             </span>
           </div>
@@ -98,23 +98,23 @@ export const BookletCardComponent: React.FC<BookletCardProps> = ({
           <div className="flex items-center gap-1.5">
             {/* Status Badge */}
             {status === 'shortlisted' && (
-              <span className="bg-emerald-50 text-emerald-700 border border-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                <CheckCircle className="w-3 h-3 text-emerald-600" /> Shortlisted
+              <span className="bg-emerald-50 text-emerald-800 border border-emerald-300 text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                <CheckCircle className="w-3.5 h-3.5 text-emerald-600" /> Shortlisted
               </span>
             )}
             {status === 'review' && (
-              <span className="bg-amber-50 text-amber-700 border border-amber-300 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                <Clock className="w-3 h-3 text-amber-600" /> Review
+              <span className="bg-amber-50 text-amber-800 border border-amber-300 text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5 text-amber-600" /> Review
               </span>
             )}
             {status === 'contacted' && (
-              <span className="bg-blue-50 text-blue-700 border border-blue-300 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                <Phone className="w-3 h-3 text-blue-600" /> Called
+              <span className="bg-blue-50 text-blue-800 border border-blue-300 text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                <Phone className="w-3.5 h-3.5 text-blue-600" /> Called
               </span>
             )}
             {status === 'not_interested' && (
-              <span className="bg-rose-50 text-rose-700 border border-rose-300 text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                <XCircle className="w-3 h-3 text-rose-600" /> Not Interested
+              <span className="bg-rose-50 text-rose-800 border border-rose-300 text-xs font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                <XCircle className="w-3.5 h-3.5 text-rose-600" /> Not Interested
               </span>
             )}
 
@@ -125,10 +125,10 @@ export const BookletCardComponent: React.FC<BookletCardProps> = ({
                   e.stopPropagation();
                   onShareFamily(candidate);
                 }}
-                className="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 border border-transparent hover:border-rose-200 transition-colors"
+                className="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-700 border border-transparent hover:border-rose-200 transition-colors"
                 title="कौटुंबिक पत्रिका / WhatsApp वर शेअर करा"
               >
-                <Share2 className="w-3.5 h-3.5" />
+                <Share2 className="w-4 h-4" />
               </button>
             )}
           </div>
@@ -136,21 +136,21 @@ export const BookletCardComponent: React.FC<BookletCardProps> = ({
 
         {/* Candidate Avatar & Name */}
         <div className="flex items-start gap-3 mb-3">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-rose-600 text-white font-extrabold text-lg flex items-center justify-center flex-shrink-0 shadow-md shadow-rose-600/20">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-rose-600 text-white font-black text-xl flex items-center justify-center flex-shrink-0 shadow-sm">
             {candidate.name.replace(/कु\.?\s*/, '').trim()?.[0] || 'ल'}
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="font-extrabold text-base text-slate-900 tracking-tight leading-snug break-words">
+            <h3 className="font-black text-lg sm:text-xl text-slate-900 tracking-tight leading-snug break-words">
               {candidate.name}
             </h3>
-            <p className="text-xs text-slate-500 font-medium mt-0.5 flex items-center gap-2">
-              <span className="font-bold text-slate-800">{candidate.age} वर्षे</span>
+            <p className="text-xs sm:text-sm text-slate-600 font-semibold mt-0.5 flex flex-wrap items-center gap-1.5">
+              <span className="font-bold text-slate-900">{candidate.age} वर्षे</span>
               <span>•</span>
               <span>उंची: {candidate.height}</span>
               {candidate.blood && (
                 <>
                   <span>•</span>
-                  <span className="text-rose-600 font-bold">{candidate.blood}</span>
+                  <span className="text-rose-700 font-bold">{candidate.blood}</span>
                 </>
               )}
             </p>
@@ -158,29 +158,29 @@ export const BookletCardComponent: React.FC<BookletCardProps> = ({
         </div>
 
         {/* Gotra & Mamkul Chips */}
-        <div className="flex flex-wrap items-center gap-1.5 mb-3 text-xs">
-          <span className="px-2 py-0.5 rounded-md bg-rose-50 text-rose-800 font-bold border border-rose-100">
+        <div className="flex flex-wrap items-center gap-1.5 mb-3 text-xs sm:text-sm">
+          <span className="px-2.5 py-1 rounded-md bg-rose-50 text-rose-800 font-bold border border-rose-100">
             गोत्र: {candidate.gotra}
           </span>
           {candidate.mamkul && (
-            <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-semibold">
+            <span className="px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 font-semibold">
               मामकूळ: {candidate.mamkul}
             </span>
           )}
         </div>
 
         {/* Education & Job excerpt - Full details displayed */}
-        <div className="space-y-2 text-xs text-slate-700 bg-slate-50 p-2.5 rounded-xl border border-slate-100 mb-3">
+        <div className="space-y-2 text-sm sm:text-base text-slate-800 bg-slate-50 p-3 rounded-xl border border-slate-100 mb-3">
           <div className="flex items-start gap-2">
-            <GraduationCap className="w-4 h-4 text-rose-600 flex-shrink-0 mt-0.5" />
-            <div className="leading-relaxed whitespace-pre-line font-medium text-slate-800 break-words flex-1">
+            <GraduationCap className="w-4 h-4 text-rose-600 flex-shrink-0 mt-1" />
+            <div className="leading-relaxed whitespace-pre-line font-medium text-slate-900 break-words flex-1">
               {candidate.edu}
             </div>
           </div>
           {candidate.fam && (
-            <div className="flex items-start gap-2 pt-1.5 border-t border-slate-200/60 text-slate-600">
-              <Users className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
-              <div className="font-medium text-[11.5px] leading-relaxed break-words flex-1">
+            <div className="flex items-start gap-2 pt-2 border-t border-slate-200/60 text-slate-700">
+              <Users className="w-4 h-4 text-slate-500 flex-shrink-0 mt-1" />
+              <div className="font-medium text-xs sm:text-sm leading-relaxed break-words flex-1">
                 {candidate.fam.replace(/\n/g, ' • ')}
               </div>
             </div>
@@ -191,11 +191,11 @@ export const BookletCardComponent: React.FC<BookletCardProps> = ({
         {contacts.length > 0 && (
           <div className="bg-amber-50/70 border border-amber-200/80 rounded-2xl p-3 mb-3 space-y-2.5">
             <div className="flex items-center justify-between pb-1.5 border-b border-amber-200/60">
-              <span className="text-[11px] font-extrabold text-amber-950 flex items-center gap-1.5">
-                <Users className="w-3.5 h-3.5 text-amber-700" />
+              <span className="text-xs sm:text-sm font-extrabold text-amber-950 flex items-center gap-1.5">
+                <Users className="w-4 h-4 text-amber-700" />
                 <span>संपर्क व्यक्ती ({contacts.length})</span>
               </span>
-              <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-full flex items-center gap-1">
+              <span className="text-[11px] sm:text-xs font-bold text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-full flex items-center gap-1">
                 <MessageCircle className="w-3 h-3 text-emerald-600" /> थेट व्हॉट्सॲप / कॉल
               </span>
             </div>
@@ -218,8 +218,8 @@ export const BookletCardComponent: React.FC<BookletCardProps> = ({
                   >
                     {/* Contact Person Name & Address */}
                     <div className="min-w-0">
-                      <div className="flex items-center gap-1.5 text-xs font-bold text-slate-900">
-                        <span className="w-4 h-4 rounded-full bg-amber-100 text-amber-900 text-[10px] font-bold flex items-center justify-center flex-shrink-0">
+                      <div className="flex items-center gap-1.5 text-sm sm:text-base font-bold text-slate-900">
+                        <span className="w-4 h-4 rounded-full bg-amber-100 text-amber-900 text-xs font-bold flex items-center justify-center flex-shrink-0">
                           {idx + 1}
                         </span>
                         <User className="w-3.5 h-3.5 text-amber-700 flex-shrink-0" />
@@ -227,7 +227,7 @@ export const BookletCardComponent: React.FC<BookletCardProps> = ({
                       </div>
 
                       {contact.address && (
-                        <div className="flex items-start gap-1 text-[11px] text-slate-500 mt-0.5 ml-5">
+                        <div className="flex items-start gap-1 text-xs sm:text-sm text-slate-600 mt-0.5 ml-5">
                           <MapPin className="w-3 h-3 text-slate-400 flex-shrink-0 mt-0.5" />
                           <span className="break-words leading-tight">{contact.address}</span>
                         </div>
@@ -240,36 +240,36 @@ export const BookletCardComponent: React.FC<BookletCardProps> = ({
                         <a
                           href={callLink || '#'}
                           onClick={(e) => e.stopPropagation()}
-                          className="font-mono text-xs font-bold text-slate-800 hover:text-blue-600 flex items-center gap-1 tracking-wide truncate"
+                          className="font-mono text-sm sm:text-base font-bold text-slate-900 hover:text-blue-600 flex items-center gap-1 tracking-wide truncate"
                           title="कॉल करा"
                         >
-                          <Phone className="w-3 h-3 text-slate-400 flex-shrink-0" />
+                          <Phone className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
                           <span>{contact.phoneClean}</span>
                         </a>
 
-                        <div className="flex items-center gap-1 flex-shrink-0">
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
                           {waLink && (
                             <a
                               href={waLink}
                               target="_blank"
                               rel="noopener noreferrer"
                               onClick={(e) => e.stopPropagation()}
-                              className="w-7 h-7 rounded-lg bg-emerald-600 hover:bg-emerald-700 active:scale-90 text-white flex items-center justify-center shadow-xs transition-all"
+                              className="w-8 h-8 rounded-lg bg-emerald-600 hover:bg-emerald-700 active:scale-90 text-white flex items-center justify-center shadow-xs transition-all"
                               title="WhatsApp वर मेसेज करा"
                               aria-label="WhatsApp"
                             >
-                              <MessageCircle className="w-3.5 h-3.5" />
+                              <MessageCircle className="w-4 h-4" />
                             </a>
                           )}
                           {callLink && (
                             <a
                               href={callLink}
                               onClick={(e) => e.stopPropagation()}
-                              className="w-7 h-7 rounded-lg bg-blue-600 hover:bg-blue-700 active:scale-90 text-white flex items-center justify-center shadow-xs transition-all"
+                              className="w-8 h-8 rounded-lg bg-blue-600 hover:bg-blue-700 active:scale-90 text-white flex items-center justify-center shadow-xs transition-all"
                               title="थेट कॉल करा"
                               aria-label="Call"
                             >
-                              <Phone className="w-3.5 h-3.5" />
+                              <Phone className="w-4 h-4" />
                             </a>
                           )}
                         </div>
@@ -284,14 +284,14 @@ export const BookletCardComponent: React.FC<BookletCardProps> = ({
 
         {/* Tags & Note Indicator */}
         {(hasNotes || tags.length > 0) && (
-          <div className="flex flex-wrap items-center gap-1 mb-2">
+          <div className="flex flex-wrap items-center gap-1.5 mb-2">
             {hasNotes && (
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-1">
+              <span className="text-xs font-semibold px-2 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200 flex items-center gap-1">
                 <StickyNote className="w-3 h-3" /> टीप (Note)
               </span>
             )}
             {tags.map((t) => (
-              <span key={t} className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">
+              <span key={t} className="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700">
                 {t}
               </span>
             ))}
@@ -302,18 +302,18 @@ export const BookletCardComponent: React.FC<BookletCardProps> = ({
       <div>
         {/* Rating Bar */}
         <div className="pt-2 border-t border-slate-100 flex items-center justify-between mb-3">
-          <span className="text-[11px] font-semibold text-slate-400">रेटिंग (Rating):</span>
+          <span className="text-xs font-semibold text-slate-500">रेटिंग (Rating):</span>
           <div className="flex items-center gap-0.5">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
                 key={star}
                 type="button"
                 onClick={(e) => handleRatingClick(e, star)}
-                className="p-0.5 text-slate-300 hover:text-amber-400 transition-colors"
+                className="p-1 text-slate-300 hover:text-amber-400 transition-colors"
                 title={`Rate ${star} Stars`}
               >
                 <Star
-                  className={`w-3.5 h-3.5 ${
+                  className={`w-4 h-4 ${
                     rating >= star ? 'text-amber-400 fill-amber-400' : ''
                   }`}
                 />
@@ -334,7 +334,7 @@ export const BookletCardComponent: React.FC<BookletCardProps> = ({
             }`}
           >
             <Star className={`w-3.5 h-3.5 mb-0.5 ${status === 'shortlisted' ? 'fill-white' : ''}`} />
-            <span className="text-[10px]">Shortlist</span>
+            <span className="text-xs font-bold">Shortlist</span>
           </button>
 
           <button
@@ -347,7 +347,7 @@ export const BookletCardComponent: React.FC<BookletCardProps> = ({
             }`}
           >
             <Clock className="w-3.5 h-3.5 mb-0.5" />
-            <span className="text-[10px]">Review</span>
+            <span className="text-xs font-bold">Review</span>
           </button>
 
           <button
@@ -360,7 +360,7 @@ export const BookletCardComponent: React.FC<BookletCardProps> = ({
             }`}
           >
             <Phone className="w-3.5 h-3.5 mb-0.5" />
-            <span className="text-[10px]">Called</span>
+            <span className="text-xs font-bold">Called</span>
           </button>
 
           <button
@@ -373,7 +373,7 @@ export const BookletCardComponent: React.FC<BookletCardProps> = ({
             }`}
           >
             <XCircle className="w-3.5 h-3.5 mb-0.5" />
-            <span className="text-[9px] leading-tight text-center">Not Interested</span>
+            <span className="text-[10px] sm:text-xs font-bold leading-tight text-center break-words">Not Interested</span>
           </button>
         </div>
       </div>

@@ -134,7 +134,7 @@ export const ComparisonPage: React.FC<ComparisonPageProps> = ({
     {
       label: 'Birth Details',
       render: (p) => (
-        <div className="text-xs space-y-0.5">
+        <div className="text-xs sm:text-sm space-y-0.5">
           <p>{p.birthdate || 'N/A'} {p.birthtime ? `at ${p.birthtime}` : ''}</p>
           <p className="text-slate-400">{p.birthplace || 'N/A'}</p>
         </div>
@@ -143,7 +143,7 @@ export const ComparisonPage: React.FC<ComparisonPageProps> = ({
     {
       label: 'Kundali',
       render: (p) => (
-        <div className="text-xs space-y-0.5">
+        <div className="text-xs sm:text-sm space-y-0.5">
           <p><span className="text-slate-400">Rashi / Zodiac:</span> {p.zodiac || 'N/A'}</p>
           <p><span className="text-slate-400">Mangal:</span> {p.mangal || 'N/A'}</p>
         </div>
@@ -152,7 +152,7 @@ export const ComparisonPage: React.FC<ComparisonPageProps> = ({
     {
       label: 'Family Details',
       render: (p) => (
-        <div className="text-xs space-y-0.5">
+        <div className="text-xs sm:text-sm space-y-0.5">
           <p><span className="text-slate-400">Father:</span> {p.fatherOccupation || 'N/A'}</p>
           <p><span className="text-slate-400">Brothers:</span> {p.brothers}</p>
           <p><span className="text-slate-400">Sisters:</span> {p.sisters}</p>
@@ -256,7 +256,7 @@ export const ComparisonPage: React.FC<ComparisonPageProps> = ({
         ) : (
           <div className="bg-white rounded-3xl shadow-sm border border-slate-200/90 overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full text-xs border-collapse">
+              <table className="w-full text-xs sm:text-sm border-collapse">
                 <thead>
                   <tr className="border-b border-slate-200 bg-slate-50/70">
                     <th className="p-3.5 text-left font-bold text-slate-500 uppercase tracking-wider w-36 sm:w-44 sticky left-0 bg-slate-50/95 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.06)]">

@@ -147,8 +147,8 @@ export const FilterSidebarComponent: React.FC<FilterSidebarProps> = ({
         <div className="p-4 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white/95 backdrop-blur-sm z-10">
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4 text-rose-600" />
-            <h2 className="font-bold text-sm text-slate-900">Filter Profiles</h2>
-            <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+            <h2 className="font-bold text-base text-slate-900">Filter Profiles</h2>
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
               {filteredCount} / {totalCount}
             </span>
           </div>
@@ -156,16 +156,16 @@ export const FilterSidebarComponent: React.FC<FilterSidebarProps> = ({
             {hasActiveFilters && (
               <button
                 onClick={handleReset}
-                className="text-xs text-rose-600 hover:text-rose-700 font-medium flex items-center gap-1 px-2 py-1 rounded-md hover:bg-rose-50 transition-colors"
+                className="text-xs sm:text-sm text-rose-600 hover:text-rose-700 font-semibold flex items-center gap-1 px-2 py-1 rounded-md hover:bg-rose-50 transition-colors cursor-pointer"
                 title="Reset all filters"
               >
-                <RotateCcw className="w-3 h-3" />
+                <RotateCcw className="w-3.5 h-3.5" />
                 Reset
               </button>
             )}
             <button
               onClick={onClose}
-              className="lg:hidden p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100"
+              className="lg:hidden p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -177,10 +177,10 @@ export const FilterSidebarComponent: React.FC<FilterSidebarProps> = ({
           <div className="pt-2">
             <button
               onClick={() => toggleSection('sort')}
-              className="w-full flex items-center justify-between font-bold text-xs uppercase tracking-wider text-slate-600 hover:text-slate-900 mb-2"
+              className="w-full flex items-center justify-between font-bold text-xs sm:text-sm uppercase tracking-wider text-slate-600 hover:text-slate-900 mb-2 cursor-pointer"
             >
               <span className="flex items-center gap-1.5">
-                <ArrowDownUp className="w-3.5 h-3.5 text-slate-400" />
+                <ArrowDownUp className="w-4 h-4 text-rose-600" />
                 Sort By
               </span>
               {expandedSections.sort ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
@@ -189,7 +189,7 @@ export const FilterSidebarComponent: React.FC<FilterSidebarProps> = ({
               <select
                 value={filters.sortBy}
                 onChange={(e) => onFilterChange({ ...filters, sortBy: e.target.value as any })}
-                className="w-full text-xs py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 font-medium text-slate-700"
+                className="w-full text-sm py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 font-bold text-slate-800"
               >
                 <option value="age_asc">Age: Youngest First</option>
                 <option value="age_desc">Age: Oldest First</option>
@@ -205,7 +205,7 @@ export const FilterSidebarComponent: React.FC<FilterSidebarProps> = ({
           <div className="pt-4">
             <button
               onClick={() => toggleSection('age')}
-              className="w-full flex items-center justify-between font-bold text-xs uppercase tracking-wider text-slate-600 hover:text-slate-900 mb-2"
+              className="w-full flex items-center justify-between font-bold text-xs sm:text-sm uppercase tracking-wider text-slate-600 hover:text-slate-900 mb-2 cursor-pointer"
             >
               <span>Age Range: {filters.minAge} – {filters.maxAge} yrs</span>
               {expandedSections.age ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}

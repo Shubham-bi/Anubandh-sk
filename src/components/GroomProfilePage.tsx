@@ -334,7 +334,7 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
         </header>
 
         {/* Tab Switcher: Separate Biodata vs Photo vs About Me */}
-        <div className="no-print grid grid-cols-3 p-1.5 bg-white/90 backdrop-blur-md rounded-2xl border border-[#d8c9bd] shadow-xs text-xs font-bold gap-1.5">
+        <div className="no-print grid grid-cols-3 p-1.5 bg-white/90 backdrop-blur-md rounded-2xl border border-[#d8c9bd] shadow-xs text-xs sm:text-sm font-bold gap-1.5">
           <button
             type="button"
             onClick={() => setActiveTab('biodata')}
@@ -520,7 +520,7 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveTab('photo')}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 hover:bg-white text-rose-800 text-xs font-bold border border-rose-200/80 shadow-xs hover:shadow-md transition-all cursor-pointer active:scale-95"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 hover:bg-white text-rose-800 text-xs sm:text-sm font-bold border border-rose-200/80 shadow-xs hover:shadow-md transition-all cursor-pointer active:scale-95"
               >
                 <Camera className="w-4 h-4 text-rose-600" />
                 <span>📸 वर फोटो पहा</span>
@@ -529,7 +529,7 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveTab('about')}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-900 text-xs font-bold border border-rose-200 shadow-xs hover:shadow-md transition-all cursor-pointer active:scale-95"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-900 text-xs sm:text-sm font-bold border border-rose-200 shadow-xs hover:shadow-md transition-all cursor-pointer active:scale-95"
               >
                 <Sparkles className="w-4 h-4 text-amber-500" />
                 <span>✨ माझ्याविषयी अधिक माहिती वाचा 👉</span>
@@ -737,7 +737,7 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveTab('biodata')}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 hover:bg-white text-rose-800 text-xs font-bold border border-rose-200/80 shadow-xs hover:shadow-md transition-all cursor-pointer active:scale-95"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 hover:bg-white text-rose-800 text-xs sm:text-sm font-bold border border-rose-200/80 shadow-xs hover:shadow-md transition-all cursor-pointer active:scale-95"
               >
                 <FileText className="w-4 h-4 text-rose-600" />
                 <span>👈 संपूर्ण विवाह पत्रिका पहा</span>
@@ -746,7 +746,7 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
               <button
                 type="button"
                 onClick={() => setActiveTab('about')}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-900 text-xs font-bold border border-rose-200 shadow-xs hover:shadow-md transition-all cursor-pointer active:scale-95"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-900 text-xs sm:text-sm font-bold border border-rose-200 shadow-xs hover:shadow-md transition-all cursor-pointer active:scale-95"
               >
                 <Sparkles className="w-4 h-4 text-amber-500" />
                 <span>✨ माझ्याविषयी अधिक माहिती वाचा 👉</span>

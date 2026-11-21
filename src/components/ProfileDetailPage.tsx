@@ -356,41 +356,41 @@ export const ProfileDetailPage: React.FC<ProfileDetailPageProps> = ({
                 </div>
 
                 {/* Key Quick Badges */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mt-4 text-xs">
-                  <div className="p-2.5 rounded-xl bg-slate-100">
-                    <span className="text-[10px] text-slate-400 block font-medium">Age & Height</span>
-                    <span className="font-bold text-slate-800">{profile.age} yrs • {profile.height}</span>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 mt-4 text-xs sm:text-sm">
+                  <div className="p-3 rounded-xl bg-slate-100">
+                    <span className="text-xs sm:text-sm text-slate-500 block font-semibold">Age & Height</span>
+                    <span className="font-bold text-slate-900 text-sm sm:text-base">{profile.age} yrs • {profile.height}</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-slate-100">
-                    <span className="text-[10px] text-slate-400 block font-medium">Annual Income</span>
-                    <span className="font-extrabold text-emerald-700">{profile.income_label}</span>
+                  <div className="p-3 rounded-xl bg-slate-100">
+                    <span className="text-xs sm:text-sm text-slate-500 block font-semibold">Annual Income</span>
+                    <span className="font-black text-emerald-800 text-sm sm:text-base">{profile.income_label}</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-slate-100">
-                    <span className="text-[10px] text-slate-400 block font-medium">Current Location</span>
-                    <span className="font-bold text-slate-800 truncate block">{profile.currentCity}</span>
+                  <div className="p-3 rounded-xl bg-slate-100">
+                    <span className="text-xs sm:text-sm text-slate-500 block font-semibold">Current Location</span>
+                    <span className="font-bold text-slate-900 truncate block text-sm sm:text-base">{profile.currentCity}</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-slate-100">
-                    <span className="text-[10px] text-slate-400 block font-medium">Education</span>
-                    <span className="font-bold text-slate-800 truncate block">{profile.education}</span>
+                  <div className="p-3 rounded-xl bg-slate-100">
+                    <span className="text-xs sm:text-sm text-slate-500 block font-semibold">Education</span>
+                    <span className="font-bold text-slate-900 truncate block text-sm sm:text-base">{profile.education}</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-slate-100">
-                    <span className="text-[10px] text-slate-400 block font-medium">Occupation</span>
-                    <span className="font-bold text-slate-800 truncate block">{profile.occupation}</span>
+                  <div className="p-3 rounded-xl bg-slate-100">
+                    <span className="text-xs sm:text-sm text-slate-500 block font-semibold">Occupation</span>
+                    <span className="font-bold text-slate-900 truncate block text-sm sm:text-base">{profile.occupation}</span>
                   </div>
-                  <div className="p-2.5 rounded-xl bg-slate-100">
-                    <span className="text-[10px] text-slate-400 block font-medium">Native District</span>
-                    <span className="font-bold text-slate-800 truncate block">{profile.nativeDistrict || 'Leva'}</span>
+                  <div className="p-3 rounded-xl bg-slate-100">
+                    <span className="text-xs sm:text-sm text-slate-500 block font-semibold">Native District</span>
+                    <span className="font-bold text-slate-900 truncate block text-sm sm:text-base">{profile.nativeDistrict || 'Leva'}</span>
                   </div>
                 </div>
 
                 {/* Direct Action Buttons: WhatsApp & Call */}
-                <div className="flex flex-wrap items-center gap-2 mt-4">
+                <div className="flex flex-wrap items-center gap-2.5 mt-4">
                   {whatsAppUrl && (
                     <a
                       href={whatsAppUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 min-w-[140px] flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-600/30 transition-colors"
+                      className="flex-1 min-w-[140px] flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs sm:text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-600/30 transition-colors"
                     >
                       <MessageCircle className="w-4 h-4" />
                       <span>WhatsApp Profile</span>
@@ -570,37 +570,37 @@ export const ProfileDetailPage: React.FC<ProfileDetailPageProps> = ({
             {activeTab === 'kundali' && (
               <div className="space-y-6">
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
-                    <span className="text-[11px] text-slate-500 font-medium block">गोत्र (Gotra)</span>
-                    <span className="font-bold text-slate-900 text-sm">{profile.gotra}</span>
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                    <span className="text-xs sm:text-sm text-slate-500 font-semibold block">गोत्र (Gotra)</span>
+                    <span className="font-bold text-slate-900 text-sm sm:text-base">{profile.gotra}</span>
                   </div>
-                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
-                    <span className="text-[11px] text-slate-500 font-medium block">मामकुळ (Mamkul)</span>
-                    <span className="font-bold text-slate-900 text-sm">{profile.mamkul || 'उपलब्ध नाही'}</span>
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                    <span className="text-xs sm:text-sm text-slate-500 font-semibold block">मामकुळ (Mamkul)</span>
+                    <span className="font-bold text-slate-900 text-sm sm:text-base">{profile.mamkul || 'उपलब्ध नाही'}</span>
                   </div>
-                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
-                    <span className="text-[11px] text-slate-500 font-medium block">जन्म तारीख (Birth Date)</span>
-                    <span className="font-bold text-slate-900 text-sm">{profile.birthdate || 'उपलब्ध नाही'}</span>
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                    <span className="text-xs sm:text-sm text-slate-500 font-semibold block">जन्म तारीख (Birth Date)</span>
+                    <span className="font-bold text-slate-900 text-sm sm:text-base">{profile.birthdate || 'उपलब्ध नाही'}</span>
                   </div>
-                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
-                    <span className="text-[11px] text-slate-500 font-medium block">जन्म वेळ (Birth Time)</span>
-                    <span className="font-bold text-slate-900 text-sm">{profile.birthtime || 'उपलब्ध नाही'}</span>
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                    <span className="text-xs sm:text-sm text-slate-500 font-semibold block">जन्म वेळ (Birth Time)</span>
+                    <span className="font-bold text-slate-900 text-sm sm:text-base">{profile.birthtime || 'उपलब्ध नाही'}</span>
                   </div>
-                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
-                    <span className="text-[11px] text-slate-500 font-medium block">जन्म ठिकाण (Birth Place)</span>
-                    <span className="font-bold text-slate-900 text-sm">{profile.birthplace || 'उपलब्ध नाही'}</span>
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                    <span className="text-xs sm:text-sm text-slate-500 font-semibold block">जन्म ठिकाण (Birth Place)</span>
+                    <span className="font-bold text-slate-900 text-sm sm:text-base">{profile.birthplace || 'उपलब्ध नाही'}</span>
                   </div>
-                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
-                    <span className="text-[11px] text-slate-500 font-medium block">जन्मनाव (Birth Name)</span>
-                    <span className="font-bold text-slate-900 text-sm">{profile.birthname || 'नोंद नाही'}</span>
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                    <span className="text-xs sm:text-sm text-slate-500 font-semibold block">जन्मनाव (Birth Name)</span>
+                    <span className="font-bold text-slate-900 text-sm sm:text-base">{profile.birthname || 'नोंद नाही'}</span>
                   </div>
-                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
-                    <span className="text-[11px] text-slate-500 font-medium block">रास (Rashi / Zodiac)</span>
-                    <span className="font-bold text-slate-900 text-sm">{profile.zodiac || 'उपलब्ध नाही'}</span>
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                    <span className="text-xs sm:text-sm text-slate-500 font-semibold block">रास (Rashi / Zodiac)</span>
+                    <span className="font-bold text-slate-900 text-sm sm:text-base">{profile.zodiac || 'उपलब्ध नाही'}</span>
                   </div>
-                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
-                    <span className="text-[11px] text-slate-500 font-medium block">मंगळ (Mangal)</span>
-                    <span className={`font-bold text-sm ${profile.mangal?.toLowerCase().includes('yes') || profile.mangal?.includes('आहे') ? 'text-rose-600' : 'text-slate-900'}`}>
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                    <span className="text-xs sm:text-sm text-slate-500 font-semibold block">मंगळ (Mangal)</span>
+                    <span className={`font-bold text-sm sm:text-base ${profile.mangal?.toLowerCase().includes('yes') || profile.mangal?.includes('आहे') ? 'text-rose-600' : 'text-slate-900'}`}>
                       {profile.mangal || 'उपलब्ध नाही'}
                     </span>
                   </div>
@@ -822,28 +822,28 @@ export const ProfileDetailPage: React.FC<ProfileDetailPageProps> = ({
             {activeTab === 'career' && (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
-                    <span className="text-[11px] text-slate-500 font-medium block">शिक्षण (Education)</span>
-                    <span className="font-bold text-slate-900 text-sm block">{profile.education}</span>
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                    <span className="text-xs sm:text-sm text-slate-500 font-semibold block">शिक्षण (Education)</span>
+                    <span className="font-bold text-slate-900 text-sm sm:text-base block">{profile.education}</span>
                   </div>
-                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
-                    <span className="text-[11px] text-slate-500 font-medium block">व्यवसाय / नोकरी (Occupation)</span>
-                    <span className="font-bold text-slate-900 text-sm block">{profile.occupation}</span>
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                    <span className="text-xs sm:text-sm text-slate-500 font-semibold block">व्यवसाय / नोकरी (Occupation)</span>
+                    <span className="font-bold text-slate-900 text-sm sm:text-base block">{profile.occupation}</span>
                   </div>
-                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
-                    <span className="text-[11px] text-slate-500 font-medium block">वार्षिक उत्पन्न (Annual Income)</span>
-                    <span className="font-black text-emerald-700 text-base">{profile.income_label}</span>
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                    <span className="text-xs sm:text-sm text-slate-500 font-semibold block">वार्षिक उत्पन्न (Annual Income)</span>
+                    <span className="font-black text-emerald-800 text-base sm:text-lg">{profile.income_label}</span>
                   </div>
-                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
-                    <span className="text-[11px] text-slate-500 font-medium block">सध्याचे शहर (Current City)</span>
-                    <span className="font-bold text-slate-900 text-sm">{profile.currentCity}</span>
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                    <span className="text-xs sm:text-sm text-slate-500 font-semibold block">सध्याचे शहर (Current City)</span>
+                    <span className="font-bold text-slate-900 text-sm sm:text-base">{profile.currentCity}</span>
                   </div>
                 </div>
 
                 {profile.about && (
-                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
-                    <span className="text-xs font-bold text-slate-700 block mb-1">स्वतःबद्दल माहिती (About)</span>
-                    <p className="text-slate-800 leading-relaxed font-medium">{profile.about}</p>
+                  <div className="p-4 sm:p-5 rounded-2xl bg-slate-50 border border-slate-200">
+                    <span className="text-xs sm:text-sm font-bold text-slate-700 block mb-1">स्वतःबद्दल माहिती (About)</span>
+                    <p className="text-slate-800 leading-relaxed font-medium text-sm sm:text-base">{profile.about}</p>
                   </div>
                 )}
               </div>
@@ -853,33 +853,33 @@ export const ProfileDetailPage: React.FC<ProfileDetailPageProps> = ({
             {activeTab === 'personal' && (
               <div className="space-y-6">
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
-                    <span className="text-[11px] text-slate-500 font-medium block">वर्ण (Complexion)</span>
-                    <span className="font-bold text-slate-900 text-sm">{profile.complexion || 'उपलब्ध नाही'}</span>
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                    <span className="text-xs sm:text-sm text-slate-500 font-semibold block">वर्ण (Complexion)</span>
+                    <span className="font-bold text-slate-900 text-sm sm:text-base">{profile.complexion || 'उपलब्ध नाही'}</span>
                   </div>
-                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
-                    <span className="text-[11px] text-slate-500 font-medium block">रक्तगट (Blood Group)</span>
-                    <span className="font-bold text-slate-900 text-sm">{profile.bloodGroup || 'उपलब्ध नाही'}</span>
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                    <span className="text-xs sm:text-sm text-slate-500 font-semibold block">रक्तगट (Blood Group)</span>
+                    <span className="font-bold text-slate-900 text-sm sm:text-base">{profile.bloodGroup || 'उपलब्ध नाही'}</span>
                   </div>
-                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
-                    <span className="text-[11px] text-slate-500 font-medium block">वैवाहिक स्थिती (Marital Status)</span>
-                    <span className="font-bold text-slate-900 text-sm">{profile.maritalStatus || 'अविवाहित'}</span>
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                    <span className="text-xs sm:text-sm text-slate-500 font-semibold block">वैवाहिक स्थिती (Marital Status)</span>
+                    <span className="font-bold text-slate-900 text-sm sm:text-base">{profile.maritalStatus || 'अविवाहित'}</span>
                   </div>
-                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
-                    <span className="text-[11px] text-slate-500 font-medium block">वय व लिंग</span>
-                    <span className="font-bold text-slate-900 text-sm">
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                    <span className="text-xs sm:text-sm text-slate-500 font-semibold block">वय व लिंग</span>
+                    <span className="font-bold text-slate-900 text-sm sm:text-base">
                       {profile.age} वर्षे {profile.gender ? `• ${profile.gender === 'F' ? 'स्त्री' : profile.gender === 'M' ? 'पुरुष' : profile.gender}` : ''}
                     </span>
                   </div>
-                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
-                    <span className="text-[11px] text-slate-500 font-medium block">उंची व वजन</span>
-                    <span className="font-bold text-slate-900 text-sm">
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                    <span className="text-xs sm:text-sm text-slate-500 font-semibold block">उंची व वजन</span>
+                    <span className="font-bold text-slate-900 text-sm sm:text-base">
                       {profile.height} {profile.weight ? `• ${profile.weight} kg` : ''}
                     </span>
                   </div>
-                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
-                    <span className="text-[11px] text-slate-500 font-medium block">समूह विवाह संमती</span>
-                    <span className="font-bold text-slate-900 text-sm">
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200">
+                    <span className="text-xs sm:text-sm text-slate-500 font-semibold block">समूह विवाह संमती</span>
+                    <span className="font-bold text-slate-900 text-sm sm:text-base">
                       {profile.groupMarriageAgree === '1' || profile.groupMarriageAgree === 'होय' ? 'होय (संमती आहे)' : 'नाही'}
                     </span>
                   </div>

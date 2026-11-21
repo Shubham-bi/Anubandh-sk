@@ -139,8 +139,8 @@ export const BookletFilterSidebarComponent: React.FC<BookletFilterSidebarProps> 
         <div className="p-4 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white/95 backdrop-blur-sm z-10">
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4 text-rose-600" />
-            <h2 className="font-bold text-sm text-slate-900">फिल्टर्स (Filters)</h2>
-            <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+            <h2 className="font-bold text-base text-slate-900">फिल्टर्स (Filters)</h2>
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
               {filteredCount} / {totalCount}
             </span>
           </div>
@@ -148,14 +148,14 @@ export const BookletFilterSidebarComponent: React.FC<BookletFilterSidebarProps> 
             {hasActiveFilters && (
               <button
                 onClick={handleReset}
-                className="text-xs text-rose-600 hover:text-rose-700 font-medium flex items-center gap-1 px-2 py-1 rounded-md hover:bg-rose-50"
+                className="text-xs sm:text-sm text-rose-600 hover:text-rose-700 font-semibold flex items-center gap-1 px-2 py-1 rounded-md hover:bg-rose-50 cursor-pointer"
               >
-                <RotateCcw className="w-3 h-3" /> रीसेट
+                <RotateCcw className="w-3.5 h-3.5" /> रीसेट
               </button>
             )}
             <button
               onClick={onClose}
-              className="lg:hidden p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100"
+              className="lg:hidden p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -167,19 +167,19 @@ export const BookletFilterSidebarComponent: React.FC<BookletFilterSidebarProps> 
           <div className="pt-2">
             <button
               onClick={() => toggleSection('sort')}
-              className="w-full flex items-center justify-between font-bold text-xs uppercase tracking-wider text-slate-600 hover:text-slate-900 mb-2"
+              className="w-full flex items-center justify-between font-bold text-xs sm:text-sm uppercase tracking-wider text-slate-600 hover:text-slate-900 mb-2 cursor-pointer"
             >
               <span className="flex items-center gap-1.5">
-                <ArrowDownUp className="w-3.5 h-3.5 text-rose-600" />
+                <ArrowDownUp className="w-4 h-4 text-rose-600" />
                 <span>क्रमवारी (Sort By)</span>
               </span>
-              {expandedSections.sort ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              {expandedSections.sort ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             </button>
             {expandedSections.sort && (
               <select
                 value={filters.sortBy}
                 onChange={(e) => onFilterChange({ ...filters, sortBy: e.target.value as any })}
-                className="w-full text-xs py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 font-bold text-slate-800"
+                className="w-full text-sm py-2 px-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-rose-500 font-bold text-slate-800"
               >
                 <option value="sr_asc">📖 अ.क्र. ० ते १८१ (पुस्तिका चढता क्रम / Ascending)</option>
                 <option value="sr_desc">📖 अ.क्र. १८१ ते ० (पुस्तिका उतरता क्रम / Descending)</option>
@@ -194,27 +194,27 @@ export const BookletFilterSidebarComponent: React.FC<BookletFilterSidebarProps> 
           <div className="pt-4">
             <button
               onClick={() => toggleSection('age')}
-              className="w-full flex items-center justify-between font-bold text-xs uppercase tracking-wider text-slate-600 hover:text-slate-900 mb-2"
+              className="w-full flex items-center justify-between font-bold text-xs sm:text-sm uppercase tracking-wider text-slate-600 hover:text-slate-900 mb-2 cursor-pointer"
             >
               <span>वय: {filters.minAge} – {filters.maxAge} वर्षे</span>
-              {expandedSections.age ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              {expandedSections.age ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             </button>
             {expandedSections.age && (
               <div className="flex items-center gap-3 px-1">
                 <div className="flex-1">
-                  <label className="text-[11px] text-slate-400 block mb-1">किमान वय</label>
+                  <label className="text-xs text-slate-500 font-medium block mb-1">किमान वय</label>
                   <input
                     type="number"
                     min={18}
                     max={filters.maxAge}
                     value={filters.minAge}
                     onChange={(e) => onFilterChange({ ...filters, minAge: Number(e.target.value) })}
-                    className="w-full py-1.5 px-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold"
+                    className="w-full py-1.5 px-2 bg-slate-50 border border-slate-200 rounded-lg text-sm font-semibold"
                   />
                 </div>
                 <span className="text-slate-300 pt-5">–</span>
                 <div className="flex-1">
-                  <label className="text-[11px] text-slate-400 block mb-1">कमाल वय</label>
+                  <label className="text-xs text-slate-500 font-medium block mb-1">कमाल वय</label>
                   <input
                     type="number"
                     min={filters.minAge}
