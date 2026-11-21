@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { GroomAboutPage } from './GroomAboutPage';
 import {
   Phone,
   Share2,
@@ -11,7 +12,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Star,
-  Plus
+  Plus,
+  Sparkles
 } from 'lucide-react';
 import { getBiodataUrl, buildGenericShareMessage } from '../utils/messages';
 import { SHUBHAM_BIODATA, GANESH_IMG_DATA } from '../constants/shubhamBiodataData';
@@ -44,7 +46,7 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
   onAdminLoginRequest
 }) => {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'biodata' | 'photo'>('biodata');
+  const [activeTab, setActiveTab] = useState<'biodata' | 'photo' | 'about'>('biodata');
   const [groomPhotos, setGroomPhotos] = useState<string[]>([]);
   const [activePhotoIndex, setActivePhotoIndex] = useState(0);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
@@ -264,7 +266,7 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
                   <span className="hidden sm:inline">बायोडाटा डाऊनलोड</span>
                 </button>
               </>
-            ) : (
+            ) : activeTab === 'photo' ? (
               <>
                 {activePhoto && (
                   <>
@@ -309,29 +311,47 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
                   <span className="hidden sm:inline">{groomPhotos.length > 0 ? 'फोटो जोडा / व्यवस्थापन' : 'फोटो जोडा'}</span>
                 </button>
               </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const text = `*चि. शुभम अनिल खर्चे - माझ्याविषयी अधिक माहिती (About Me)*\n\n` +
+                      `नमस्कार, चि. शुभम खर्चे (Senior QA Engineer, Pune) यांच्याविषयी सविस्तर माहिती, स्वभाव, शिक्षण, करिअर, कौटुंबिक पार्श्वभूमी व भविष्यातील विचार जाणून घेण्यासाठी खालील लिंक पहा:\n\n` +
+                      `🔗 ${window.location.origin}/profile\n\n` +
+                      `धन्यवाद! 🙏`;
+                    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+                  }}
+                  className="px-3 h-9 sm:h-10 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1.5 shadow-sm transition-all active:scale-90 cursor-pointer text-xs font-bold"
+                  title="माझ्याविषयी माहिती शेअर करा"
+                >
+                  <Share2 className="w-4 h-4" />
+                  <span>शेअर करा</span>
+                </button>
+              </>
             )}
           </div>
         </header>
 
-        {/* Tab Switcher: Separate Biodata vs Photo */}
-        <div className="no-print grid grid-cols-2 p-1.5 bg-white/90 backdrop-blur-md rounded-2xl border border-[#d8c9bd] shadow-xs text-xs font-bold gap-1.5">
+        {/* Tab Switcher: Separate Biodata vs Photo vs About Me */}
+        <div className="no-print grid grid-cols-3 p-1.5 bg-white/90 backdrop-blur-md rounded-2xl border border-[#d8c9bd] shadow-xs text-xs font-bold gap-1.5">
           <button
             type="button"
             onClick={() => setActiveTab('biodata')}
-            className={`py-2.5 px-3 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer ${
+            className={`py-2.5 px-1.5 sm:px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer ${
               activeTab === 'biodata'
                 ? 'bg-gradient-to-r from-rose-800 to-rose-700 text-white shadow-md shadow-rose-900/20'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
             }`}
           >
             <FileText className="w-4 h-4 flex-shrink-0" />
-            <span className="truncate">📄 विवाह पत्रिका (Shubham-Kharche.png)</span>
+            <span className="truncate">विवाह पत्रिका</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('photo')}
-            className={`py-2.5 px-3 rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer ${
+            className={`py-2.5 px-1.5 sm:px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer ${
               activeTab === 'photo'
                 ? 'bg-gradient-to-r from-rose-800 to-rose-700 text-white shadow-md shadow-rose-900/20'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
@@ -339,9 +359,22 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
           >
             <Camera className="w-4 h-4 flex-shrink-0" />
             <span className="truncate">
-              🤵 वर फोटो {groomPhotos.length > 0 ? `(${groomPhotos.length})` : ''}
+              वर फोटो {groomPhotos.length > 0 ? `(${groomPhotos.length})` : ''}
             </span>
-            {groomPhotos.length > 0 && <span className="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0" />}
+            {groomPhotos.length > 0 && <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 flex-shrink-0" />}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('about')}
+            className={`py-2.5 px-1.5 sm:px-3 rounded-xl transition-all flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer ${
+              activeTab === 'about'
+                ? 'bg-gradient-to-r from-rose-800 to-rose-700 text-white shadow-md shadow-rose-900/20'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/80'
+            }`}
+          >
+            <Sparkles className="w-4 h-4 flex-shrink-0 text-amber-500" />
+            <span className="truncate">माझ्याविषयी</span>
           </button>
         </div>
 
@@ -482,15 +515,24 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
               </section>
             </main>
 
-            {/* Quick Link to Groom Photo */}
-            <div className="no-print text-center pt-2 pb-4">
+            {/* Quick Links to Groom Photo and About Me */}
+            <div className="no-print flex flex-wrap items-center justify-center gap-2 pt-2 pb-4">
               <button
                 type="button"
                 onClick={() => setActiveTab('photo')}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/95 hover:bg-white text-rose-800 text-xs font-bold border border-rose-200/80 shadow-xs hover:shadow-md transition-all cursor-pointer active:scale-95"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 hover:bg-white text-rose-800 text-xs font-bold border border-rose-200/80 shadow-xs hover:shadow-md transition-all cursor-pointer active:scale-95"
               >
                 <Camera className="w-4 h-4 text-rose-600" />
-                <span>📸 चि. शुभम खर्चे यांचे फोटो पाहण्यासाठी येथे क्लिक करा 👉</span>
+                <span>📸 वर फोटो पहा</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('about')}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-900 text-xs font-bold border border-rose-200 shadow-xs hover:shadow-md transition-all cursor-pointer active:scale-95"
+              >
+                <Sparkles className="w-4 h-4 text-amber-500" />
+                <span>✨ माझ्याविषयी अधिक माहिती वाचा 👉</span>
               </button>
             </div>
           </div>
@@ -690,17 +732,37 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
               )}
             </div>
 
-            {/* Switch back to Patrika */}
-            <div className="text-center pt-2 pb-4">
+            {/* Switch back to Patrika or About Me */}
+            <div className="flex flex-wrap items-center justify-center gap-2 pt-2 pb-4">
               <button
                 type="button"
                 onClick={() => setActiveTab('biodata')}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/95 hover:bg-white text-rose-800 text-xs font-bold border border-rose-200/80 shadow-xs hover:shadow-md transition-all cursor-pointer active:scale-95"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/95 hover:bg-white text-rose-800 text-xs font-bold border border-rose-200/80 shadow-xs hover:shadow-md transition-all cursor-pointer active:scale-95"
               >
                 <FileText className="w-4 h-4 text-rose-600" />
-                <span>👈 संपूर्ण विवाह परिचय पत्रिका (बायोडाटा) पहा</span>
+                <span>👈 संपूर्ण विवाह पत्रिका पहा</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveTab('about')}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-900 text-xs font-bold border border-rose-200 shadow-xs hover:shadow-md transition-all cursor-pointer active:scale-95"
+              >
+                <Sparkles className="w-4 h-4 text-amber-500" />
+                <span>✨ माझ्याविषयी अधिक माहिती वाचा 👉</span>
               </button>
             </div>
+          </div>
+        )}
+
+        {/* Tab 3 Content: माझ्याविषयी अधिक माहिती (About Me) */}
+        {activeTab === 'about' && (
+          <div className="space-y-4 animate-fade-in">
+            <GroomAboutPage
+              isTabMode={true}
+              onBackToPortal={onBackToPortal}
+              onOpenGroomProfile={() => setActiveTab('biodata')}
+            />
           </div>
         )}
       </div>

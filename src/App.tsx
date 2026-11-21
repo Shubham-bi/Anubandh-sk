@@ -40,6 +40,7 @@ import { KanbanBoard } from './components/KanbanBoard';
 import { AnalyticsDashboard } from './components/AnalyticsDashboard';
 import { FamilySharePage } from './components/FamilySharePage';
 import { GroomProfilePage } from './components/GroomProfilePage';
+import { GroomAboutPage } from './components/GroomAboutPage';
 import { InstallPwaModal } from './components/InstallPwaModal';
 import { InstallFloatingBanner } from './components/InstallFloatingBanner';
 import { Toast, ToastMessage } from './components/Toast';
@@ -56,6 +57,7 @@ export type PageView =
   | { type: 'kanban' }
   | { type: 'analytics' }
   | { type: 'groom_profile' }
+  | { type: 'groom_about' }
   | { type: 'profile_detail'; profile: Profile }
   | { type: 'booklet_detail'; candidate: BookletCandidate }
   | { type: 'comparison' }
@@ -84,6 +86,9 @@ export const App: React.FC = () => {
     if (typeof window !== 'undefined') {
       const path = window.location.pathname.toLowerCase();
       const hash = window.location.hash.toLowerCase();
+      if (path.includes('/about') || hash.includes('about')) {
+        return { type: 'groom_about' };
+      }
       if (path.includes('/profile') || hash.includes('profile')) {
         return { type: 'groom_profile' };
       }
@@ -107,12 +112,16 @@ export const App: React.FC = () => {
     });
 
     if (typeof window !== 'undefined') {
-      if (view.type === 'groom_profile') {
+      if (view.type === 'groom_about') {
+        if (!window.location.pathname.includes('/about')) {
+          window.history.pushState({ page: 'groom_about' }, '', '/about');
+        }
+      } else if (view.type === 'groom_profile') {
         if (!window.location.pathname.includes('/profile')) {
           window.history.pushState({ page: 'groom_profile' }, '', '/profile');
         }
       } else {
-        if (window.location.pathname.includes('/profile')) {
+        if (window.location.pathname.includes('/profile') || window.location.pathname.includes('/about')) {
           window.history.pushState({ page: view.type }, '', '/');
         } else {
           window.history.pushState({ page: view.type }, '');
@@ -134,12 +143,16 @@ export const App: React.FC = () => {
         setCurrentPageView(prev);
       });
       if (typeof window !== 'undefined') {
-        if (prev.type === 'groom_profile') {
+        if (prev.type === 'groom_about') {
+          if (!window.location.pathname.includes('/about')) {
+            window.history.replaceState({ page: 'groom_about' }, '', '/about');
+          }
+        } else if (prev.type === 'groom_profile') {
           if (!window.location.pathname.includes('/profile')) {
             window.history.replaceState({ page: 'groom_profile' }, '', '/profile');
           }
         } else {
-          if (window.location.pathname.includes('/profile')) {
+          if (window.location.pathname.includes('/profile') || window.location.pathname.includes('/about')) {
             window.history.replaceState({ page: prev.type }, '', '/');
           }
         }
@@ -157,6 +170,10 @@ export const App: React.FC = () => {
     const handlePopState = () => {
       const path = window.location.pathname.toLowerCase();
       const hash = window.location.hash.toLowerCase();
+      if (path.includes('/about') || hash.includes('about')) {
+        setCurrentPageView({ type: 'groom_about' });
+        return;
+      }
       if (path.includes('/profile') || hash.includes('profile')) {
         setCurrentPageView({ type: 'groom_profile' });
         return;
@@ -770,6 +787,45 @@ export const App: React.FC = () => {
           isParentAuthenticated={isParentAuth}
           isAdminAuthenticated={isAdminAuth}
           onAdminLoginRequest={(reason) => triggerAdminPrompt(reason || 'ॲडमिन पासवर्ड आवश्यक आहे.', () => {})}
+        />
+        {/* Floating PWA Install Banner */}
+        <InstallFloatingBanner
+          onInstall={handleInstallClick}
+          isStandalone={isStandalone}
+        />
+        {/* PWA Install Guide Bottom Sheet */}
+        <InstallPwaModal
+          isOpen={activeSheet.type === 'install_pwa'}
+          onClose={() => setActiveSheet({ type: 'none' })}
+          onNativeInstall={handleInstallClick}
+          canNativeInstall={Boolean(deferredPrompt || (typeof window !== 'undefined' && (window as any).deferredInstallPrompt))}
+        />
+        {/* Toast */}
+        {toast && <Toast toast={toast} onClose={() => setToast(null)} />}
+      </div>
+    );
+  }
+
+  // Public Groom About Me Page (Accessible WITHOUT PIN, isolated from portal)
+  if (currentPageView.type === 'groom_about') {
+    return (
+      <div className="min-h-screen bg-[#fcf9f6] selection:bg-rose-500 selection:text-white">
+        <GroomAboutPage
+          onBackToPortal={
+            isParentAuth
+              ? () => {
+                  if (navHistory.length > 0) {
+                    const prev = navHistory[navHistory.length - 1];
+                    if (prev.type === 'booklet' || prev.type === 'booklet_detail') {
+                      navigateBack();
+                      return;
+                    }
+                  }
+                  handleSectionChange('booklet');
+                }
+              : undefined
+          }
+          onOpenGroomProfile={() => navigateTo({ type: 'groom_profile' })}
         />
         {/* Floating PWA Install Banner */}
         <InstallFloatingBanner
