@@ -70,12 +70,21 @@ export async function initDatabase(): Promise<{ profilesCount: number; bookletCo
         console.warn('Cleanup error ignored:', e);
       }
 
+      const DATASET_VERSION_KEY = 'lsm_profiles_dataset_v2';
+      const isUpToDate = typeof window !== 'undefined' && localStorage.getItem(DATASET_VERSION_KEY) === 'true';
       let pCount = await db.profiles.count();
-      if (pCount === 0) {
-        console.log('Seeding Dexie IndexedDB with portal profiles...');
+      if (pCount === 0 || !isUpToDate) {
+        console.log('Seeding / refreshing Dexie IndexedDB with enriched portal profiles...');
         const profiles = cleanProfilesData as Profile[];
-        await db.profiles.bulkAdd(profiles);
+        await db.profiles.bulkPut(profiles);
         pCount = profiles.length;
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.setItem(DATASET_VERSION_KEY, 'true');
+          } catch {
+            // Ignore storage quota errors
+          }
+        }
       }
 
       let bCount = await db.booklet_candidates.count();

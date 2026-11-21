@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   ArrowLeft,
   Star,
@@ -60,7 +60,7 @@ export const ProfileDetailPage: React.FC<ProfileDetailPageProps> = ({
   const [newTagInput, setNewTagInput] = useState('');
   const [localNotes, setLocalNotes] = useState('');
 
-  const photos = profile?.photos || [];
+  const photos = useMemo(() => profile?.photos || [], [profile?.photos]);
   const currentPhoto = photos.length > 0 ? photos[currentPhotoIdx] : null;
 
   useEffect(() => {
@@ -145,6 +145,7 @@ export const ProfileDetailPage: React.FC<ProfileDetailPageProps> = ({
     : null;
   const phoneUrl = profile.mobile1 ? getTelLink(profile.mobile1) : null;
   const fatherPhoneUrl = profile.fatherMobile ? getTelLink(profile.fatherMobile) : null;
+  const motherPhoneUrl = profile.motherMobile1 ? getTelLink(profile.motherMobile1) : null;
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col animate-in fade-in duration-200">
@@ -315,10 +316,29 @@ export const ProfileDetailPage: React.FC<ProfileDetailPageProps> = ({
               <div>
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h2 className="text-2xl font-black text-slate-900 tracking-tight">{profile.name}</h2>
-                    <p className="text-sm font-semibold text-rose-600 mt-0.5">
-                      {profile.gotra} {profile.mamkul ? `(Mamkul: ${profile.mamkul})` : ''}
-                    </p>
+                    <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+                      {profile.name}
+                      {profile.birthname && profile.birthname.toLowerCase() !== profile.firstname.toLowerCase() && (
+                        <span className="text-sm font-semibold text-slate-500 ml-2">
+                          (जन्मनाव: {profile.birthname})
+                        </span>
+                      )}
+                    </h2>
+                    <div className="flex flex-wrap items-center gap-2 mt-1">
+                      <span className="text-sm font-semibold text-rose-600">
+                        {profile.gotra} {profile.mamkul ? `(मामकुळ: ${profile.mamkul})` : ''}
+                      </span>
+                      {profile.gender && (
+                        <span className="text-xs px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 border border-purple-200 font-bold">
+                          {profile.gender === 'F' ? 'स्त्री (F)' : profile.gender === 'M' ? 'पुरुष (M)' : profile.gender}
+                        </span>
+                      )}
+                      {profile.profileCreatedBy && (
+                        <span className="text-xs px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200 font-medium">
+                          नोंदणी: {profile.profileCreatedBy}
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   {/* Rating Stars */}
@@ -392,6 +412,15 @@ export const ProfileDetailPage: React.FC<ProfileDetailPageProps> = ({
                     >
                       <Phone className="w-4 h-4" />
                       <span>Call Father ({profile.fatherMobile})</span>
+                    </a>
+                  )}
+                  {!fatherPhoneUrl && motherPhoneUrl && (
+                    <a
+                      href={motherPhoneUrl}
+                      className="flex-1 min-w-[140px] flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-bold bg-purple-700 hover:bg-purple-800 text-white shadow-sm transition-colors"
+                    >
+                      <Phone className="w-4 h-4" />
+                      <span>Call Mother ({profile.motherMobile1})</span>
                     </a>
                   )}
                 </div>
@@ -540,32 +569,36 @@ export const ProfileDetailPage: React.FC<ProfileDetailPageProps> = ({
             {/* Kundali & Gotra Tab */}
             {activeTab === 'kundali' && (
               <div className="space-y-6">
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
                     <span className="text-[11px] text-slate-500 font-medium block">गोत्र (Gotra)</span>
                     <span className="font-bold text-slate-900 text-sm">{profile.gotra}</span>
                   </div>
-                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
                     <span className="text-[11px] text-slate-500 font-medium block">मामकुळ (Mamkul)</span>
                     <span className="font-bold text-slate-900 text-sm">{profile.mamkul || 'उपलब्ध नाही'}</span>
                   </div>
-                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
                     <span className="text-[11px] text-slate-500 font-medium block">जन्म तारीख (Birth Date)</span>
                     <span className="font-bold text-slate-900 text-sm">{profile.birthdate || 'उपलब्ध नाही'}</span>
                   </div>
-                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
                     <span className="text-[11px] text-slate-500 font-medium block">जन्म वेळ (Birth Time)</span>
                     <span className="font-bold text-slate-900 text-sm">{profile.birthtime || 'उपलब्ध नाही'}</span>
                   </div>
-                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
                     <span className="text-[11px] text-slate-500 font-medium block">जन्म ठिकाण (Birth Place)</span>
                     <span className="font-bold text-slate-900 text-sm">{profile.birthplace || 'उपलब्ध नाही'}</span>
                   </div>
-                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
+                    <span className="text-[11px] text-slate-500 font-medium block">जन्मनाव (Birth Name)</span>
+                    <span className="font-bold text-slate-900 text-sm">{profile.birthname || 'नोंद नाही'}</span>
+                  </div>
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
                     <span className="text-[11px] text-slate-500 font-medium block">रास (Rashi / Zodiac)</span>
                     <span className="font-bold text-slate-900 text-sm">{profile.zodiac || 'उपलब्ध नाही'}</span>
                   </div>
-                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
+                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/80">
                     <span className="text-[11px] text-slate-500 font-medium block">मंगळ (Mangal)</span>
                     <span className={`font-bold text-sm ${profile.mangal?.toLowerCase().includes('yes') || profile.mangal?.includes('आहे') ? 'text-rose-600' : 'text-slate-900'}`}>
                       {profile.mangal || 'उपलब्ध नाही'}
@@ -579,16 +612,108 @@ export const ProfileDetailPage: React.FC<ProfileDetailPageProps> = ({
             {activeTab === 'family' && (
               <div className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
-                    <span className="text-[11px] text-slate-500 font-medium block">वडिलांचे नाव व व्यवसाय</span>
-                    <span className="font-bold text-slate-900 block text-sm">{profile.fatherName || 'उपलब्ध नाही'}</span>
-                    <span className="text-xs text-slate-600">{profile.fatherOccupation}</span>
+                  {/* Father Details */}
+                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
+                    <span className="text-[11px] text-slate-500 font-bold block">वडिलांची माहिती (Father Details)</span>
+                    <div>
+                      <span className="font-bold text-slate-900 block text-sm">{profile.fatherName || 'उपलब्ध नाही'}</span>
+                      {profile.fatherOccupation && (
+                        <p className="text-xs text-slate-600 mt-0.5">
+                          {profile.fatherOccupation}
+                          {profile.fatherJobPosition ? ` • ${profile.fatherJobPosition}` : ''}
+                        </p>
+                      )}
+                      {profile.fatherJobAddress && (
+                        <p className="text-xs text-slate-500 mt-0.5">कार्यालय: {profile.fatherJobAddress}</p>
+                      )}
+                    </div>
+
+                    {profile.fatherAddress && (
+                      <div className="pt-1.5 border-t border-slate-200/60 text-xs text-slate-600">
+                        <span className="text-slate-400 block text-[10px] uppercase font-bold">पत्ता:</span>
+                        <span>{profile.fatherAddress}</span>
+                      </div>
+                    )}
+
+                    {(profile.fatherMobile || profile.fatherMobile2 || profile.fatherEmail) && (
+                      <div className="pt-2 border-t border-slate-200/60 flex flex-wrap items-center gap-2">
+                        {profile.fatherMobile && (
+                          <a
+                            href={getTelLink(profile.fatherMobile)}
+                            className="py-1 px-2.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold flex items-center gap-1 border border-blue-200"
+                          >
+                            <Phone className="w-3.5 h-3.5" />
+                            <span>{profile.fatherMobile}</span>
+                          </a>
+                        )}
+                        {profile.fatherMobile && (
+                          <a
+                            href={getWhatsAppLink(profile.fatherMobile, profile.name, profile.fatherName, profile.nu_id)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="py-1 px-2.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold flex items-center gap-1 border border-emerald-200"
+                          >
+                            <MessageCircle className="w-3.5 h-3.5" />
+                            <span>व्हॉट्सॲप</span>
+                          </a>
+                        )}
+                        {profile.fatherMobile2 && (
+                          <a
+                            href={getTelLink(profile.fatherMobile2)}
+                            className="py-1 px-2.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold flex items-center gap-1"
+                          >
+                            <Phone className="w-3.5 h-3.5" />
+                            <span>{profile.fatherMobile2}</span>
+                          </a>
+                        )}
+                      </div>
+                    )}
                   </div>
-                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
-                    <span className="text-[11px] text-slate-500 font-medium block">आईचे नाव व व्यवसाय</span>
-                    <span className="font-bold text-slate-900 block text-sm">{profile.motherName || 'उपलब्ध नाही'}</span>
-                    <span className="text-xs text-slate-600">{profile.motherOccupation}</span>
+
+                  {/* Mother Details */}
+                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2">
+                    <span className="text-[11px] text-slate-500 font-bold block">आईची माहिती (Mother Details)</span>
+                    <div>
+                      <span className="font-bold text-slate-900 block text-sm">{profile.motherName || 'उपलब्ध नाही'}</span>
+                      {profile.motherOccupation && (
+                        <p className="text-xs text-slate-600 mt-0.5">{profile.motherOccupation}</p>
+                      )}
+                    </div>
+
+                    {profile.motherAddress && (
+                      <div className="pt-1.5 border-t border-slate-200/60 text-xs text-slate-600">
+                        <span className="text-slate-400 block text-[10px] uppercase font-bold">पत्ता:</span>
+                        <span>{profile.motherAddress}</span>
+                      </div>
+                    )}
+
+                    {(profile.motherMobile1 || profile.motherMobile2) && (
+                      <div className="pt-2 border-t border-slate-200/60 flex flex-wrap items-center gap-2">
+                        {profile.motherMobile1 && (
+                          <a
+                            href={getTelLink(profile.motherMobile1)}
+                            className="py-1 px-2.5 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold flex items-center gap-1 border border-purple-200"
+                          >
+                            <Phone className="w-3.5 h-3.5" />
+                            <span>{profile.motherMobile1}</span>
+                          </a>
+                        )}
+                        {profile.motherMobile1 && (
+                          <a
+                            href={getWhatsAppLink(profile.motherMobile1, profile.name, profile.fatherName, profile.nu_id)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="py-1 px-2.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold flex items-center gap-1 border border-emerald-200"
+                          >
+                            <MessageCircle className="w-3.5 h-3.5" />
+                            <span>व्हॉट्सॲप</span>
+                          </a>
+                        )}
+                      </div>
+                    )}
                   </div>
+
+                  {/* Siblings & Native Place */}
                   <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
                     <span className="text-[11px] text-slate-500 font-medium block">भाऊ (Brothers)</span>
                     <span className="font-bold text-slate-900 text-sm">{profile.brothers || 'नाही'}</span>
@@ -604,17 +729,90 @@ export const ProfileDetailPage: React.FC<ProfileDetailPageProps> = ({
                   <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
                     <span className="text-[11px] text-slate-500 font-medium block">मूळ तालुका व जिल्हा</span>
                     <span className="font-bold text-slate-900 text-sm">
-                      {profile.nativeTaluka ? `ता. ${profile.nativeTaluka}, ` : ''}जि. {profile.nativeDistrict || 'उपलब्ध नाही'}
+                      {[profile.nativeTaluka ? `ता. ${profile.nativeTaluka}` : '', profile.nativeDistrict ? `जि. ${profile.nativeDistrict}` : '', profile.nativeState].filter(Boolean).join(', ') || 'उपलब्ध नाही'}
                     </span>
                   </div>
                 </div>
 
-                {profile.uncleName && (
-                  <div className="p-3 rounded-2xl bg-amber-50/60 border border-amber-200/80">
-                    <span className="text-[11px] text-amber-800 font-bold block mb-1">मामांची माहिती (Maternal Uncle)</span>
+                {/* Maternal Uncle Info */}
+                {(profile.uncleName || profile.unclePlace) && (
+                  <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/80">
+                    <span className="text-[11px] text-amber-900 font-bold block mb-1">मामांची माहिती (Maternal Uncle)</span>
                     <p className="font-semibold text-slate-800 text-xs">
-                      {profile.uncleName} {profile.unclePlace ? `(${profile.unclePlace})` : ''}
+                      {profile.uncleName || 'मामा'}
+                      {profile.unclePlace ? ` (${[profile.unclePlace, profile.uncleTaluka ? `ता. ${profile.uncleTaluka}` : '', profile.uncleDistrict ? `जि. ${profile.uncleDistrict}` : '', profile.uncleState].filter(Boolean).join(', ')})` : ''}
                     </p>
+                  </div>
+                )}
+
+                {/* Extended Contact Persons (cp1 - cp5) */}
+                {profile.contactPersons && profile.contactPersons.length > 0 && (
+                  <div className="space-y-3 pt-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-black uppercase tracking-wider text-slate-700">
+                        विस्तारित संपर्क व्यक्ती व नातेवाईक ({profile.contactPersons.length})
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {profile.contactPersons.map((cp) => {
+                        const cpWhatsApp = cp.mobile1 ? getWhatsAppLink(cp.mobile1, profile.name, profile.fatherName, profile.nu_id) : null;
+                        const cpTel = cp.mobile1 ? getTelLink(cp.mobile1) : null;
+                        const locationStr = [cp.homeAddress, cp.place, cp.taluka ? `ता. ${cp.taluka}` : '', cp.district ? `जि. ${cp.district}` : '', cp.state].filter(Boolean).join(', ');
+                        const jobStr = [cp.jobName, cp.jobAddress, cp.officeContactNo ? `कार्यालय: ${cp.officeContactNo}` : ''].filter(Boolean).join(' • ');
+
+                        return (
+                          <div key={cp.id} className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col justify-between space-y-3">
+                            <div>
+                              <div className="flex items-start justify-between gap-2">
+                                <h4 className="font-bold text-slate-900 text-sm">{cp.name || 'संपर्क व्यक्ती'}</h4>
+                                {cp.relationName && (
+                                  <span className="text-[11px] px-2 py-0.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 font-bold shrink-0">
+                                    {cp.relationName}
+                                  </span>
+                                )}
+                              </div>
+                              {locationStr && (
+                                <p className="text-xs text-slate-600 mt-1 flex items-start gap-1">
+                                  <span className="text-slate-400 shrink-0 font-medium">पत्ता:</span>
+                                  <span>{locationStr}</span>
+                                </p>
+                              )}
+                              {jobStr && (
+                                <p className="text-xs text-slate-600 mt-1 flex items-start gap-1">
+                                  <span className="text-slate-400 shrink-0 font-medium">व्यवसाय:</span>
+                                  <span>{jobStr}</span>
+                                </p>
+                              )}
+                            </div>
+
+                            {/* Direct Action Buttons */}
+                            <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
+                              {cpTel && (
+                                <a
+                                  href={cpTel}
+                                  className="flex-1 py-1.5 px-2.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors border border-blue-200"
+                                >
+                                  <Phone className="w-3.5 h-3.5" />
+                                  <span>{cp.mobile1}</span>
+                                </a>
+                              )}
+                              {cpWhatsApp && (
+                                <a
+                                  href={cpWhatsApp}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="py-1.5 px-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors border border-emerald-200"
+                                  title="WhatsApp वर मेसेज पाठवा"
+                                >
+                                  <MessageCircle className="w-3.5 h-3.5" />
+                                  <span>व्हॉट्सॲप</span>
+                                </a>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 )}
               </div>
@@ -664,15 +862,74 @@ export const ProfileDetailPage: React.FC<ProfileDetailPageProps> = ({
                     <span className="font-bold text-slate-900 text-sm">{profile.bloodGroup || 'उपलब्ध नाही'}</span>
                   </div>
                   <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
-                    <span className="text-[11px] text-slate-500 font-medium block">वैवाहिक स्थिती</span>
+                    <span className="text-[11px] text-slate-500 font-medium block">वैवाहिक स्थिती (Marital Status)</span>
                     <span className="font-bold text-slate-900 text-sm">{profile.maritalStatus || 'अविवाहित'}</span>
                   </div>
-                  {profile.handicap && (
-                    <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
-                      <span className="text-[11px] text-slate-500 font-medium block">अपंगत्व (Handicap)</span>
-                      <span className="font-bold text-slate-900 text-sm">{profile.handicap}</span>
+                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
+                    <span className="text-[11px] text-slate-500 font-medium block">वय व लिंग</span>
+                    <span className="font-bold text-slate-900 text-sm">
+                      {profile.age} वर्षे {profile.gender ? `• ${profile.gender === 'F' ? 'स्त्री' : profile.gender === 'M' ? 'पुरुष' : profile.gender}` : ''}
+                    </span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
+                    <span className="text-[11px] text-slate-500 font-medium block">उंची व वजन</span>
+                    <span className="font-bold text-slate-900 text-sm">
+                      {profile.height} {profile.weight ? `• ${profile.weight} kg` : ''}
+                    </span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80">
+                    <span className="text-[11px] text-slate-500 font-medium block">समूह विवाह संमती</span>
+                    <span className="font-bold text-slate-900 text-sm">
+                      {profile.groupMarriageAgree === '1' || profile.groupMarriageAgree === 'होय' ? 'होय (संमती आहे)' : 'नाही'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Marital History (if divorced / widowed or if marriageYear/divorceYear/children exist) */}
+                {(profile.maritalStatus?.includes('घटस्फोटित') || profile.maritalStatus?.toLowerCase().includes('divorce') || profile.marriageYear || profile.divorceYear || profile.numberOfChildren) && (
+                  <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200">
+                    <span className="text-xs font-bold text-amber-900 block mb-2">वैवाहिक इतिहास (Marital Details)</span>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                      <div>
+                        <span className="text-[10px] text-amber-700 block font-medium">लग्न वर्ष</span>
+                        <span className="font-bold text-slate-800">{profile.marriageYear || 'नोंद नाही'}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-amber-700 block font-medium">घटस्फोट वर्ष</span>
+                        <span className="font-bold text-slate-800">{profile.divorceYear || 'नोंद नाही'}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-amber-700 block font-medium">अपत्य संख्या</span>
+                        <span className="font-bold text-slate-800">{profile.numberOfChildren || 'नाही'}</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] text-amber-700 block font-medium">मुलांचे वय</span>
+                        <span className="font-bold text-slate-800">{profile.avgChildrenAge || 'उपलब्ध नाही'}</span>
+                      </div>
                     </div>
-                  )}
+                  </div>
+                )}
+
+                {/* Handicap Details */}
+                {profile.handicap && profile.handicap !== 'No' && (
+                  <div className="p-3.5 rounded-2xl bg-rose-50/70 border border-rose-200">
+                    <span className="text-xs font-bold text-rose-900 block mb-1">अपंगत्व माहिती (Handicap Details)</span>
+                    <p className="font-bold text-slate-900 text-xs">
+                      {profile.handicapPercent ? `टक्केवारी: ${profile.handicapPercent}% • ` : ''}
+                      {profile.handicapDetails || profile.handicap}
+                    </p>
+                  </div>
+                )}
+
+                {/* Personal Residential Address */}
+                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80">
+                  <span className="text-[11px] text-slate-500 font-bold block mb-1">सध्याचा राहण्याचा संपूर्ण पत्ता (Personal Residential Address)</span>
+                  <p className="font-bold text-slate-900 text-sm leading-relaxed">
+                    {profile.personalAddress || 'उपलब्ध नाही'}
+                  </p>
+                  <p className="text-xs text-slate-600 mt-1">
+                    {[profile.currentCity, profile.currentTaluka ? `ता. ${profile.currentTaluka}` : '', profile.currentDistrict ? `जि. ${profile.currentDistrict}` : '', profile.currentState].filter(Boolean).join(', ')}
+                  </p>
                 </div>
 
                 {profile.expectations && (
@@ -686,32 +943,78 @@ export const ProfileDetailPage: React.FC<ProfileDetailPageProps> = ({
 
             {/* Documents & Scans Tab */}
             {activeTab === 'documents' && (
-              <div className="space-y-4">
-                {photos.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    {photos.map((p, idx) => (
-                      <div
-                        key={idx}
-                        onClick={() => setLightboxImage(p)}
-                        className="group relative rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 cursor-zoom-in"
-                      >
-                        <img
-                          src={p}
-                          alt={`Document scan ${idx + 1}`}
-                          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
-                          <span className="text-xs font-bold text-white flex items-center gap-1">
-                            <Maximize2 className="w-3.5 h-3.5" /> झूम करा
-                          </span>
+              <div className="space-y-6">
+                {/* Scanned Biodata Sheets */}
+                {profile.biodatas && profile.biodatas.length > 0 && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <FileText className="w-4 h-4 text-emerald-600" />
+                      <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                        मूळ स्कॅन केलेले विवाह बायोडाटा पत्रक ({profile.biodatas.length})
+                      </h4>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                      {profile.biodatas.map((bio, idx) => (
+                        <div
+                          key={idx}
+                          onClick={() => setLightboxImage(bio)}
+                          className="group relative rounded-2xl overflow-hidden border-2 border-emerald-200 bg-emerald-50/40 cursor-zoom-in shadow-sm hover:shadow-md transition-shadow"
+                        >
+                          <img
+                            src={bio}
+                            alt={`Biodata scan ${idx + 1}`}
+                            className="w-full h-60 object-contain group-hover:scale-105 transition-transform duration-300"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-between p-3">
+                            <span className="text-xs font-bold text-white flex items-center gap-1">
+                              <Maximize2 className="w-3.5 h-3.5" /> बायोडाटा {idx + 1} झूम करा
+                            </span>
+                            <span className="text-[10px] bg-emerald-600 text-white font-bold px-2 py-0.5 rounded-md">
+                              बायोडाटा
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                ) : (
+                )}
+
+                {/* Profile Photos */}
+                {photos.length > 0 && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-3">
+                      <FileText className="w-4 h-4 text-rose-600" />
+                      <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                        प्रोफाइल फोटो गॅलरी ({photos.length})
+                      </h4>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                      {photos.map((p, idx) => (
+                        <div
+                          key={idx}
+                          onClick={() => setLightboxImage(p)}
+                          className="group relative rounded-2xl overflow-hidden border border-slate-200 bg-slate-100 cursor-zoom-in shadow-sm hover:shadow-md transition-shadow"
+                        >
+                          <img
+                            src={p}
+                            alt={`Photo ${idx + 1}`}
+                            className="w-full h-52 object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
+                            <span className="text-xs font-bold text-white flex items-center gap-1">
+                              <Maximize2 className="w-3.5 h-3.5" /> फोटो {idx + 1} झूम करा
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {(!profile.biodatas || profile.biodatas.length === 0) && photos.length === 0 && (
                   <div className="text-center py-12 text-slate-400">
                     <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
-                    <p className="text-xs font-medium">कोणतेही स्कॅन केलेले दस्तऐवज उपलब्ध नाहीत.</p>
+                    <p className="text-xs font-medium">कोणतेही स्कॅन केलेले दस्तऐवज किंवा फोटो उपलब्ध नाहीत.</p>
                   </div>
                 )}
               </div>
@@ -913,7 +1216,7 @@ export const ProfileDetailPage: React.FC<ProfileDetailPageProps> = ({
             className="w-full max-w-4xl flex items-center justify-between text-xs text-slate-300 pt-2 border-t border-white/10"
           >
             <span>कन्सोल: कीबोर्डवरील Left/Right बाण किंवा Esc दाबा</span>
-            <span>ID: {profile.nu_id}</span>
+            <span>झूम करण्यासाठी क्लिक किंवा स्क्रोल करा</span>
           </div>
         </div>
       )}

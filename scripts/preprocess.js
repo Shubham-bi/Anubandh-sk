@@ -1,8 +1,14 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const PROFILES_PATH = path.join(__dirname, '..', 'profiles.json');
-const USER_PROFILES_PATH = path.join(__dirname, '..', 'user_profiles.json');
+const USER_PROFILES_PATH = fs.existsSync(path.join(__dirname, '..', 'src', 'data', 'raw_profile.json'))
+  ? path.join(__dirname, '..', 'src', 'data', 'raw_profile.json')
+  : path.join(__dirname, '..', 'user_profiles.json');
 const OUTPUT_DIR = path.join(__dirname, '..', 'src', 'data');
 const OUTPUT_FILE = path.join(OUTPUT_DIR, 'profiles_clean.json');
 const METADATA_FILE = path.join(OUTPUT_DIR, 'filter_metadata.json');
@@ -86,7 +92,12 @@ function formatIncomeLabel(val) {
 function cleanString(val) {
   if (val === null || val === undefined) return '';
   const s = String(val).trim();
-  return (s === 'null' || s === 'undefined' || s === '0' || s === '0000-00-00') ? '' : s;
+  return (s === 'null' || s === 'undefined' || s === '0000-00-00' || s === 'Select Sta') ? '' : s;
+}
+
+function cleanText(val) {
+  const s = cleanString(val);
+  return s === '0' ? '' : s;
 }
 
 function main() {
@@ -190,18 +201,66 @@ function main() {
       }
     }
 
+    // Extended Contact Persons (cp1 to cp5)
+    const contactPersons = [];
+    for (let i = 1; i <= 5; i++) {
+      const cpName = cleanText(detailBg[`cp${i}name`]);
+      const cpMobile1 = cleanText(detailBg[`cp${i}mobile1`]);
+      const cpMobile2 = cleanText(detailBg[`cp${i}mobile2`]);
+      const cpRelation = cleanText(detailBg[`cp${i}relation_name`]);
+      const cpHomeAddress = cleanText(detailBg[`cp${i}HomeAddress`]);
+      const cpPlace = cleanText(detailBg[`e_nu_cp${i}_address_place`]);
+      const cpTaluka = cleanText(detailBg[`e_nu_cp${i}_address_taluka`]);
+      const cpDistrict = cleanText(detailBg[`e_nu_cp${i}_address_district`]);
+      const cpState = cleanText(detailBg[`e_nu_cp${i}_address_state`]);
+      const cpJobName = cleanText(detailBg[`cp${i}jobname`]);
+      const cpJobAddress = cleanText(detailBg[`cp${i}jobaddress`]);
+      const cpOfficeContactNo = cleanText(detailBg[`cp${i}officeContactNo`]);
+
+      if (cpName || cpMobile1) {
+        contactPersons.push({
+          id: i,
+          name: cpName,
+          relationName: cpRelation,
+          mobile1: cpMobile1,
+          mobile2: cpMobile2,
+          homeAddress: cpHomeAddress,
+          place: cpPlace,
+          taluka: cpTaluka,
+          district: cpDistrict,
+          state: cpState,
+          jobName: cpJobName,
+          jobAddress: cpJobAddress,
+          officeContactNo: cpOfficeContactNo
+        });
+      }
+    }
+
     // Family details
     const fatherName = cleanString(detailBg.fatherName);
     const fatherOccupation = cleanString(detailBg.fatherjobDetails);
+    const fatherJobPosition = cleanText(detailBg.fatherjobPosition);
+    const fatherJobAddress = cleanText(detailBg.fatherjobAddress);
+    const fatherAddress = cleanText(detailBg.fatherAddress);
     const fatherMobile = cleanString(detailBg.fathermobile1 || detailBg.fathermobile2);
+    const fatherMobile2 = cleanText(detailBg.fathermobile2);
+    const fatherEmail = cleanText(detailBg.fatheremail);
+
     const motherName = cleanString(detailBg.motherName);
     const motherOccupation = cleanString(detailBg.motherjobDetails);
+    const motherAddress = cleanText(detailBg.motherAddress);
+    const motherMobile1 = cleanText(detailBg.motherMobile1);
+    const motherMobile2 = cleanText(detailBg.motherMobile2);
+    const motherEmail = cleanText(detailBg.motheremail);
 
     const brothers = `Unmarried: ${cleanString(detailBg.unmarriedBrother) || '0'}, Married: ${cleanString(detailBg.marriedBrother) || '0'}`;
     const sisters = `Unmarried: ${cleanString(detailBg.unmarriedSister) || '0'}, Married: ${cleanString(detailBg.marriedSister) || '0'}`;
 
     const uncleName = cleanString(detailBg.uncleName);
     const unclePlace = cleanString(detailBg.unclePlace);
+    const uncleTaluka = cleanText(detailBg.uncleTaluka);
+    const uncleDistrict = cleanText(detailBg.uncleDistrict);
+    const uncleState = cleanText(detailBg.uncleState);
 
     const contactMobile1 = cleanString(detailBg.mobile1 || listSummary.mobile1);
     const contactMobile2 = cleanString(detailBg.mobile2 || listSummary.mobile2);
@@ -218,6 +277,7 @@ function main() {
       birthdate: cleanString(detailBg.birthdate),
       birthtime: cleanString(detailBg.birthTime),
       birthplace: cleanString(detailBg.birthplace),
+      birthname: cleanText(detailBg.birthname),
       height: height.text,
       height_inches: height.inches,
       height_cm: height.cm,
@@ -234,25 +294,54 @@ function main() {
       nativePlace: nativePlace,
       nativeTaluka: nativeTaluka,
       nativeDistrict: nativeDistrict,
+      nativeState: cleanText(detailBg.nativeState),
       currentCity: currentCity,
+      currentTaluka: cleanText(detailBg.currentTaluka),
+      currentDistrict: cleanText(detailBg.currentDistrict),
+      currentState: cleanText(detailBg.currentState),
+      personalAddress: cleanText(detailBg.Personal_Address),
+      gender: cleanText(detailBg.gender),
+      profileCreatedBy: cleanText(detailBg.nu_profile_created_by),
+      weight: cleanText(detailBg.e_nu_weight),
+      groupMarriageAgree: cleanText(detailBg.groupMarrageAgree),
       about: cleanString(detailBg.e_nu_about_user),
       expectations: cleanString(detailBg.e_nu_exception),
       photos: photos,
       biodatas: biodatas,
       fatherName: fatherName,
       fatherOccupation: fatherOccupation,
+      fatherJobPosition: fatherJobPosition,
+      fatherJobAddress: fatherJobAddress,
+      fatherAddress: fatherAddress,
       fatherMobile: fatherMobile,
+      fatherMobile2: fatherMobile2,
+      fatherEmail: fatherEmail,
       motherName: motherName,
       motherOccupation: motherOccupation,
+      motherAddress: motherAddress,
+      motherMobile1: motherMobile1,
+      motherMobile2: motherMobile2,
+      motherEmail: motherEmail,
       brothers: brothers,
       sisters: sisters,
       uncleName: uncleName,
       unclePlace: unclePlace,
+      uncleTaluka: uncleTaluka,
+      uncleDistrict: uncleDistrict,
+      uncleState: uncleState,
       mobile1: contactMobile1,
       mobile2: contactMobile2,
       email: contactEmail,
       maritalStatus: cleanString(detailBg.maratialStatus) || 'Never Married',
-      handicap: cleanString(detailBg.handcap_status) === '1' ? (cleanString(detailBg.handcapDetails) || 'Yes') : 'No'
+      marriageYear: cleanText(detailBg.marrageDateYear),
+      divorceYear: cleanText(detailBg.divorceYear),
+      numberOfChildren: cleanText(detailBg.NumberOfChildren),
+      avgChildrenAge: cleanText(detailBg.avgChildrenAge),
+      handicap: cleanString(detailBg.handcap_status) === '1' ? (cleanString(detailBg.handcapDetails) || 'Yes') : 'No',
+      handicapStatus: cleanText(detailBg.handcap_status),
+      handicapPercent: cleanText(detailBg.handCapPersent),
+      handicapDetails: cleanText(detailBg.handcapDetails),
+      contactPersons: contactPersons
     });
   }
 

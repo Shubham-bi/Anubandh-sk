@@ -17,6 +17,7 @@ dist-ssr
 # Temporary / Scratch files
 *.tmp
 user_profiles.json.tmp
+src/data/raw_profile.json
 scratch/
 
 # Editor / OS
