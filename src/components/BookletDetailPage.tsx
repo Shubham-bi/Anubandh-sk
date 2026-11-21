@@ -288,7 +288,7 @@ export const BookletDetailPage: React.FC<BookletDetailPageProps> = ({
                     const message = buildCandidateProposalMessage(proposalParams);
                     navigator.clipboard.writeText(message);
                     setCopiedContactIdx(idx);
-                    setTimeout(() => setCopiedContactIdx(null), 2500);
+                    setTimeout(() => setCopiedContactIdx(null), 1800);
                   };
 
                   return (

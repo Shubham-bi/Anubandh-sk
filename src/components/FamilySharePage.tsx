@@ -244,7 +244,7 @@ export const FamilySharePage: React.FC<FamilySharePageProps> = ({
     navigator.clipboard.writeText(text);
     setCopiedIndex(index);
     onShowToast(`${item.name} ची माहिती क्लिपबोर्डवर कॉपी झाली!`);
-    setTimeout(() => setCopiedIndex(null), 3000);
+    setTimeout(() => setCopiedIndex(null), 1800);
   };
 
   // Direct WhatsApp Share

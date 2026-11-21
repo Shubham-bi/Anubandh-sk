@@ -83,7 +83,7 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
     setToastMessage(msg);
     setTimeout(() => {
       setToastMessage(null);
-    }, 3200);
+    }, 1800);
   };
 
   const handleCopyLink = async () => {
@@ -219,7 +219,7 @@ export const GroomProfilePageComponent: React.FC<GroomProfilePageProps> = ({
     <div className="min-h-screen bg-[#eeeae5] py-4 sm:py-8 px-2 sm:px-4 font-sans text-[#343434] pb-10 print:pb-0 print:bg-white print:p-0">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-[100000] bg-[#1e293b] text-white px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold shadow-2xl transition-all duration-300 animate-fade-in text-center max-w-[90%]">
+        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-[100000] bg-[#1e293b] text-white px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold shadow-2xl transition-all duration-200 animate-fade-in text-center max-w-[90%] pointer-events-none">
           {toastMessage}
         </div>
       )}

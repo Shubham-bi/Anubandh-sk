@@ -51,7 +51,7 @@ export const GroomAboutPage: React.FC<GroomAboutPageProps> = ({
     setToastMessage(msg);
     setTimeout(() => {
       setToastMessage(null);
-    }, 3200);
+    }, 1800);
   };
 
   const getAboutUrl = () => {
@@ -836,7 +836,7 @@ export const GroomAboutPage: React.FC<GroomAboutPageProps> = ({
     <div className="min-h-screen bg-slate-50 text-slate-800 pb-16">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-5 py-2.5 rounded-xl shadow-lg text-sm sm:text-base font-semibold flex items-center gap-2 border border-slate-700">
+        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 bg-slate-900 text-white px-5 py-2.5 rounded-xl shadow-lg text-sm sm:text-base font-semibold flex items-center gap-2 border border-slate-700 pointer-events-none transition-opacity duration-200">
           <span>{toastMessage}</span>
         </div>
       )}
